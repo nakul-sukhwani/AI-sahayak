@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 
 const BodySchema = z.object({
   assigned_to: z.string().uuid('Invalid worker ID'),
@@ -39,8 +40,13 @@ export async function PATCH(request: NextRequest, { params }: Props): Promise<Ne
 
     const { assigned_to } = parsed.data;
 
+    const adminSupabase = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     // Verify worker exists and is actually a worker
-    const { data: worker } = await supabase
+    const { data: worker } = await adminSupabase
       .from('users_profile')
       .select('role')
       .eq('id', assigned_to)
@@ -51,7 +57,7 @@ export async function PATCH(request: NextRequest, { params }: Props): Promise<Ne
     }
 
     // Update complaint
-    const { error: updateError } = await supabase
+    const { error: updateError, data: updatedComplaint } = await adminSupabase
       .from('complaints')
       .update({
         assigned_to,
@@ -61,10 +67,12 @@ export async function PATCH(request: NextRequest, { params }: Props): Promise<Ne
         status_updated_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .eq('status', 'filed'); // only unassigned
+      .eq('status', 'filed') // only unassigned
+      .select()
+      .single();
 
-    if (updateError) {
-      return NextResponse.json({ error: 'Failed to assign complaint' }, { status: 500 });
+    if (updateError || !updatedComplaint) {
+      return NextResponse.json({ error: 'Failed to assign complaint: ' + (updateError?.message || 'Complaint not found or already assigned') }, { status: 500 });
     }
 
     // Audit log

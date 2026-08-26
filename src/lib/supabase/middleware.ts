@@ -11,7 +11,7 @@ const ROLE_REDIRECTS: Record<UserRole, string> = {
 };
 
 const PROTECTED_PREFIXES: { prefix: string; roles: UserRole[] }[] = [
-  { prefix: '/dashboard', roles: ['citizen'] },
+  { prefix: '/dashboard', roles: ['citizen', 'supervisor', 'officer', 'admin'] },
   { prefix: '/worker', roles: ['worker'] },
   { prefix: '/supervisor', roles: ['supervisor', 'officer', 'admin'] },
   { prefix: '/admin', roles: ['admin'] },

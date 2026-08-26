@@ -84,7 +84,9 @@ export async function generateComplaintPDF(data: PDFComplaintData): Promise<Uint
     page.drawText(label + ':', {
       x: indent, y, size: 8, font: helveticaBold, color: gray,
     });
-    page.drawText(value || '—', {
+    // Sanitize value to prevent WinAnsi encode error on unsupported characters
+    const sanitizedValue = (value || '—').replace(/[^\x00-\xFF]/g, '');
+    page.drawText(sanitizedValue, {
       x: indent + 120, y, size: 9, font: helvetica, color: navy,
     });
     y -= 16;
@@ -101,8 +103,9 @@ export async function generateComplaintPDF(data: PDFComplaintData): Promise<Uint
 
   y -= 4;
   sectionTitle('Description');
-  // Word-wrap description
-  const words = complaint.description_en.split(' ');
+  // Sanitize description to remove non-latin characters (WinAnsi limitation)
+  const safeDescEn = complaint.description_en.replace(/[^\x00-\xFF]/g, '');
+  const words = safeDescEn.split(' ');
   let line = '';
   for (const word of words) {
     const testLine = line + word + ' ';
@@ -117,9 +120,10 @@ export async function generateComplaintPDF(data: PDFComplaintData): Promise<Uint
   }
   if (line) { page.drawText(line.trim(), { x: 40, y, size: 10, font: helvetica, color: navy }); y -= 14; }
 
-  if (complaint.description_hi) {
+  const safeDescHi = (complaint.description_hi || '').replace(/[^\x00-\xFF]/g, '');
+  if (safeDescHi.trim()) {
     y -= 4;
-    page.drawText('(Hindi) ' + complaint.description_hi, {
+    page.drawText('(Hindi) ' + safeDescHi.trim(), {
       x: 40, y, size: 9, font: helveticaOblique, color: gray,
     });
     y -= 16;
