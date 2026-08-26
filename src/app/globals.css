@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* ── Design tokens — Nagrik Seva / Stitch ─────────────────────────── */
+:root {
+  --color-primary:       #001e40;
+  --color-secondary:     #545f72;
+  --color-background:    #f7f9fb;
+  --color-surface:       #ffffff;
+  --color-border:        #E2E8F0;
+  --color-success:       #059669;
+  --color-warning:       #D97706;
+  --color-error:         #DC2626;
+  --color-ai-accent:     #7C3AED;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
+  background: var(--color-background);
+  color: #191c1e;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Material Symbols config — used across all Stitch screens */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  line-height: 1;
+  display: inline-block;
+}
+
+/* ── Animations ───────────────────────────────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* ── Safe area for mobile bottom nav ─────────────────────────────── */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ── Focus visible — accessibility ───────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar styling ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c3c6d1; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #737780; }
