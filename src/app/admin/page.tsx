@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { ActivityMap } from '@/components/admin/ActivityMap';
+import { AnalyticsCharts } from '@/components/admin/AnalyticsCharts';
+import type { Complaint } from '@/types/complaint';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard — Nagrik Seva',
@@ -10,24 +12,43 @@ export const metadata: Metadata = {
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
 
-  // Fetch recent complaint locations
-  const { data: recentComplaints } = await supabase
+  // Fetch all recent complaints for analytics
+  const { data: allComplaints } = await supabase
     .from('complaints')
-    .select('id, latitude, longitude, issue_type')
-    .not('latitude', 'is', null)
-    .not('longitude', 'is', null)
+    .select('*')
     .order('created_at', { ascending: false })
-    .limit(50);
+    .limit(500); // Limit to 500 for demo performance
 
-  const locations = (recentComplaints ?? []) as { id: string; latitude: number; longitude: number; issue_type: string }[];
+  const complaints = (allComplaints ?? []) as Complaint[];
 
-  // Mock analytics data
+  // Real analytics data aggregation
+  const total = complaints.length;
+  const aiRouted = complaints.filter(c => c.ai_confidence && c.ai_confidence > 0.7).length; // rough proxy for AI routing
+  const resolved = complaints.filter(c => c.status === 'resolved').length;
+  
+  // Calculate average resolution time for resolved complaints
+  let avgDays = 0;
+  if (resolved > 0) {
+    const resolvedComplaints = complaints.filter(c => c.status === 'resolved' && c.updated_at);
+    const totalDays = resolvedComplaints.reduce((acc, c) => {
+      const created = new Date(c.created_at);
+      const updated = new Date(c.updated_at!);
+      return acc + (updated.getTime() - created.getTime()) / (1000 * 3600 * 24);
+    }, 0);
+    avgDays = resolvedComplaints.length > 0 ? totalDays / resolvedComplaints.length : 0;
+  }
+
   const stats = [
-    { label: 'Total Complaints', value: '1,245', change: '+12%', positive: true },
-    { label: 'AI Auto-Routed', value: '1,180', change: '+15%', positive: true },
-    { label: 'Resolved (7d)', value: '856', change: '+5%', positive: true },
-    { label: 'Avg Resolution Time', value: '2.4 days', change: '-10%', positive: true },
+    { label: 'Total Complaints', value: total.toString(), change: 'Live', positive: true },
+    { label: 'AI Auto-Routed', value: aiRouted.toString(), change: 'Live', positive: true },
+    { label: 'Resolved', value: resolved.toString(), change: 'Live', positive: true },
+    { label: 'Avg Resolution Time', value: avgDays > 0 ? `${avgDays.toFixed(1)} days` : 'N/A', change: 'Live', positive: true },
   ];
+
+  const locations = complaints
+    .filter(c => c.latitude && c.longitude)
+    .map(c => ({ id: c.id, latitude: c.latitude!, longitude: c.longitude!, issue_type: c.issue_type }))
+    .slice(0, 50);
 
   return (
     <>
@@ -36,7 +57,7 @@ export default async function AdminDashboardPage() {
         <p className="text-sm text-[#545f72] mt-1">System overview and analytics.</p>
       </div>
 
-      {/* Mock Stats */}
+      {/* Real Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {stats.map((s, i) => (
           <div key={i} className="bg-white border border-[#E2E8F0] p-5 rounded-xl shadow-sm">
@@ -50,6 +71,9 @@ export default async function AdminDashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Interactive Charts */}
+      <AnalyticsCharts complaints={complaints} />
 
       {/* Activity Map */}
       <div className="mb-8 bg-white border border-[#E2E8F0] rounded-xl overflow-hidden shadow-sm">

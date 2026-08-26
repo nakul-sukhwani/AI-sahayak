@@ -13,7 +13,8 @@ const ROLE_REDIRECTS: Record<UserRole, string> = {
 const PROTECTED_PREFIXES: { prefix: string; roles: UserRole[] }[] = [
   { prefix: '/dashboard', roles: ['citizen', 'supervisor', 'officer', 'admin'] },
   { prefix: '/worker', roles: ['worker'] },
-  { prefix: '/supervisor', roles: ['supervisor', 'officer', 'admin'] },
+  { prefix: '/supervisor/verify', roles: ['officer', 'admin'] },
+  { prefix: '/supervisor', roles: ['supervisor', 'admin'] },
   { prefix: '/admin', roles: ['admin'] },
 ];
 
@@ -84,8 +85,14 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
 
     const role: UserRole = (profile?.role as UserRole) ?? 'citizen';
 
-    for (const { prefix, roles } of PROTECTED_PREFIXES) {
-      if (pathname.startsWith(prefix) && !roles.includes(role)) {
+    const matchedPrefixes = PROTECTED_PREFIXES.filter(({ prefix }) =>
+      pathname.startsWith(prefix)
+    );
+
+    if (matchedPrefixes.length > 0) {
+      const matched = matchedPrefixes.sort((a, b) => b.prefix.length - a.prefix.length)[0];
+      
+      if (!matched.roles.includes(role)) {
         const redirectUrl = request.nextUrl.clone();
         redirectUrl.pathname = ROLE_REDIRECTS[role];
         return NextResponse.redirect(redirectUrl);

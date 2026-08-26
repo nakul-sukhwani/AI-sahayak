@@ -21,16 +21,14 @@ const ROLE_TABS: Record<UserRole, NavTab[]> = {
     { href: '/worker', label: 'Tasks', icon: 'construction' },
   ],
   supervisor: [
-    { href: '/supervisor',        label: 'Queue',  icon: 'assignment_ind' },
-    { href: '/supervisor/verify', label: 'Verify', icon: 'verified' },
+    { href: '/supervisor', label: 'Assign', icon: 'assignment_ind' },
   ],
   officer: [
     { href: '/supervisor/verify', label: 'Verify', icon: 'verified' },
-    { href: '/supervisor',        label: 'All',    icon: 'list_alt' },
   ],
   admin: [
     { href: '/admin',             label: 'Admin',  icon: 'admin_panel_settings' },
-    { href: '/supervisor',        label: 'All',    icon: 'list_alt' },
+    { href: '/supervisor',        label: 'Assign', icon: 'assignment_ind' },
     { href: '/supervisor/verify', label: 'Verify', icon: 'verified' },
   ],
 };
