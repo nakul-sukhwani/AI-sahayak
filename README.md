@@ -42,4 +42,4 @@ By leveraging **Gemini AI**, the platform instantly categorizes complaints based
 4. **Database Setup**: Run the SQL migrations found in the documentation to set up tables, RLS policies, and seed data.
 5. **Run the development server**: `npm run dev`
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+Open [https://ai-sahayak.vercel.app](https://ai-sahayak.vercel.app) to view the application.
