@@ -196,8 +196,36 @@ CREATE TABLE complaints (
   user_notes            TEXT
 );
 ```
+## Role-Based Navigation Structure
+
+The application routes and tabs available in both mobile and desktop navigation are determined by the user's role mapping:
+
+```typescript
+const ROLE_TABS: Record<UserRole, NavTab[]> = {
+  citizen: [
+    { href: '/dashboard',     label: 'Home',    icon: 'home' },
+    { href: '/dashboard/new', label: 'Report',  icon: 'add_circle' },
+    { href: '/feed',          label: 'Feed',    icon: 'public' },
+  ],
+  worker: [
+    { href: '/worker', label: 'Tasks', icon: 'construction' },
+  ],
+  supervisor: [
+    { href: '/supervisor', label: 'Assign', icon: 'assignment_ind' },
+  ],
+  officer: [
+    { href: '/supervisor/verify', label: 'Verify', icon: 'verified' },
+  ],
+  admin: [
+    { href: '/admin',             label: 'Admin',  icon: 'admin_panel_settings' },
+    { href: '/supervisor',        label: 'Assign', icon: 'assignment_ind' },
+    { href: '/supervisor/verify', label: 'Verify', icon: 'verified' },
+  ],
+};
+```
 
 ## Development Rules
+
 
 1. **Read Before Writing**: Before creating any file, read all existing files in that directory. Never create a file that conflicts with or duplicates existing code.
 2. **One Task Per Response**: Execute exactly one atomic task per response. Do not chain unrelated changes.
