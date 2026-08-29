@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
+import { SUPPORTED_LOCALES, type SupportedLocale } from '@/lib/translations';
 import type { UserRole } from '@/types/user';
 
 interface NavLink {
@@ -13,30 +15,31 @@ interface NavLink {
 
 const ROLE_LINKS: Record<UserRole, NavLink[]> = {
   citizen: [
-    { href: '/dashboard',     label: 'My Complaints', icon: 'assignment' },
-    { href: '/dashboard/new', label: 'Report Issue',   icon: 'add_circle' },
-    { href: '/feed',          label: 'Public Feed',    icon: 'public' },
+    { href: '/dashboard', label: 'My Complaints', icon: 'assignment' },
+    { href: '/dashboard/new', label: 'Report Issue', icon: 'add_circle' },
+    { href: '/feed', label: 'Public Feed', icon: 'public' },
   ],
   worker: [
-    { href: '/worker', label: 'My Tasks',    icon: 'construction' },
+    { href: '/worker', label: 'My Tasks', icon: 'construction' },
   ],
   supervisor: [
-    { href: '/supervisor',        label: 'Assignment Queue', icon: 'assignment_ind' },
-    { href: '/supervisor/verify', label: 'Verify Proof',     icon: 'verified' },
+    { href: '/supervisor', label: 'Assignment Queue', icon: 'assignment_ind' },
+    { href: '/supervisor/verify', label: 'Verify Proof', icon: 'verified' },
   ],
   officer: [
-    { href: '/supervisor/verify', label: 'Verify Proof',     icon: 'verified' },
-    { href: '/supervisor',        label: 'All Complaints',   icon: 'list_alt' },
+    { href: '/supervisor/verify', label: 'Verify Proof', icon: 'verified' },
+    { href: '/supervisor', label: 'All Complaints', icon: 'list_alt' },
   ],
   admin: [
-    { href: '/admin',             label: 'Admin',            icon: 'admin_panel_settings' },
-    { href: '/supervisor',        label: 'All Complaints',   icon: 'list_alt' },
-    { href: '/supervisor/verify', label: 'Verify Proof',     icon: 'verified' },
+    { href: '/admin', label: 'Admin', icon: 'admin_panel_settings' },
+    { href: '/supervisor', label: 'All Complaints', icon: 'list_alt' },
+    { href: '/supervisor/verify', label: 'Verify Proof', icon: 'verified' },
   ],
 };
 
 export function Navbar() {
   const { profile, role, signOut } = useAuth();
+  const { lang, changeLanguage } = useLanguage();
   const pathname = usePathname();
 
   const links = role ? ROLE_LINKS[role] : [];
@@ -80,12 +83,31 @@ export function Navbar() {
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          {/* Global Language Selector */}
+          <div className="flex items-center bg-[#f7f9fb] border border-[#E2E8F0] rounded-lg px-2 py-1 text-xs text-[#001e40] font-medium hover:border-[#001e40] transition-colors">
+            <span className="material-symbols-outlined text-sm mr-1 text-[#545f72]">translate</span>
+            <select
+              id="nav-lang-select"
+              aria-label="Select Language"
+              value={lang}
+              onChange={(e) => changeLanguage(e.target.value as SupportedLocale)}
+              className="bg-transparent text-xs font-semibold text-[#001e40] focus:outline-none cursor-pointer pr-1"
+            >
+              {SUPPORTED_LOCALES.map((locale) => (
+                <option key={locale.code} value={locale.code}>
+                  {locale.label} ({locale.code.toUpperCase()})
+                </option>
+              ))}
+            </select>
+          </div>
+
           {profile && (
             <span className="hidden sm:block text-sm text-[#545f72]">
               {profile.display_name ?? profile.full_name ?? 'User'}
             </span>
           )}
+
           <button
             onClick={signOut}
             aria-label="Sign out"
