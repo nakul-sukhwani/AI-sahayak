@@ -15,12 +15,12 @@ export const workerJobReportSchema = z.object({
   id: z.string().uuid().optional(),
   work_proof_id: z.string().uuid(),
   worker_issues: z.string().nullable().optional(),
-  damage_type: z.enum(DAMAGE_TYPES),
+  damage_type: z.string().min(1),
   tools_required: z.array(z.string()).default([]),
   team_members_count: z.number().int().min(1).default(1),
   captured_latitude: z.number().min(-90).max(90),
   captured_longitude: z.number().min(-180).max(180),
-  captured_at: z.string().datetime(),
+  captured_at: z.string().optional(),
 });
 
 export type WorkerJobReport = z.infer<typeof workerJobReportSchema>;

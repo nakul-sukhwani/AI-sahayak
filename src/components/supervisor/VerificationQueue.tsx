@@ -24,10 +24,28 @@ export interface WorkProofWithDetails {
     address: string | null;
     latitude: number | null;
     longitude: number | null;
+    created_at?: string | null;
   } | null;
   users_profile: {
     full_name: string | null;
     display_name: string | null;
+  } | null;
+  worker_job_reports?: {
+    damage_type?: string | null;
+    worker_issues?: string | null;
+    tools_required?: string[] | null;
+    team_members_count?: number | null;
+    captured_latitude?: number | null;
+    captured_longitude?: number | null;
+    captured_at?: string | null;
+  }[] | {
+    damage_type?: string | null;
+    worker_issues?: string | null;
+    tools_required?: string[] | null;
+    team_members_count?: number | null;
+    captured_latitude?: number | null;
+    captured_longitude?: number | null;
+    captured_at?: string | null;
   } | null;
   // Pre-signed URLs mapped on server
   beforeSignedUrl: string | null;
@@ -60,58 +78,99 @@ export function VerificationQueue({ initialProofs }: VerificationQueueProps) {
         body: JSON.stringify({ status, rejection_reason: status === 'rejected' ? rejectionReason : null }),
       });
       const data = await res.json() as { error?: string };
-      if (!res.ok) throw new Error(data.error ?? 'Verification failed');
-      
-      toast(`Proof ${status === 'approved' ? 'approved' : 'rejected'} successfully`, 'success');
+      if (!res.ok) throw new Error(data.error ?? 'Failed to update verification');
+
+      toast(status === 'approved' ? 'Proof approved successfully.' : 'Proof rejected.', status === 'approved' ? 'success' : 'info');
       setProofs(prev => prev.filter(p => p.id !== selectedProof.id));
       setSelectedProof(null);
       setRejectionReason('');
     } catch (err) {
-      toast(err instanceof Error ? err.message : 'Verification failed', 'error');
+      toast(err instanceof Error ? err.message : 'Action failed', 'error');
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  if (proofs.length === 0) {
-    return (
-      <div className="text-center py-16">
-        <span className="material-symbols-outlined text-5xl text-[#c3c6d1]">verified_user</span>
-        <p className="text-base font-medium text-[#191c1e] mt-3">Queue empty</p>
-        <p className="text-sm text-[#545f72] mt-1">No proofs pending verification.</p>
-      </div>
-    );
-  }
+  const selectedReport = selectedProof
+    ? Array.isArray(selectedProof.worker_job_reports)
+      ? selectedProof.worker_job_reports[0]
+      : selectedProof.worker_job_reports
+    : null;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {proofs.map(p => {
-          const workerName = p.users_profile?.full_name ?? p.users_profile?.display_name ?? 'Unknown Worker';
-          return (
-            <div key={p.id} className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className="relative aspect-video">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.afterSignedUrl!} alt="After" className="w-full h-full object-cover" />
-                {p.ai_verified !== null && (
-                  <div className={`absolute top-2 right-2 px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide backdrop-blur-md ${p.ai_verified ? 'bg-[#059669]/90 text-white' : 'bg-[#DC2626]/90 text-white'}`}>
-                    AI: {p.ai_verified ? 'PASS' : 'FAIL'}
+    <div>
+      {proofs.length === 0 ? (
+        <div className="text-center py-16 bg-white border border-[#E2E8F0] rounded-2xl">
+          <span className="material-symbols-outlined text-4xl text-[#059669] mb-2" style={{ fontVariationSettings: "'FILL' 1" }}>
+            task_alt
+          </span>
+          <p className="text-base font-semibold text-[#191c1e]">All caught up!</p>
+          <p className="text-sm text-[#545f72] mt-1">No pending proofs to verify right now.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {proofs.map((proof) => (
+            <div key={proof.id} className="bg-white border border-[#E2E8F0] rounded-2xl p-4 flex flex-col justify-between hover:border-[#001e40]/30 transition-all shadow-sm">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-[#001e40] bg-[#f2f4f6] px-2.5 py-1 rounded-md">
+                    {getIssueLabel(proof.complaints?.issue_type ?? '')}
+                  </span>
+                  <span className="text-xs text-[#737780]">
+                    {new Date(proof.submitted_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] uppercase font-bold text-[#737780]">Before</span>
+                    {proof.beforeSignedUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={proof.beforeSignedUrl} alt="Before" className="w-full aspect-square object-cover rounded-lg border border-[#E2E8F0]" />
+                    ) : (
+                      <div className="w-full aspect-square bg-[#f2f4f6] rounded-lg border border-[#E2E8F0] flex items-center justify-center text-[#c3c6d1]">
+                        <span className="material-symbols-outlined text-xl">image_not_supported</span>
+                      </div>
+                    )}
                   </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] uppercase font-bold text-[#737780]">After</span>
+                    {proof.afterSignedUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={proof.afterSignedUrl} alt="After" className="w-full aspect-square object-cover rounded-lg border border-[#E2E8F0]" />
+                    ) : (
+                      <div className="w-full aspect-square bg-[#f2f4f6] rounded-lg border border-[#E2E8F0] flex items-center justify-center text-[#c3c6d1]">
+                        <span className="material-symbols-outlined text-xl">image_not_supported</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {proof.complaints?.description_en && (
+                  <p className="text-xs text-[#545f72] line-clamp-2">{proof.complaints.description_en}</p>
                 )}
-              </div>
-              <div className="p-4">
-                <p className="text-sm font-semibold text-[#191c1e] truncate">{getIssueLabel(p.complaints?.issue_type ?? 'other')}</p>
-                <p className="text-xs text-[#545f72] mt-1 flex items-center gap-1">
-                  <span className="material-symbols-outlined text-xs">person</span> {workerName}
-                </p>
-                <div className="mt-4">
-                  <Button size="sm" className="w-full" onClick={() => setSelectedProof(p)}>Review Proof</Button>
+
+                <div className="text-xs text-[#737780] flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">person</span>
+                  Worker: <span className="font-medium text-[#191c1e]">{proof.users_profile?.display_name || proof.users_profile?.full_name || 'Worker'}</span>
                 </div>
               </div>
+
+              <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
+                {proof.ai_verified !== null && (
+                  <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${proof.ai_verified ? 'bg-[#d1fae5] text-[#059669]' : 'bg-[#fee2e2] text-[#DC2626]'}`}>
+                    <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                    {proof.ai_verified ? 'AI Verified' : 'AI Flagged'}
+                  </span>
+                )}
+                <Button size="sm" onClick={() => setSelectedProof(proof)} className="ml-auto">
+                  Review
+                </Button>
+              </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
 
       {selectedProof && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#001e40]/40 backdrop-blur-sm p-4">
@@ -130,6 +189,15 @@ export function VerificationQueue({ initialProofs }: VerificationQueueProps) {
                 aiVerified={selectedProof.ai_verified}
                 aiConfidence={selectedProof.ai_confidence}
                 aiObservation={selectedProof.ai_observation}
+                damageType={selectedReport?.damage_type}
+                workerIssues={selectedReport?.worker_issues}
+                toolsRequired={selectedReport?.tools_required}
+                capturedLatitude={selectedReport?.captured_latitude ? Number(selectedReport.captured_latitude) : null}
+                capturedLongitude={selectedReport?.captured_longitude ? Number(selectedReport.captured_longitude) : null}
+                capturedAt={selectedReport?.captured_at}
+                complaintLatitude={selectedProof.complaints?.latitude}
+                complaintLongitude={selectedProof.complaints?.longitude}
+                complaintCreatedAt={selectedProof.complaints?.created_at}
               />
 
               {selectedProof.complaints?.latitude && selectedProof.complaints?.longitude && (

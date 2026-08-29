@@ -16,8 +16,9 @@ export default async function SupervisorVerifyPage() {
     .select(`
       id, complaint_id, before_photo_url, after_photo_url,
       ai_verified, ai_confidence, ai_observation, worker_notes, submitted_at,
-      complaints ( issue_type, description_en, ward_name, address, latitude, longitude ),
-      users_profile!work_proof_worker_id_fkey ( full_name, display_name )
+      complaints ( issue_type, description_en, ward_name, address, latitude, longitude, created_at ),
+      users_profile!work_proof_worker_id_fkey ( full_name, display_name ),
+      worker_job_reports ( damage_type, worker_issues, tools_required, team_members_count, captured_latitude, captured_longitude, captured_at )
     `)
     .in('status', ['pending', 'ai_verified'])
     .order('submitted_at', { ascending: false });
