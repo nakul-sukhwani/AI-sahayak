@@ -13,10 +13,16 @@ import {
   VERIFY_PROOF_SYSTEM,
 } from '@/prompts/verify-proof';
 import {
+  DETECT_AI_IMAGE_SYSTEM,
+  buildDetectAiImagePrompt,
+} from '@/prompts/detect-ai-image';
+import {
   type AIAnalysisResult,
   AI_ANALYSIS_FALLBACK,
   type AIProofVerificationResult,
   AI_PROOF_FALLBACK,
+  type AIImageDetectionResult,
+  AI_IMAGE_DETECTION_FALLBACK,
 } from '@/types/ai';
 
 // Lazy-init the client — validates key at call time, not module load
@@ -54,6 +60,13 @@ const ProofSchema = z.object({
   observation:       z.string(),
   remaining_issues:  z.string().nullable(),
   new_issues:        z.string().nullable(),
+});
+
+const ImageDetectionSchema = z.object({
+  classification: z.enum(['AUTHENTIC', 'AI_GENERATED', 'UNCERTAIN']),
+  confidence:     z.number().min(0).max(1),
+  reason:         z.string(),
+  artifacts:      z.array(z.string()),
 });
 
 /** Strips markdown fences from AI output then attempts JSON.parse */
@@ -148,5 +161,41 @@ export async function verifyProof(
   } catch (err) {
     console.error('verifyProof error:', err);
     return AI_PROOF_FALLBACK;
+  }
+}
+
+/**
+ * Detects whether a complaint image is AI-generated or a real photograph.
+ * Accepts a base64-encoded image and MIME type directly from the client.
+ * @param imageBase64 - Raw base64 string (no data URL prefix)
+ * @param mimeType    - MIME type of the image (e.g. 'image/jpeg')
+ */
+export async function detectAiImage(
+  imageBase64: string,
+  mimeType: string
+): Promise<AIImageDetectionResult> {
+  try {
+    const genAI = getClient();
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      systemInstruction: DETECT_AI_IMAGE_SYSTEM,
+      safetySettings: SAFETY_SETTINGS,
+    });
+
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          data: imageBase64,
+          mimeType,
+        },
+      },
+      { text: buildDetectAiImagePrompt() },
+    ]);
+
+    const raw = result.response.text();
+    return parseJson(raw, ImageDetectionSchema, AI_IMAGE_DETECTION_FALLBACK);
+  } catch (err) {
+    console.error('detectAiImage error:', err);
+    return AI_IMAGE_DETECTION_FALLBACK;
   }
 }

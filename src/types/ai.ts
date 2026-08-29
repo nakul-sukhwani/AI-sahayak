@@ -39,3 +39,21 @@ export const AI_PROOF_FALLBACK: AIProofVerificationResult = {
   remaining_issues: null,
   new_issues: null,
 };
+
+// ── AI Image Detection ────────────────────────────────────────────────
+
+export type AIImageClassification = 'AUTHENTIC' | 'AI_GENERATED' | 'UNCERTAIN';
+
+export interface AIImageDetectionResult {
+  classification: AIImageClassification;
+  confidence: number;
+  reason: string;
+  artifacts: string[];
+}
+
+export const AI_IMAGE_DETECTION_FALLBACK: AIImageDetectionResult = {
+  classification: 'UNCERTAIN',
+  confidence: 0,
+  reason: 'Automated detection unavailable. Manual review required.',
+  artifacts: [],
+};

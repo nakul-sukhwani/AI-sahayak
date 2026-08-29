@@ -39,6 +39,7 @@ export const LIMITS = {
   uploadProof:      { maxRequests: 10, windowMs: 60_000 },
   submitProof:      { maxRequests: 5,  windowMs: 60_000 },
   fileComplaint:    { maxRequests: 3,  windowMs: 60_000 },
+  validateImage:    { maxRequests: 10, windowMs: 60_000 },  // AI image detection: 10/min per user
   default:          { maxRequests: 30, windowMs: 60_000 },
 } satisfies Record<string, RateLimitConfig>;
 
