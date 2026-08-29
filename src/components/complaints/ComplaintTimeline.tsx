@@ -2,6 +2,8 @@
 
 import type { ComplaintStatus } from '@/types/complaint';
 import { STATUS_LABELS, STATUS_ICONS, STATUS_ORDER } from '@/constants/statuses';
+import { useLanguage } from '@/context/LanguageContext';
+import type { TranslationKey } from '@/lib/translations';
 
 interface TimelineEvent {
   status: ComplaintStatus;
@@ -15,6 +17,7 @@ interface ComplaintTimelineProps {
 }
 
 export function ComplaintTimeline({ currentStatus, events = [] }: ComplaintTimelineProps) {
+  const { t } = useLanguage();
   const currentIndex = STATUS_ORDER.indexOf(currentStatus);
 
   const getStepState = (status: ComplaintStatus) => {
@@ -38,6 +41,7 @@ export function ComplaintTimeline({ currentStatus, events = [] }: ComplaintTimel
         const state = getStepState(status);
         const event = getEvent(status);
         const isLast = i === displaySteps.length - 1;
+        const statusLabel = t(status as TranslationKey) || STATUS_LABELS[status] || status;
 
         return (
           <div key={status} className="flex gap-3">
@@ -71,7 +75,7 @@ export function ComplaintTimeline({ currentStatus, events = [] }: ComplaintTimel
                 'text-sm font-medium',
                 state === 'pending' ? 'text-[#737780]' : 'text-[#191c1e]',
               ].join(' ')}>
-                {STATUS_LABELS[status] ?? status}
+                {statusLabel}
               </p>
               {event?.timestamp && (
                 <p className="text-xs text-[#545f72] mt-0.5">

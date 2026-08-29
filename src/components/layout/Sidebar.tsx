@@ -3,38 +3,41 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/context/LanguageContext';
 import type { UserRole } from '@/types/user';
+import type { TranslationKey } from '@/lib/translations';
 
 interface NavTab {
   href: string;
-  label: string;
+  key: TranslationKey;
   icon: string;
 }
 
 const ROLE_TABS: Record<UserRole, NavTab[]> = {
   citizen: [
-    { href: '/dashboard',     label: 'Home',    icon: 'home' },
-    { href: '/dashboard/new', label: 'Report',  icon: 'add_circle' },
-    { href: '/feed',          label: 'Feed',    icon: 'public' },
+    { href: '/dashboard',     key: 'home',    icon: 'home' },
+    { href: '/dashboard/new', key: 'report',  icon: 'add_circle' },
+    { href: '/feed',          key: 'feed',    icon: 'public' },
   ],
   worker: [
-    { href: '/worker', label: 'Tasks', icon: 'construction' },
+    { href: '/worker', key: 'tasks', icon: 'construction' },
   ],
   supervisor: [
-    { href: '/supervisor', label: 'Assign', icon: 'assignment_ind' },
+    { href: '/supervisor', key: 'assign', icon: 'assignment_ind' },
   ],
   officer: [
-    { href: '/supervisor/verify', label: 'Verify', icon: 'verified' },
+    { href: '/supervisor/verify', key: 'verify', icon: 'verified' },
   ],
   admin: [
-    { href: '/admin',             label: 'Admin',  icon: 'admin_panel_settings' },
-    { href: '/supervisor',        label: 'Assign', icon: 'assignment_ind' },
-    { href: '/supervisor/verify', label: 'Verify', icon: 'verified' },
+    { href: '/admin',             key: 'admin',  icon: 'admin_panel_settings' },
+    { href: '/supervisor',        key: 'assign', icon: 'assignment_ind' },
+    { href: '/supervisor/verify', key: 'verify', icon: 'verified' },
   ],
 };
 
 export function Sidebar() {
   const { role } = useAuth();
+  const { t } = useLanguage();
   const pathname = usePathname();
 
   if (!role) return null;
@@ -47,7 +50,7 @@ export function Sidebar() {
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#001e40] to-[#2563eb] flex items-center justify-center">
           <span className="material-symbols-outlined text-white text-[18px]">account_balance</span>
         </div>
-        <span className="font-semibold text-[#191c1e] tracking-tight">Nagrik Seva</span>
+        <span className="font-semibold text-[#191c1e] tracking-tight">{t('portal_title')}</span>
       </div>
       <nav className="flex-1 p-4 space-y-1">
         {tabs.map((tab) => {
@@ -68,7 +71,7 @@ export function Sidebar() {
               >
                 {tab.icon}
               </span>
-              <span className="text-sm">{tab.label}</span>
+              <span className="text-sm">{t(tab.key)}</span>
             </Link>
           );
         })}

@@ -8,10 +8,20 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const isLocalDev = process.env.NODE_ENV === 'development';
+  let user = null;
 
-  if (!user) redirect('/login');
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    user = null;
+  }
+
+  if (!user && !isLocalDev) {
+    redirect('/login');
+  }
 
   return (
     <div className="min-h-screen bg-[#f7f9fb] flex flex-col">

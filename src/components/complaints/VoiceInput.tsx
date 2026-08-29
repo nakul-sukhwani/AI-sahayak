@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
@@ -41,6 +42,7 @@ function getSpeechRecognition(): (new () => SpeechRecognitionInstance) | null {
 }
 
 export function VoiceInput({ onTranscript, disabled = false }: VoiceInputProps) {
+  const { t } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [interimText, setInterimText] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -140,8 +142,8 @@ export function VoiceInput({ onTranscript, disabled = false }: VoiceInputProps) 
 
       <p className="text-xs text-[#545f72] text-center">
         {isListening
-          ? interimText || 'Listening… speak now'
-          : 'Tap to add voice description'}
+          ? interimText || t('listening_speak')
+          : t('tap_to_add_voice')}
       </p>
 
       {error && <p className="text-xs text-[#DC2626] text-center">{error}</p>}

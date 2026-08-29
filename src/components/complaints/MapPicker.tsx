@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { useLanguage } from '@/context/LanguageContext';
 import { Spinner } from '@/components/ui/Spinner';
 
 interface MapPickerProps {
@@ -52,6 +53,7 @@ export function MapPicker({
   onLocationChange,
   disabled = false,
 }: MapPickerProps) {
+  const { t } = useLanguage();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const leafletRef = useRef<LeafletInstance>({ map: null, marker: null });
   const [isMapLoaded, setIsMapLoaded] = useState(false);
@@ -179,7 +181,7 @@ export function MapPicker({
           ) : (
             <span className="material-symbols-outlined text-base">my_location</span>
           )}
-          {geoLoading ? 'Locating…' : 'Use my location'}
+          {geoLoading ? t('locating') : t('use_my_location')}
         </button>
 
         {displayAddress && (
@@ -194,7 +196,7 @@ export function MapPicker({
       )}
 
       <p className="text-xs text-[#737780]">
-        Tap the map or drag the pin to adjust the location.
+        {t('tap_map_adjust')}
       </p>
     </div>
   );

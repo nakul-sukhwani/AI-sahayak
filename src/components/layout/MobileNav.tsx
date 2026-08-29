@@ -3,38 +3,41 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/context/LanguageContext';
 import type { UserRole } from '@/types/user';
+import type { TranslationKey } from '@/lib/translations';
 
 interface NavTab {
   href: string;
-  label: string;
+  key: TranslationKey;
   icon: string;
 }
 
 const ROLE_TABS: Record<UserRole, NavTab[]> = {
   citizen: [
-    { href: '/dashboard',     label: 'Home',    icon: 'home' },
-    { href: '/dashboard/new', label: 'Report',  icon: 'add_circle' },
-    { href: '/feed',          label: 'Feed',    icon: 'public' },
+    { href: '/dashboard',     key: 'home',    icon: 'home' },
+    { href: '/dashboard/new', key: 'report',  icon: 'add_circle' },
+    { href: '/feed',          key: 'feed',    icon: 'public' },
   ],
   worker: [
-    { href: '/worker', label: 'Tasks', icon: 'construction' },
+    { href: '/worker', key: 'tasks', icon: 'construction' },
   ],
   supervisor: [
-    { href: '/supervisor', label: 'Assign', icon: 'assignment_ind' },
+    { href: '/supervisor', key: 'assign', icon: 'assignment_ind' },
   ],
   officer: [
-    { href: '/supervisor/verify', label: 'Verify', icon: 'verified' },
+    { href: '/supervisor/verify', key: 'verify', icon: 'verified' },
   ],
   admin: [
-    { href: '/admin',             label: 'Admin',  icon: 'admin_panel_settings' },
-    { href: '/supervisor',        label: 'Assign', icon: 'assignment_ind' },
-    { href: '/supervisor/verify', label: 'Verify', icon: 'verified' },
+    { href: '/admin',             key: 'admin',  icon: 'admin_panel_settings' },
+    { href: '/supervisor',        key: 'assign', icon: 'assignment_ind' },
+    { href: '/supervisor/verify', key: 'verify', icon: 'verified' },
   ],
 };
 
 export function MobileNav() {
   const { role } = useAuth();
+  const { t } = useLanguage();
   const pathname = usePathname();
 
   if (!role) return null;
@@ -62,7 +65,7 @@ export function MobileNav() {
               >
                 {tab.icon}
               </span>
-              <span>{tab.label}</span>
+              <span>{t(tab.key)}</span>
               {isActive && (
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-[#001e40] rounded-full" />
               )}

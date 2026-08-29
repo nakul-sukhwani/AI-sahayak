@@ -5,6 +5,7 @@ import { PhotoCapture } from '@/components/complaints/PhotoCapture';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
+import { useLanguage } from '@/context/LanguageContext';
 import { DAMAGE_TYPES, type DamageType } from '@/types/work-proof';
 import type { ProcessedImage } from '@/lib/image';
 
@@ -15,6 +16,7 @@ interface JobReportFormProps {
 
 export function JobReportForm({ workProofId, onSuccess }: JobReportFormProps) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [damageType, setDamageType] = useState<DamageType>(DAMAGE_TYPES[0]);
   const [customDamage, setCustomDamage] = useState('');
   const [workerIssues, setWorkerIssues] = useState('');
@@ -72,7 +74,7 @@ export function JobReportForm({ workProofId, onSuccess }: JobReportFormProps) {
           work_proof_id: workProofId,
           damage_type: finalDamage,
           worker_issues: workerIssues.trim() || null,
-          tools_required: tools.split(',').map((t) => t.trim()).filter(Boolean),
+          tools_required: tools.split(',').map((item) => item.trim()).filter(Boolean),
           team_members_count: teamCount,
           captured_latitude: gps.lat,
           captured_longitude: gps.lng,
@@ -95,8 +97,8 @@ export function JobReportForm({ workProofId, onSuccess }: JobReportFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
       <div className="relative">
-        <label className="block text-sm font-medium text-[#191c1e] mb-1.5">Work Proof Photo</label>
-        <PhotoCapture onCapture={handlePhotoCapture} onError={(msg) => toast(msg, 'error')} label="Capture Completion Photo" />
+        <label className="block text-sm font-medium text-[#191c1e] mb-1.5">{t('work_proof_photo')}</label>
+        <PhotoCapture onCapture={handlePhotoCapture} onError={(msg) => toast(msg, 'error')} label={t('capture_completion_photo')} />
         {previewUrl && capturedAt && (
           <div className="absolute bottom-3 right-3 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1 rounded text-[11px] font-mono pointer-events-none">
             🕒 {new Date(capturedAt).toLocaleString('en-IN', { hour12: true })}
@@ -106,37 +108,37 @@ export function JobReportForm({ workProofId, onSuccess }: JobReportFormProps) {
 
       <div className="flex items-center justify-between p-3 rounded-lg border bg-[#f7f9fb] text-xs">
         {gps ? (
-          <span className="text-[#059669] font-medium">📍 Live GPS Acquired ({gps.lat.toFixed(4)}, {gps.lng.toFixed(4)})</span>
+          <span className="text-[#059669] font-medium">📍 {t('live_gps_acquired')} ({gps.lat.toFixed(4)}, {gps.lng.toFixed(4)})</span>
         ) : (
-          <span className="text-[#545f72]">📍 {gpsLoading ? 'Acquiring GPS coordinates…' : 'GPS location not acquired'}</span>
+          <span className="text-[#545f72]">📍 {gpsLoading ? t('acquiring_gps') : t('gps_not_acquired')}</span>
         )}
         <button type="button" onClick={acquireGPS} disabled={gpsLoading} className="text-[#001e40] font-semibold hover:underline disabled:opacity-50">
-          {gps ? 'Refresh GPS' : 'Retry GPS'}
+          {gps ? t('refresh_gps') : t('retry_gps')}
         </button>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="damage-type-select" className="text-sm font-medium text-[#191c1e]">Damage Classification *</label>
+        <label htmlFor="damage-type-select" className="text-sm font-medium text-[#191c1e]">{t('damage_classification')} *</label>
         <select id="damage-type-select" value={damageType} onChange={(e) => setDamageType(e.target.value as DamageType)} required className="w-full px-3 py-2.5 bg-white border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] focus:outline-none focus:border-[#001e40]">
           {DAMAGE_TYPES.map((type) => (<option key={type} value={type}>{type}</option>))}
         </select>
       </div>
 
       {damageType === 'Other' && (
-        <Input id="custom-damage-input" label="Specify Damage Type *" placeholder="Describe damage classification…" value={customDamage} onChange={(e) => setCustomDamage(e.target.value)} required />
+        <Input id="custom-damage-input" label={`${t('specify_damage_type')} *`} placeholder={t('describe_damage_placeholder')} value={customDamage} onChange={(e) => setCustomDamage(e.target.value)} required />
       )}
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="worker-issues" className="text-sm font-medium text-[#191c1e]">On-site Issues / Observations</label>
-        <textarea id="worker-issues" value={workerIssues} onChange={(e) => setWorkerIssues(e.target.value)} rows={2} placeholder="Any obstacles, traffic restrictions, or extra damage…" className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] bg-white focus:outline-none focus:border-[#001e40] resize-none" />
+        <label htmlFor="worker-issues" className="text-sm font-medium text-[#191c1e]">{t('onsite_issues_observations')}</label>
+        <textarea id="worker-issues" value={workerIssues} onChange={(e) => setWorkerIssues(e.target.value)} rows={2} placeholder={t('describe_damage_placeholder')} className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] bg-white focus:outline-none focus:border-[#001e40] resize-none" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Input id="tools-required" label="Tools Used (comma separated)" placeholder="e.g. Shovel, Asphalt" value={tools} onChange={(e) => setTools(e.target.value)} />
-        <Input id="team-count" type="number" min={1} max={50} label="Team Members Present" value={teamCount} onChange={(e) => setTeamCount(Math.max(1, parseInt(e.target.value, 10) || 1))} />
+        <Input id="tools-required" label={t('tools_used')} placeholder="e.g. Shovel, Asphalt" value={tools} onChange={(e) => setTools(e.target.value)} />
+        <Input id="team-count" type="number" min={1} max={50} label={t('team_members_present')} value={teamCount} onChange={(e) => setTeamCount(Math.max(1, parseInt(e.target.value, 10) || 1))} />
       </div>
 
-      <Button type="submit" isLoading={isSubmitting} className="w-full mt-1">Submit Job Report & Proof</Button>
+      <Button type="submit" isLoading={isSubmitting} className="w-full mt-1">{t('submit_job_report_proof')}</Button>
     </form>
   );
 }

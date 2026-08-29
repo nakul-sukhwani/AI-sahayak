@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { MiniMap } from '@/components/ui/MiniMap';
 import { useToast } from '@/components/ui/Toast';
+import { useLanguage } from '@/context/LanguageContext';
 import type { Complaint } from '@/types/complaint';
 
 interface Worker {
@@ -27,6 +28,7 @@ interface AssignWorkerModalProps {
 
 export function AssignWorkerModal({ complaint, isOpen, onClose, onAssigned }: AssignWorkerModalProps) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedWorkerId, setSelectedWorkerId] = useState<string>('');
@@ -41,10 +43,7 @@ export function AssignWorkerModal({ complaint, isOpen, onClose, onAssigned }: As
         const supabase = createClient();
         let query = supabase
           .from('workers')
-          .select(`
-            user_id, department, is_available,
-            users_profile:user_id ( full_name, display_name )
-          `);
+          .select(`user_id, department, is_available, users_profile:user_id ( full_name, display_name )`);
 
         if (complaint.ai_suggested_department) {
           query = query.eq('department', complaint.ai_suggested_department);
@@ -53,7 +52,7 @@ export function AssignWorkerModal({ complaint, isOpen, onClose, onAssigned }: As
         const { data, error } = await query;
         if (error) throw error;
         setWorkers((data as unknown as Worker[]) ?? []);
-      } catch (err) {
+      } catch {
         toast('Failed to load workers', 'error');
       } finally {
         setIsLoading(false);
@@ -93,7 +92,7 @@ export function AssignWorkerModal({ complaint, isOpen, onClose, onAssigned }: As
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#001e40]/40 backdrop-blur-sm p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
         <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-[#191c1e]">Assign Worker</h2>
+          <h2 className="text-lg font-semibold text-[#191c1e]">{t('assign_worker')}</h2>
           <button onClick={onClose} className="p-1 text-[#737780] hover:text-[#191c1e] rounded-md transition-colors">
             <span className="material-symbols-outlined text-xl">close</span>
           </button>
@@ -111,35 +110,24 @@ export function AssignWorkerModal({ complaint, isOpen, onClose, onAssigned }: As
               )}
             </div>
           )}
-          <p className="text-sm text-[#545f72] mb-4">
-            Select a worker to resolve this issue. The list is filtered by the suggested department: <span className="font-semibold text-[#191c1e]">{complaint.ai_suggested_department ?? 'Any'}</span>.
-          </p>
+          <p className="text-sm text-[#545f72] mb-4">{t('select_worker_desc')} ({complaint.ai_suggested_department ?? 'Any'})</p>
 
           {isLoading ? (
             <div className="py-8 flex justify-center"><Spinner size="md" /></div>
           ) : workers.length === 0 ? (
-            <div className="text-center py-6 text-sm text-[#737780]">
-              No workers found for this department.
-            </div>
+            <div className="text-center py-6 text-sm text-[#737780]">{t('no_workers_found')}</div>
           ) : (
             <div className="flex flex-col gap-2">
-              {workers.map(w => {
+              {workers.map((w) => {
                 const name = w.users_profile?.full_name ?? w.users_profile?.display_name ?? 'Unknown Worker';
                 return (
                   <label key={w.user_id} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${selectedWorkerId === w.user_id ? 'border-[#001e40] bg-[#f7f9fb]' : 'border-[#E2E8F0] hover:border-[#001e40]/50'}`}>
-                    <input
-                      type="radio"
-                      name="worker"
-                      value={w.user_id}
-                      checked={selectedWorkerId === w.user_id}
-                      onChange={() => setSelectedWorkerId(w.user_id)}
-                      className="mt-1"
-                    />
+                    <input type="radio" name="worker" value={w.user_id} checked={selectedWorkerId === w.user_id} onChange={() => setSelectedWorkerId(w.user_id)} className="mt-1" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-[#191c1e]">{name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className={`w-2 h-2 rounded-full ${w.is_available ? 'bg-[#059669]' : 'bg-[#D97706]'}`} />
-                        <span className="text-xs text-[#545f72]">{w.is_available ? 'Available' : 'Busy'}</span>
+                        <span className="text-xs text-[#545f72]">{w.is_available ? t('available') : t('busy')}</span>
                         <span className="text-xs text-[#c3c6d1]">•</span>
                         <span className="text-xs text-[#545f72]">{w.department}</span>
                       </div>
@@ -152,12 +140,8 @@ export function AssignWorkerModal({ complaint, isOpen, onClose, onAssigned }: As
         </div>
 
         <div className="p-4 border-t border-[#E2E8F0] flex items-center justify-end gap-3 bg-[#f7f9fb]">
-          <button onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-[#545f72] hover:text-[#191c1e]">
-            Cancel
-          </button>
-          <Button onClick={handleAssign} isLoading={isSubmitting} disabled={!selectedWorkerId || isLoading}>
-            Assign
-          </Button>
+          <button onClick={onClose} disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-[#545f72] hover:text-[#191c1e]">{t('cancel')}</button>
+          <Button onClick={handleAssign} isLoading={isSubmitting} disabled={!selectedWorkerId || isLoading}>{t('assign')}</Button>
         </div>
       </div>
     </div>

@@ -1,4 +1,8 @@
+'use client';
+
 import type { HTMLAttributes } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
+import type { TranslationKey } from '@/lib/translations';
 
 type BadgeVariant =
   | 'filed'
@@ -39,22 +43,10 @@ const variantStyles: Record<BadgeVariant, string> = {
   neutral: 'bg-[#f7f9fb] text-[#43474f] border border-[#E2E8F0]',
 };
 
-const LABELS: Partial<Record<BadgeVariant, string>> = {
-  draft:           'Draft',
-  filed:           'Filed',
-  assigned:        'Assigned',
-  in_progress:     'In Progress',
-  proof_submitted: 'Proof Submitted',
-  resolved:        'Resolved',
-  rejected:        'Rejected',
-  low:             'Low',
-  medium:          'Medium',
-  high:            'High',
-  critical:        'Critical',
-};
-
 export function Badge({ variant, label, className = '', ...props }: BadgeProps) {
-  const displayLabel = label ?? LABELS[variant] ?? variant;
+  const { t } = useLanguage();
+  const displayLabel = label ?? t(variant as TranslationKey) ?? variant;
+
   return (
     <span
       className={[

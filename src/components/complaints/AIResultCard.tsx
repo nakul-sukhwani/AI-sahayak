@@ -2,7 +2,9 @@
 
 import type { AIAnalysisResult } from '@/types/ai';
 import { Badge } from '@/components/ui/Badge';
+import { useLanguage } from '@/context/LanguageContext';
 import type { ComplaintSeverity } from '@/types/complaint';
+import type { TranslationKey } from '@/lib/translations';
 
 interface AIResultCardProps {
   result: AIAnalysisResult;
@@ -17,10 +19,11 @@ const confidenceColor = (score: number): string => {
 };
 
 export function AIResultCard({ result, onAccept, onEdit }: AIResultCardProps) {
+  const { t } = useLanguage();
   const confidencePct = Math.round(result.confidence_score * 100);
+  const issueName = t(result.issue_type as TranslationKey) || result.issue_type.replace(/_/g, ' ');
 
   return (
-    /* Violet-tinted border marks AI-generated content — matches Stitch ai_analysis_result_mobile */
     <div className="border border-[#7C3AED]/30 bg-[#faf8ff] rounded-xl p-5 flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-center gap-2">
@@ -31,10 +34,10 @@ export function AIResultCard({ result, onAccept, onEdit }: AIResultCardProps) {
           auto_awesome
         </span>
         <span className="text-xs font-semibold uppercase tracking-widest text-[#7C3AED]">
-          AI Analysis
+          {t('ai_analysis')}
         </span>
         <span className={['ml-auto text-sm font-semibold', confidenceColor(result.confidence_score)].join(' ')}>
-          {confidencePct}% confident
+          {confidencePct}% {t('confident')}
         </span>
       </div>
 
@@ -50,10 +53,10 @@ export function AIResultCard({ result, onAccept, onEdit }: AIResultCardProps) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-[#43474f] mb-1">
-            Issue Type
+            {t('issue_type_label')}
           </p>
           <p className="text-sm text-[#191c1e] font-medium capitalize">
-            {result.issue_type.replace(/_/g, ' ')}
+            {issueName}
           </p>
           {result.subcategory && (
             <p className="text-xs text-[#545f72] mt-0.5 capitalize">
@@ -63,13 +66,13 @@ export function AIResultCard({ result, onAccept, onEdit }: AIResultCardProps) {
         </div>
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-[#43474f] mb-1">
-            Severity
+            {t('severity_label')}
           </p>
           <Badge variant={result.severity as ComplaintSeverity} />
         </div>
         <div className="col-span-2">
           <p className="text-xs font-semibold uppercase tracking-widest text-[#43474f] mb-1">
-            Department
+            {t('department')}
           </p>
           <p className="text-sm text-[#191c1e]">{result.suggested_department}</p>
         </div>
@@ -78,7 +81,7 @@ export function AIResultCard({ result, onAccept, onEdit }: AIResultCardProps) {
       {/* Description */}
       <div>
         <p className="text-xs font-semibold uppercase tracking-widest text-[#43474f] mb-1">
-          AI Description
+          {t('ai_description')}
         </p>
         <p className="text-sm text-[#191c1e] leading-relaxed">{result.description_en}</p>
         {result.description_hi && (
@@ -116,7 +119,7 @@ export function AIResultCard({ result, onAccept, onEdit }: AIResultCardProps) {
                      hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
         >
           <span className="material-symbols-outlined text-base">check</span>
-          Looks correct
+          {t('looks_correct')}
         </button>
         <button
           type="button"
@@ -125,7 +128,7 @@ export function AIResultCard({ result, onAccept, onEdit }: AIResultCardProps) {
                      rounded-lg hover:bg-[#f7f9fb] transition-colors flex items-center gap-1.5"
         >
           <span className="material-symbols-outlined text-base">edit</span>
-          Edit
+          {t('edit_btn')}
         </button>
       </div>
     </div>

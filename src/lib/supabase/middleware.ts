@@ -21,41 +21,56 @@ const PROTECTED_PREFIXES: { prefix: string; roles: UserRole[] }[] = [
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
   let supabaseResponse = NextResponse.next({ request });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
+  // Enable demo / local mode on localhost or development environment
+  const isLocalDev =
+    process.env.NODE_ENV === 'development' ||
+    request.nextUrl.hostname === 'localhost' ||
+    request.nextUrl.hostname === '127.0.0.1';
 
-  // Refresh session — do NOT remove this block
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+
+  try {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key',
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value)
+            );
+            supabaseResponse = NextResponse.next({ request });
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+    user = authUser;
+  } catch {
+    user = null;
+  }
 
   const pathname = request.nextUrl.pathname;
 
+  // In local dev mode, allow navigating to any route without forcing login redirect
+  if (isLocalDev && !user) {
+    return supabaseResponse;
+  }
+
   // Redirect authenticated users away from /login
   if (user && pathname === '/login') {
-    const { data: profile } = await supabase
-      .from('users_profile')
-      .select('role')
-      .eq('id', user.id)
-      .single();
+    const { data: profile } = await (await import('@/lib/supabase/server')).createClient().then(s => 
+      s.from('users_profile').select('role').eq('id', user.id).single()
+    ).catch(() => ({ data: null }));
 
     const role: UserRole = (profile?.role as UserRole) ?? 'citizen';
     const redirectUrl = request.nextUrl.clone();
@@ -63,8 +78,8 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Redirect unauthenticated users away from protected routes
-  if (!user) {
+  // Redirect unauthenticated users away from protected routes in production
+  if (!user && !isLocalDev) {
     const isProtected = PROTECTED_PREFIXES.some(({ prefix }) =>
       pathname.startsWith(prefix)
     );
@@ -75,13 +90,11 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
     }
   }
 
-  // Role-based access control for protected prefixes
-  if (user) {
-    const { data: profile } = await supabase
-      .from('users_profile')
-      .select('role')
-      .eq('id', user.id)
-      .single();
+  // Role-based access control for protected prefixes in production
+  if (user && !isLocalDev) {
+    const { data: profile } = await (await import('@/lib/supabase/server')).createClient().then(s => 
+      s.from('users_profile').select('role').eq('id', user.id).single()
+    ).catch(() => ({ data: null }));
 
     const role: UserRole = (profile?.role as UserRole) ?? 'citizen';
 

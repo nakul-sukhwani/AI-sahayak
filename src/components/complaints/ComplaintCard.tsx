@@ -4,8 +4,10 @@ import Link from 'next/link';
 import type { Complaint } from '@/types/complaint';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
+import { useLanguage } from '@/context/LanguageContext';
 import { getIssueLabel } from '@/constants/issue-types';
 import type { ComplaintSeverity, ComplaintStatus } from '@/types/complaint';
+import type { TranslationKey } from '@/lib/translations';
 
 interface ComplaintCardProps {
   complaint: Complaint;
@@ -23,6 +25,9 @@ function timeAgo(dateStr: string): string {
 }
 
 export function ComplaintCard({ complaint }: ComplaintCardProps) {
+  const { t } = useLanguage();
+  const issueName = t(complaint.issue_type as TranslationKey) || getIssueLabel(complaint.issue_type);
+
   return (
     <Link href={`/dashboard/${complaint.id}`} className="block">
       <Card hover padding="md">
@@ -49,7 +54,7 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-sm font-semibold text-[#191c1e] truncate">
-                {getIssueLabel(complaint.issue_type)}
+                {issueName}
               </p>
               <Badge variant={complaint.status as ComplaintStatus} />
             </div>
