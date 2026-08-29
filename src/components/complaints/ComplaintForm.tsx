@@ -10,12 +10,14 @@ import { AuthoritySuggestion } from './AuthoritySuggestion';
 import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { useToast } from '@/components/ui/Toast';
+import { useLanguage } from '@/context/LanguageContext';
 import { ISSUE_TYPES } from '@/constants/issue-types';
 import { SEVERITIES } from '@/constants/severities';
 import { BANGALORE_WARDS } from '@/constants/authorities';
 import type { ProcessedImage } from '@/lib/image';
 import type { AIAnalysisResult } from '@/types/ai';
 import type { Authority } from '@/types/authority';
+import type { TranslationKey } from '@/lib/translations';
 
 type Step = 'photo' | 'ai-result' | 'location' | 'details' | 'review';
 
@@ -49,12 +51,12 @@ const INITIAL_FORM: FormState = {
   isAnonymous: false, authority: null,
 };
 
-const STEP_LABELS: Record<Step, string> = {
-  photo: 'Photo',
-  'ai-result': 'AI Review',
-  location: 'Location',
-  details: 'Details',
-  review: 'Submit',
+const STEP_LABELS: Record<Step, TranslationKey> = {
+  photo: 'step_photo',
+  'ai-result': 'step_ai_review',
+  location: 'step_location',
+  details: 'step_details',
+  review: 'step_submit',
 };
 
 const STEPS: Step[] = ['photo', 'ai-result', 'location', 'details', 'review'];
@@ -62,6 +64,7 @@ const STEPS: Step[] = ['photo', 'ai-result', 'location', 'details', 'review'];
 export function ComplaintForm() {
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const [step, setStep] = useState<Step>('photo');
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
@@ -179,14 +182,14 @@ export function ComplaintForm() {
         ))}
       </div>
       <p className="text-sm text-[#545f72] mb-4">
-        Step {currentStepIndex + 1} of {STEPS.length}: <span className="font-medium text-[#191c1e]">{STEP_LABELS[step]}</span>
+        {t('step_prefix')} {currentStepIndex + 1} {t('of')} {STEPS.length}: <span className="font-medium text-[#191c1e]">{t(STEP_LABELS[step])}</span>
       </p>
 
       {/* ── Step: Photo ── */}
       {step === 'photo' && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">Capture the issue</h2>
-          <p className="text-sm text-[#545f72]">Take a clear photo of the civic problem. Our AI will analyze it automatically.</p>
+          <h2 className="text-lg font-semibold text-[#191c1e]">{t('capture_issue')}</h2>
+          <p className="text-sm text-[#545f72]">{t('capture_issue_desc')}</p>
           <PhotoCapture
             onCapture={handlePhotoCapture}
             onError={(msg) => toast(msg, 'error')}
@@ -204,7 +207,7 @@ export function ComplaintForm() {
       {/* ── Step: AI Result ── */}
       {step === 'ai-result' && form.aiResult && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">Review AI classification</h2>
+          <h2 className="text-lg font-semibold text-[#191c1e]">{t('review_ai_title')}</h2>
           <AIResultCard
             result={form.aiResult}
             onAccept={() => { setForm((f) => ({ ...f, aiAccepted: true })); setStep('location'); }}
@@ -216,7 +219,7 @@ export function ComplaintForm() {
       {/* ── Step: Location ── */}
       {step === 'location' && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">Pin the location</h2>
+          <h2 className="text-lg font-semibold text-[#191c1e]">{t('pin_location_title')}</h2>
           <MapPicker
             onLocationChange={(lat, lng, addr) => setForm((f) => ({ ...f, latitude: lat, longitude: lng, address: addr }))}
           />
@@ -235,7 +238,7 @@ export function ComplaintForm() {
             onClick={() => setStep('details')}
             disabled={!form.latitude || !form.longitude}
           >
-            Continue
+            {t('continue_btn')}
           </Button>
         </div>
       )}
@@ -243,7 +246,7 @@ export function ComplaintForm() {
       {/* ── Step: Details ── */}
       {step === 'details' && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">Confirm details</h2>
+          <h2 className="text-lg font-semibold text-[#191c1e]">{t('confirm_details_title')}</h2>
           <div>
             <label className="block text-sm font-medium text-[#191c1e] mb-1.5">Issue Type</label>
             <select
@@ -252,7 +255,7 @@ export function ComplaintForm() {
               className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] bg-white focus:outline-none focus:border-[#001e40]"
             >
               <option value="">Select issue type…</option>
-              {ISSUE_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+              {ISSUE_TYPES.map((tItem) => <option key={tItem.value} value={tItem.value}>{tItem.label}</option>)}
             </select>
           </div>
           <div>
@@ -285,7 +288,7 @@ export function ComplaintForm() {
               className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] bg-white focus:outline-none focus:border-[#001e40] resize-none"
             />
             <div className="mt-2">
-              <VoiceInput onTranscript={(t) => setForm((f) => ({ ...f, descriptionEn: f.descriptionEn + ' ' + t }))} />
+              <VoiceInput onTranscript={(v) => setForm((f) => ({ ...f, descriptionEn: f.descriptionEn + ' ' + v }))} />
             </div>
           </div>
           <div>
@@ -316,7 +319,7 @@ export function ComplaintForm() {
             </div>
           </label>
           <Button onClick={() => setStep('review')} disabled={!form.issueType || !form.descriptionEn}>
-            Continue to Review
+            {t('continue_to_review')}
           </Button>
         </div>
       )}
@@ -324,7 +327,7 @@ export function ComplaintForm() {
       {/* ── Step: Review ── */}
       {step === 'review' && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">Review & Submit</h2>
+          <h2 className="text-lg font-semibold text-[#191c1e]">{t('review_submit_title')}</h2>
           <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 space-y-3 text-sm">
             {form.processedImage && (
               // eslint-disable-next-line @next/next/no-img-element
@@ -341,10 +344,10 @@ export function ComplaintForm() {
           </div>
           {form.authority && <AuthoritySuggestion authority={form.authority} aiDepartment={form.aiResult?.suggested_department} />}
           <Button onClick={handleSubmit} isLoading={isSubmitting} className="w-full">
-            Submit Complaint
+            {t('submit_complaint')}
           </Button>
           <button type="button" onClick={() => setStep('details')} className="text-sm text-[#545f72] hover:text-[#191c1e] text-center transition-colors">
-            ← Back to edit
+            ← {t('back_to_edit')}
           </button>
         </div>
       )}
@@ -352,7 +355,7 @@ export function ComplaintForm() {
       {/* Back nav (except photo + ai-result which have their own flow) */}
       {step === 'location' && (
         <button type="button" onClick={() => setStep('ai-result')} className="mt-3 text-sm text-[#545f72] hover:text-[#191c1e] transition-colors">
-          ← Back
+          ← {t('back_btn')}
         </button>
       )}
     </div>
