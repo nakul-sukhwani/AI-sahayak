@@ -3,43 +3,43 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { useLanguage } from '@/hooks/useLanguage';
-import { SUPPORTED_LOCALES, type SupportedLocale } from '@/lib/translations';
+import { useLanguage } from '@/context/LanguageContext';
+import { SUPPORTED_LOCALES, type SupportedLocale, type TranslationKey } from '@/lib/translations';
 import type { UserRole } from '@/types/user';
 
 interface NavLink {
   href: string;
-  label: string;
+  key: TranslationKey;
   icon: string;
 }
 
 const ROLE_LINKS: Record<UserRole, NavLink[]> = {
   citizen: [
-    { href: '/dashboard', label: 'My Complaints', icon: 'assignment' },
-    { href: '/dashboard/new', label: 'Report Issue', icon: 'add_circle' },
-    { href: '/feed', label: 'Public Feed', icon: 'public' },
+    { href: '/dashboard', key: 'my_complaints', icon: 'assignment' },
+    { href: '/dashboard/new', key: 'report_issue', icon: 'add_circle' },
+    { href: '/feed', key: 'public_feed', icon: 'public' },
   ],
   worker: [
-    { href: '/worker', label: 'My Tasks', icon: 'construction' },
+    { href: '/worker', key: 'my_tasks', icon: 'construction' },
   ],
   supervisor: [
-    { href: '/supervisor', label: 'Assignment Queue', icon: 'assignment_ind' },
-    { href: '/supervisor/verify', label: 'Verify Proof', icon: 'verified' },
+    { href: '/supervisor', key: 'assignment_queue', icon: 'assignment_ind' },
+    { href: '/supervisor/verify', key: 'verify_proof', icon: 'verified' },
   ],
   officer: [
-    { href: '/supervisor/verify', label: 'Verify Proof', icon: 'verified' },
-    { href: '/supervisor', label: 'All Complaints', icon: 'list_alt' },
+    { href: '/supervisor/verify', key: 'verify_proof', icon: 'verified' },
+    { href: '/supervisor', key: 'all_complaints', icon: 'list_alt' },
   ],
   admin: [
-    { href: '/admin', label: 'Admin', icon: 'admin_panel_settings' },
-    { href: '/supervisor', label: 'All Complaints', icon: 'list_alt' },
-    { href: '/supervisor/verify', label: 'Verify Proof', icon: 'verified' },
+    { href: '/admin', key: 'admin', icon: 'admin_panel_settings' },
+    { href: '/supervisor', key: 'all_complaints', icon: 'list_alt' },
+    { href: '/supervisor/verify', key: 'verify_proof', icon: 'verified' },
   ],
 };
 
 export function Navbar() {
   const { profile, role, signOut } = useAuth();
-  const { lang, changeLanguage } = useLanguage();
+  const { lang, setLanguage, t } = useLanguage();
   const pathname = usePathname();
 
   const links = role ? ROLE_LINKS[role] : [];
@@ -56,7 +56,7 @@ export function Navbar() {
             account_balance
           </span>
           <span className="text-base font-semibold text-[#001e40] tracking-tight hidden sm:block">
-            Nagrik Seva
+            {t('portal_title')}
           </span>
         </Link>
 
@@ -76,7 +76,7 @@ export function Navbar() {
                 ].join(' ')}
               >
                 <span className="material-symbols-outlined text-base">{link.icon}</span>
-                {link.label}
+                {t(link.key)}
               </Link>
             );
           })}
@@ -91,7 +91,7 @@ export function Navbar() {
               id="nav-lang-select"
               aria-label="Select Language"
               value={lang}
-              onChange={(e) => changeLanguage(e.target.value as SupportedLocale)}
+              onChange={(e) => setLanguage(e.target.value as SupportedLocale)}
               className="bg-transparent text-xs font-semibold text-[#001e40] focus:outline-none cursor-pointer pr-1"
             >
               {SUPPORTED_LOCALES.map((locale) => (
@@ -114,7 +114,7 @@ export function Navbar() {
             className="flex items-center gap-1.5 text-sm text-[#545f72] hover:text-[#DC2626] transition-colors px-2 py-1.5 rounded-lg hover:bg-[#fee2e2]"
           >
             <span className="material-symbols-outlined text-base">logout</span>
-            <span className="hidden sm:block">Sign out</span>
+            <span className="hidden sm:block">{t('sign_out')}</span>
           </button>
         </div>
       </div>

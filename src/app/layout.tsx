@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { SupabaseProvider } from '@/components/providers/SupabaseProvider';
+import { LanguageProvider } from '@/context/LanguageContext';
 import { ToastProvider } from '@/components/ui/Toast';
 
 const inter = Inter({
@@ -40,11 +41,13 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-[#f7f9fb] text-[#191c1e] antialiased font-sans">
-        <SupabaseProvider>
-          <ToastProvider>
-            {children}
-          </ToastProvider>
-        </SupabaseProvider>
+        <LanguageProvider>
+          <SupabaseProvider>
+            <ToastProvider>
+              {children}
+            </ToastProvider>
+          </SupabaseProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

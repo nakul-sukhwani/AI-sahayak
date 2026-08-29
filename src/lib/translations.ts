@@ -25,7 +25,24 @@ export type TranslationKey =
   | 'help_text'
   | 'footer_text'
   | 'privacy'
-  | 'terms';
+  | 'terms'
+  | 'welcome'
+  | 'my_complaints'
+  | 'report_issue'
+  | 'public_feed'
+  | 'active'
+  | 'resolved'
+  | 'total'
+  | 'sign_out'
+  | 'my_tasks'
+  | 'assignment_queue'
+  | 'verify_proof'
+  | 'all_complaints'
+  | 'admin'
+  | 'complaints_filed'
+  | 'no_complaints'
+  | 'report_first_issue'
+  | 'start_first_issue';
 
 export const translations: Record<SupportedLocale, Record<TranslationKey, string>> = {
   en: {
@@ -40,6 +57,23 @@ export const translations: Record<SupportedLocale, Record<TranslationKey, string
     footer_text: '© 2024 Nagrik Seva. Institutional Trust Division.',
     privacy: 'Privacy',
     terms: 'Terms',
+    welcome: 'Welcome',
+    my_complaints: 'My Complaints',
+    report_issue: 'Report Issue',
+    public_feed: 'Public Feed',
+    active: 'Active',
+    resolved: 'Resolved',
+    total: 'Total',
+    sign_out: 'Sign out',
+    my_tasks: 'My Tasks',
+    assignment_queue: 'Assignment Queue',
+    verify_proof: 'Verify Proof',
+    all_complaints: 'All Complaints',
+    admin: 'Admin',
+    complaints_filed: 'complaints filed',
+    no_complaints: 'No complaints yet',
+    report_first_issue: 'Report your first issue',
+    start_first_issue: 'Report your first civic issue to get started.',
   },
   hi: {
     portal_title: 'नागरिक सेवा',
@@ -53,6 +87,23 @@ export const translations: Record<SupportedLocale, Record<TranslationKey, string
     footer_text: '© 2024 नागरिक सेवा। संस्थागत विश्वास प्रभाग।',
     privacy: 'गोपनीयता',
     terms: 'नियम',
+    welcome: 'स्वागत है',
+    my_complaints: 'मेरी शिकायतें',
+    report_issue: 'समस्या दर्ज करें',
+    public_feed: 'सार्वजनिक फीड',
+    active: 'सक्रिय',
+    resolved: 'समाधानित',
+    total: 'कुल',
+    sign_out: 'लॉग आउट',
+    my_tasks: 'मेरे कार्य',
+    assignment_queue: 'कार्य आवंटन',
+    verify_proof: 'प्रमाण सत्यापन',
+    all_complaints: 'सभी शिकायतें',
+    admin: 'व्यवस्थापक',
+    complaints_filed: 'शिकायतें दर्ज की गईं',
+    no_complaints: 'अभी तक कोई शिकायत नहीं',
+    report_first_issue: 'अपनी पहली शिकायत दर्ज करें',
+    start_first_issue: 'शुरू करने के लिए अपनी पहली नागरिक समस्या दर्ज करें।',
   },
   bn: {
     portal_title: 'নাগরিক সেবা',
@@ -66,6 +117,23 @@ export const translations: Record<SupportedLocale, Record<TranslationKey, string
     footer_text: '© 2024 নাগরিক সেবা। প্রাতিষ্ঠানিক ট্রাস্ট বিভাগ।',
     privacy: 'গোপনীয়তা',
     terms: 'শর্তাবলী',
+    welcome: 'স্বাগতম',
+    my_complaints: 'আমার অভিযোগসমূহ',
+    report_issue: 'অভিযোগ দায়ের করুন',
+    public_feed: 'পাবলিক ফিড',
+    active: 'সক্রিয়',
+    resolved: 'সমাধান হয়েছে',
+    total: 'মোট',
+    sign_out: 'সাইন আউট',
+    my_tasks: 'আমার কাজ',
+    assignment_queue: 'বরাদ্দ সারি',
+    verify_proof: 'প্রমাণ যাচাই',
+    all_complaints: 'সকল অভিযোগ',
+    admin: 'প্রশাসক',
+    complaints_filed: 'অভিযোগ জমা হয়েছে',
+    no_complaints: 'এখনও কোনো অভিযোগ নেই',
+    report_first_issue: 'আপনার প্রথম অভিযোগ দায়ের করুন',
+    start_first_issue: 'শুরু করতে আপনার প্রথম নাগরিক সমস্যা দায়ের করুন।',
   },
   mr: {
     portal_title: 'नागरिक सेवा',
@@ -79,6 +147,23 @@ export const translations: Record<SupportedLocale, Record<TranslationKey, string
     footer_text: '© 2024 नागरिक सेवा. संस्थात्मक विश्वास विभाग.',
     privacy: 'गोपनीयता',
     terms: 'अटी',
+    welcome: 'स्वागत आहे',
+    my_complaints: 'माझ्या तक्रारी',
+    report_issue: 'तक्रार नोंदवा',
+    public_feed: 'सार्वजनिक फीड',
+    active: 'सक्रिय',
+    resolved: 'निवारण झाले',
+    total: 'एकूण',
+    sign_out: 'बाहेर पडा',
+    my_tasks: 'माझी कामे',
+    assignment_queue: 'नियुक्ती रांग',
+    verify_proof: 'पुरावा पडताळणी',
+    all_complaints: 'सर्व तक्रारी',
+    admin: 'प्रशासक',
+    complaints_filed: 'नोंदवलेल्या तक्रारी',
+    no_complaints: 'अद्याप कोणतीही तक्रार नाही',
+    report_first_issue: 'पहिली तक्रार नोंदवा',
+    start_first_issue: 'सुरू करण्यासाठी तुमची पहिली नागरी समस्या नोंदवा.',
   },
   ta: {
     portal_title: 'நாக்ரிக் சேவா',
@@ -92,6 +177,23 @@ export const translations: Record<SupportedLocale, Record<TranslationKey, string
     footer_text: '© 2024 நாக்ரிக் சேவா. நிறுவன நம்பிக்கை பிரிவு.',
     privacy: 'தனியுரிமை',
     terms: 'விதிமுறைகள்',
+    welcome: 'வரவேற்கிறோம்',
+    my_complaints: 'என் புகார்கள்',
+    report_issue: 'புகார் பதிவு செய்',
+    public_feed: 'பொது ஊட்டம்',
+    active: 'செயலில் உள்ளவை',
+    resolved: 'தீர்க்கப்பட்டவை',
+    total: 'மொத்தம்',
+    sign_out: 'வெளியேறு',
+    my_tasks: 'எனது பணிகள்',
+    assignment_queue: 'பணி ஒதுக்கீட்டு வரிசை',
+    verify_proof: 'சான்று சரிபார்த்தல்',
+    all_complaints: 'அனைத்து புகார்கள்',
+    admin: 'நிர்வாகி',
+    complaints_filed: 'பதிவு செய்யப்பட்ட புகார்கள்',
+    no_complaints: 'இதுவரை புகார்கள் இல்லை',
+    report_first_issue: 'உங்கள் முதல் புகாரைப் பதிவு செய்யவும்',
+    start_first_issue: 'தொடங்குவதற்கு உங்கள் முதல் புகாரைப் பதிவு செய்யவும்.',
   },
   ml: {
     portal_title: 'നാഗരിക് സേവ',
@@ -105,6 +207,23 @@ export const translations: Record<SupportedLocale, Record<TranslationKey, string
     footer_text: '© 2024 നാഗരിക് സേവ. ഇൻസ്റ്റിറ്റ്യൂഷണൽ ട്രസ്റ്റ് ഡിവിഷൻ.',
     privacy: 'സ്വകാര്യത',
     terms: 'നിബന്ധനകൾ',
+    welcome: 'സ്വാഗതം',
+    my_complaints: 'എന്റെ പരാതികൾ',
+    report_issue: 'പരാതി നൽകുക',
+    public_feed: 'പൊതു ഫീഡ്',
+    active: 'സജീവം',
+    resolved: 'പരിഹരിച്ചവ',
+    total: 'ആകെ',
+    sign_out: 'പുറത്തുകടക്കുക',
+    my_tasks: 'എന്റെ ജോലികൾ',
+    assignment_queue: 'നിയോഗ ക്യൂ',
+    verify_proof: 'തെളിവ് പരിശോധന',
+    all_complaints: 'എല്ലാ പരാതികളും',
+    admin: 'അഡ്മിൻ',
+    complaints_filed: 'പരാതികൾ സമർപ്പിച്ചു',
+    no_complaints: 'ഇതുവരെ പരാതികളൊന്നുമില്ല',
+    report_first_issue: 'ആദ്യ പരാതി സമർപ്പിക്കുക',
+    start_first_issue: 'തുടങ്ങുന്നതിനായി ആദ്യ പൗര പരാതി സമർപ്പിക്കുക.',
   },
 };
 
