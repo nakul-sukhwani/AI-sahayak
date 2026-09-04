@@ -40,6 +40,10 @@ export const LIMITS = {
   submitProof:      { maxRequests: 5,  windowMs: 60_000 },
   fileComplaint:    { maxRequests: 3,  windowMs: 60_000 },
   validateImage:    { maxRequests: 10, windowMs: 60_000 },  // AI image detection: 10/min per user
+  // SIH 26043 — new endpoints
+  embedding:        { maxRequests: 10, windowMs: 60_000 },  // generateEmbedding calls
+  challengeSubmit:  { maxRequests: 3,  windowMs: 60_000 },  // POST /api/challenges (same as fileComplaint)
+  routingSuggest:   { maxRequests: 5,  windowMs: 60_000 },  // POST /api/challenges/:id/route-suggestions
   default:          { maxRequests: 30, windowMs: 60_000 },
 } satisfies Record<string, RateLimitConfig>;
 
