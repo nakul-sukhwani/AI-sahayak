@@ -84,8 +84,8 @@ export async function PATCH(
 
     // Determine corresponding challenge status (synchronised lifecycle)
     let challengeStatus: ChallengeStatus | null = null;
-    if (newStatus === 'approved') challengeStatus = 'prototype_development';
-    if (newStatus === 'completed') challengeStatus = 'deployed';
+    if (newStatus === 'approved') challengeStatus = 'in_progress';
+    if (newStatus === 'withdrawn') challengeStatus = 'stalled';
 
     // Transactional-ish updates
     const { error: updateError } = await supabase
@@ -117,7 +117,7 @@ export async function PATCH(
     });
 
     // Notify submitter of major stage transitions
-    if (newStatus === 'approved' || newStatus === 'completed') {
+    if (newStatus === 'approved' || newStatus === 'rejected') {
       const { data: challenge } = await supabase
         .from('challenges')
         .select('submitted_by, title')

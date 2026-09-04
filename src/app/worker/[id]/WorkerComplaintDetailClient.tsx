@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ProofSubmission } from '@/components/worker/ProofSubmission';
 import { ComplaintTimeline } from '@/components/complaints/ComplaintTimeline';
-import { MiniMap } from '@/components/ui/MiniMap';
-import { useToast } from '@/components/ui/Toast';
+import { MiniMap } from '@/components/ui/minimap';
+import { useToast } from '@/components/ui/toast';
 import { useLanguage } from '@/context/LanguageContext';
 import { getIssueLabel } from '@/constants/issue-types';
 import type { Complaint, ComplaintSeverity, ComplaintStatus } from '@/types/complaint';

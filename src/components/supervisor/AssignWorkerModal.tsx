@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/Button';
-import { Spinner } from '@/components/ui/Spinner';
-import { MiniMap } from '@/components/ui/MiniMap';
-import { useToast } from '@/components/ui/Toast';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import { MiniMap } from '@/components/ui/minimap';
+import { useToast } from '@/components/ui/toast';
 import { useLanguage } from '@/context/LanguageContext';
 import type { Complaint } from '@/types/complaint';
 

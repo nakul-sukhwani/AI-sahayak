@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useLanguage } from '@/context/LanguageContext';
-import { Spinner } from '@/components/ui/Spinner';
+import { Spinner } from '@/components/ui/spinner';
 
 interface MapPickerProps {
   initialLat?: number;

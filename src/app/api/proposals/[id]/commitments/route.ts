@@ -164,11 +164,14 @@ export async function POST(
       .single();
 
     if (proposal) {
+      const challengeTitle = Array.isArray(proposal.challenges)
+        ? (proposal.challenges as { title: string }[])[0]?.title
+        : (proposal.challenges as { title: string } | null)?.title;
       await supabase.from('notifications').insert({
         user_id:      proposal.faculty_mentor_id,
         event_type:   'industry_committed',
         reference_id: commitment.id,
-        message:      `An industry partner has pledged a ${commitment_type} commitment to your project "${proposal.challenges?.title}".`,
+        message:      `An industry partner has pledged a ${commitment_type} commitment to your project "${challengeTitle}".`,
       });
     }
 

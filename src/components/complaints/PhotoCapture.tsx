@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback } from 'react';
 import { processImage, type ProcessedImage } from '@/lib/image';
-import { Spinner } from '@/components/ui/Spinner';
+import { Spinner } from '@/components/ui/spinner';
 
 type ValidationStatus = 'idle' | 'validating' | 'approved' | 'rejected' | 'flagged' | 'error';
 

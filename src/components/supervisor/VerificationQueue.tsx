@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { useToast } from '@/components/ui/Toast';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/toast';
 import { BeforeAfterView } from './BeforeAfterView';
 import { getIssueLabel } from '@/constants/issue-types';
-import { MiniMap } from '@/components/ui/MiniMap';
+import { MiniMap } from '@/components/ui/minimap';
 import { useLanguage } from '@/context/LanguageContext';
 import type { TranslationKey } from '@/lib/translations';
 

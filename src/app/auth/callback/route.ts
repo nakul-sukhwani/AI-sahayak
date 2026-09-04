@@ -23,11 +23,18 @@ export async function GET(request: Request) {
       const role = (profileData?.role as UserRole) ?? 'citizen';
       
       const ROLE_REDIRECTS: Record<UserRole, string> = {
-        citizen: '/dashboard',
-        worker: '/worker',
-        supervisor: '/supervisor',
-        officer: '/supervisor/verify',
-        admin: '/admin',
+        citizen:          '/dashboard',
+        worker:           '/worker',
+        supervisor:       '/supervisor',
+        officer:          '/supervisor/verify',
+        admin:            '/admin',
+        // SIH 26043
+        community_org:    '/dashboard',
+        pri_ulb_official: '/dashboard',
+        university_admin: '/university',
+        faculty_mentor:   '/university',
+        student:          '/university',
+        industry_partner: '/industry',
       };
       
       return NextResponse.redirect(`${origin}${ROLE_REDIRECTS[role]}`);

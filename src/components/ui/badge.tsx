@@ -1,31 +1,24 @@
 'use client';
 
 import type { HTMLAttributes } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
-import type { TranslationKey } from '@/lib/translations';
 
+// Combined variant type: existing app variants + shadcn-style variants
 type BadgeVariant =
-  | 'filed'
-  | 'assigned'
-  | 'in_progress'
-  | 'proof_submitted'
-  | 'resolved'
-  | 'rejected'
-  | 'draft'
-  | 'low'
-  | 'medium'
-  | 'high'
-  | 'critical'
-  | 'ai'
-  | 'neutral';
+  // Existing app variants
+  | 'filed' | 'assigned' | 'in_progress' | 'proof_submitted'
+  | 'resolved' | 'rejected' | 'draft'
+  | 'low' | 'medium' | 'high' | 'critical'
+  | 'ai' | 'neutral'
+  // shadcn-style variants used by new components
+  | 'default' | 'secondary' | 'destructive' | 'outline';
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant: BadgeVariant;
+  variant?: BadgeVariant;
   label?: string;
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  // Status
+  // Existing status variants
   draft:           'bg-[#e0e3e5] text-[#43474f]',
   filed:           'bg-[#dbeafe] text-[#1d4ed8]',
   assigned:        'bg-[#dbeafe] text-[#1d4ed8]',
@@ -41,12 +34,14 @@ const variantStyles: Record<BadgeVariant, string> = {
   // Special
   ai:      'bg-[#ede9fe] text-[#7C3AED] border border-[#7C3AED]/30',
   neutral: 'bg-[#f7f9fb] text-[#43474f] border border-[#E2E8F0]',
+  // shadcn-style variants
+  default:     'bg-[#001e40] text-white',
+  secondary:   'bg-[#e0e3e5] text-[#43474f]',
+  destructive: 'bg-[#fee2e2] text-[#DC2626]',
+  outline:     'bg-transparent text-[#43474f] border border-[#E2E8F0]',
 };
 
-export function Badge({ variant, label, className = '', ...props }: BadgeProps) {
-  const { t } = useLanguage();
-  const displayLabel = label ?? t(variant as TranslationKey) ?? variant;
-
+export function Badge({ variant = 'neutral', label, children, className = '', ...props }: BadgeProps) {
   return (
     <span
       className={[
@@ -57,7 +52,7 @@ export function Badge({ variant, label, className = '', ...props }: BadgeProps) 
       ].join(' ')}
       {...props}
     >
-      {displayLabel}
+      {label ?? children}
     </span>
   );
 }

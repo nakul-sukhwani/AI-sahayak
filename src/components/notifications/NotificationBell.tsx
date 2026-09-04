@@ -2,18 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bell, Check, Circle } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import { useToast } from '@/components/ui/toast';
 
 interface Notification {
   id: string;
@@ -25,9 +16,11 @@ interface Notification {
 }
 
 export function NotificationBell() {
+  const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
+  const { toast } = useToast();
 
   const fetchNotifications = async () => {
     try {
@@ -44,7 +37,6 @@ export function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
-    // Poll every 60s for new notifications
     const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -53,80 +45,93 @@ export function NotificationBell() {
     try {
       const res = await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' });
       if (res.ok) {
-        setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
-        setUnreadCount(prev => Math.max(0, prev - 1));
+        setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
       }
-    } catch (e) {
-      toast.error('Failed to mark notification as read');
+    } catch {
+      toast('Failed to mark notification as read', 'error');
     }
   };
 
   const handleNotificationClick = (n: Notification) => {
     if (!n.read) markAsRead(n.id);
-    
-    // Simple navigation routing based on event type
+    setOpen(false);
     if (n.event_type.startsWith('routing_')) {
       router.push('/university/inbox');
-    } else if (n.reference_id && (n.event_type === 'team_formed' || n.event_type === 'stage_transition' || n.event_type.startsWith('milestone_') || n.event_type.startsWith('industry_'))) {
-      // Assuming reference_id points to proposal or challenge. A real app might have deeper linking.
+    } else if (n.reference_id) {
       router.push('/dashboard');
     }
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative text-slate-600 hover:text-slate-900">
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px]"
-            >
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </Badge>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      
-      <DropdownMenuContent align="end" className="w-80 max-h-[400px] overflow-y-auto">
-        <DropdownMenuLabel className="font-semibold text-slate-900 sticky top-0 bg-white z-10 shadow-sm pb-2">
-          Notifications
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        
-        {notifications.length === 0 ? (
-          <div className="p-4 text-center text-sm text-slate-500">
-            No notifications yet
-          </div>
-        ) : (
-          notifications.map((n) => (
-            <DropdownMenuItem 
-              key={n.id} 
-              className={`flex flex-col items-start p-3 cursor-pointer ${!n.read ? 'bg-indigo-50/50' : ''}`}
-              onClick={() => handleNotificationClick(n)}
-            >
-              <div className="flex items-start gap-2 w-full">
-                <div className="mt-1 shrink-0">
-                  {!n.read ? (
-                    <Circle className="h-2 w-2 fill-indigo-600 text-indigo-600" />
-                  ) : (
-                    <Check className="h-3 w-3 text-slate-400" />
-                  )}
-                </div>
-                <div className="flex-1 space-y-1">
-                  <p className={`text-sm leading-tight ${!n.read ? 'font-medium text-slate-900' : 'text-slate-600'}`}>
-                    {n.message}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {new Date(n.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-              </div>
-            </DropdownMenuItem>
-          ))
+    <div className="relative">
+      {/* Bell trigger */}
+      <button
+        aria-label="Notifications"
+        onClick={() => setOpen((v) => !v)}
+        className="relative p-2 rounded-lg text-[#545f72] hover:bg-[#f7f9fb] transition-colors focus:outline-none focus:ring-2 focus:ring-[#001e40]/30"
+      >
+        <span className="material-symbols-outlined text-[22px]">notifications</span>
+        {unreadCount > 0 && (
+          <Badge
+            variant="critical"
+            label={unreadCount > 99 ? '99+' : String(unreadCount)}
+            className="absolute -top-1 -right-1 !px-1.5 !py-0 !rounded-full min-w-[18px] flex items-center justify-center text-[10px]"
+          />
         )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </button>
+
+      {/* Dropdown panel */}
+      {open && (
+        <>
+          {/* Overlay to close on outside click */}
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+
+          <div className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-white border border-[#E2E8F0] rounded-xl shadow-lg z-50">
+            <div className="sticky top-0 bg-white px-4 py-3 border-b border-[#E2E8F0]">
+              <p className="text-sm font-semibold text-[#191c1e]">Notifications</p>
+            </div>
+
+            {notifications.length === 0 ? (
+              <div className="p-6 text-center text-sm text-[#545f72]">No notifications yet</div>
+            ) : (
+              <ul>
+                {notifications.map((n) => (
+                  <li key={n.id}>
+                    <button
+                      onClick={() => handleNotificationClick(n)}
+                      className={[
+                        'w-full text-left px-4 py-3 flex items-start gap-3 transition-colors hover:bg-[#f7f9fb]',
+                        !n.read ? 'bg-[#dbeafe]/30' : '',
+                      ].join(' ')}
+                    >
+                      <span
+                        className="material-symbols-outlined text-base mt-0.5 flex-shrink-0"
+                        style={{ fontVariationSettings: "'FILL' 1" }}
+                      >
+                        {!n.read ? 'circle' : 'check_circle'}
+                      </span>
+                      <div className="flex-1 space-y-0.5">
+                        <p className={['text-sm leading-tight', !n.read ? 'font-medium text-[#191c1e]' : 'text-[#545f72]'].join(' ')}>
+                          {n.message}
+                        </p>
+                        <p className="text-xs text-[#737780]">
+                          {new Date(n.created_at).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 }

@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import type { Complaint } from '@/types/complaint';
-import { Badge } from '@/components/ui/Badge';
-import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { useLanguage } from '@/context/LanguageContext';
 import { getIssueLabel } from '@/constants/issue-types';
 import type { ComplaintSeverity, ComplaintStatus } from '@/types/complaint';

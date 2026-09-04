@@ -13,7 +13,7 @@ export const CreateUniversitySchema = z.object({
   latitude:              z.number().min(-90).max(90).optional(),
   longitude:             z.number().min(-180).max(180).optional(),
   disciplines:           z.array(z.string().max(100)).min(1).max(30),
-  incubation_facilities: z.record(z.unknown()).optional(),
+  incubation_facilities: z.record(z.string(), z.unknown()).optional(),
   innovation_cell:       z.boolean().default(false),
   website_url:           z.string().url().optional(),
   admin_user_id:         z.string().uuid().optional(),

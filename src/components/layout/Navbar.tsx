@@ -15,25 +15,48 @@ interface NavLink {
 
 const ROLE_LINKS: Record<UserRole, NavLink[]> = {
   citizen: [
-    { href: '/dashboard', key: 'my_complaints', icon: 'assignment' },
-    { href: '/dashboard/new', key: 'report_issue', icon: 'add_circle' },
-    { href: '/feed', key: 'public_feed', icon: 'public' },
+    { href: '/dashboard',     key: 'my_complaints',  icon: 'assignment' },
+    { href: '/dashboard/new', key: 'report_issue',   icon: 'add_circle' },
+    { href: '/feed',          key: 'public_feed',    icon: 'public' },
   ],
   worker: [
     { href: '/worker', key: 'my_tasks', icon: 'construction' },
   ],
   supervisor: [
-    { href: '/supervisor', key: 'assignment_queue', icon: 'assignment_ind' },
-    { href: '/supervisor/verify', key: 'verify_proof', icon: 'verified' },
+    { href: '/supervisor',        key: 'assignment_queue', icon: 'assignment_ind' },
+    { href: '/supervisor/verify', key: 'verify_proof',     icon: 'verified' },
   ],
   officer: [
-    { href: '/supervisor/verify', key: 'verify_proof', icon: 'verified' },
-    { href: '/supervisor', key: 'all_complaints', icon: 'list_alt' },
+    { href: '/supervisor/verify', key: 'verify_proof',  icon: 'verified' },
+    { href: '/supervisor',        key: 'all_complaints', icon: 'list_alt' },
   ],
   admin: [
-    { href: '/admin', key: 'admin', icon: 'admin_panel_settings' },
-    { href: '/supervisor', key: 'all_complaints', icon: 'list_alt' },
-    { href: '/supervisor/verify', key: 'verify_proof', icon: 'verified' },
+    { href: '/admin',             key: 'admin',         icon: 'admin_panel_settings' },
+    { href: '/supervisor',        key: 'all_complaints', icon: 'list_alt' },
+    { href: '/supervisor/verify', key: 'verify_proof',  icon: 'verified' },
+  ],
+  // SIH 26043
+  community_org: [
+    { href: '/dashboard',     key: 'my_complaints', icon: 'groups' },
+    { href: '/dashboard/new', key: 'report_issue',  icon: 'add_circle' },
+  ],
+  pri_ulb_official: [
+    { href: '/dashboard',     key: 'my_complaints', icon: 'account_balance' },
+    { href: '/dashboard/new', key: 'report_issue',  icon: 'add_circle' },
+  ],
+  university_admin: [
+    { href: '/university',         key: 'home',   icon: 'school' },
+    { href: '/university/inbox',   key: 'home',   icon: 'inbox' },
+  ],
+  faculty_mentor: [
+    { href: '/university',         key: 'home',   icon: 'person_celebrate' },
+    { href: '/university/inbox',   key: 'home',   icon: 'inbox' },
+  ],
+  student: [
+    { href: '/university',         key: 'home',   icon: 'backpack' },
+  ],
+  industry_partner: [
+    { href: '/industry',           key: 'home',   icon: 'business' },
   ],
 };
 

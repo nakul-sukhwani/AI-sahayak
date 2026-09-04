@@ -1,7 +1,7 @@
 'use client';
 
 import type { AIAnalysisResult } from '@/types/ai';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/context/LanguageContext';
 import type { ComplaintSeverity } from '@/types/complaint';
 import type { TranslationKey } from '@/lib/translations';

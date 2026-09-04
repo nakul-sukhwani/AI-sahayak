@@ -2,9 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import { PhotoCapture } from '@/components/complaints/PhotoCapture';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { useToast } from '@/components/ui/Toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/toast';
 import { useLanguage } from '@/context/LanguageContext';
 import { DAMAGE_TYPES, type DamageType } from '@/types/work-proof';
 import type { ProcessedImage } from '@/lib/image';

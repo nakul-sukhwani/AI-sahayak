@@ -56,8 +56,9 @@ export async function generateEmbedding(
 
     const result = await model.embedContent({
       content: { parts: [{ text: text.trim() }], role: 'user' },
-      taskType: taskType as Parameters<typeof model.embedContent>[0]['taskType'],
-    });
+      // Rule 11: taskType is supported at runtime but SDK types vary by version
+      taskType,
+    } as Parameters<typeof model.embedContent>[0]);
 
     const values = result.embedding?.values;
 

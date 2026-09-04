@@ -4,7 +4,7 @@ import { useState } from 'react';
 import type { Complaint } from '@/types/complaint';
 import { ComplaintCard } from '@/components/complaints/ComplaintCard';
 import { AssignWorkerModal } from '@/components/supervisor/AssignWorkerModal';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface AssignmentQueueProps {

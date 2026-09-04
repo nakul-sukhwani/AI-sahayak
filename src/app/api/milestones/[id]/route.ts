@@ -101,7 +101,11 @@ export async function PATCH(
           .eq('id', existing.proposal_id)
           .single();
 
-        const submitterId = proposal?.challenges?.submitted_by;
+        const rawChallenges = proposal?.challenges as unknown;
+        const challenge = Array.isArray(rawChallenges)
+          ? (rawChallenges as { submitted_by: string }[])[0]
+          : (rawChallenges as { submitted_by: string } | null | undefined);
+        const submitterId = challenge?.submitted_by;
         if (submitterId) {
           await supabase.from('notifications').insert({
             user_id: submitterId,

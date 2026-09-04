@@ -15,9 +15,9 @@ interface NavTab {
 
 const ROLE_TABS: Record<UserRole, NavTab[]> = {
   citizen: [
-    { href: '/dashboard',     key: 'home',    icon: 'home' },
-    { href: '/dashboard/new', key: 'report',  icon: 'add_circle' },
-    { href: '/feed',          key: 'feed',    icon: 'public' },
+    { href: '/dashboard',     key: 'home',   icon: 'home' },
+    { href: '/dashboard/new', key: 'report', icon: 'add_circle' },
+    { href: '/feed',          key: 'feed',   icon: 'public' },
   ],
   worker: [
     { href: '/worker', key: 'tasks', icon: 'construction' },
@@ -33,6 +33,13 @@ const ROLE_TABS: Record<UserRole, NavTab[]> = {
     { href: '/supervisor',        key: 'assign', icon: 'assignment_ind' },
     { href: '/supervisor/verify', key: 'verify', icon: 'verified' },
   ],
+  // SIH 26043
+  community_org:    [{ href: '/dashboard',   key: 'home',   icon: 'groups' }],
+  pri_ulb_official: [{ href: '/dashboard',   key: 'home',   icon: 'account_balance' }],
+  university_admin: [{ href: '/university',  key: 'home',   icon: 'school' }],
+  faculty_mentor:   [{ href: '/university',  key: 'home',   icon: 'person_celebrate' }],
+  student:          [{ href: '/university',  key: 'home',   icon: 'backpack' }],
+  industry_partner: [{ href: '/industry',    key: 'home',   icon: 'business' }],
 };
 
 export function Sidebar() {

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { AnalyticsCharts } from '@/components/dashboard/AnalyticsCharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Briefcase, CheckCircle, Database, TrendingUp } from 'lucide-react';
+
 import { headers } from 'next/headers';
 
 export const metadata = {
@@ -75,7 +75,7 @@ export default async function AnalyticsPage() {
         <Card className="shadow-sm border-slate-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">Total Challenges</CardTitle>
-            <Database className="w-4 h-4 text-indigo-500" />
+            <span className="material-symbols-outlined text-lg text-[#7C3AED]" style={{ fontVariationSettings: "'FILL' 1" }}>storage</span>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-slate-900">{stats.total_challenges}</div>
@@ -86,7 +86,7 @@ export default async function AnalyticsPage() {
         <Card className="shadow-sm border-slate-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">Active Proposals</CardTitle>
-            <TrendingUp className="w-4 h-4 text-emerald-500" />
+            <span className="material-symbols-outlined text-lg text-[#059669]" style={{ fontVariationSettings: "'FILL' 1" }}>trending_up</span>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-slate-900">{stats.active_proposals}</div>
@@ -97,7 +97,7 @@ export default async function AnalyticsPage() {
         <Card className="shadow-sm border-slate-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">Industry Funding</CardTitle>
-            <Briefcase className="w-4 h-4 text-amber-500" />
+            <span className="material-symbols-outlined text-lg text-[#D97706]" style={{ fontVariationSettings: "'FILL' 1" }}>business_center</span>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-slate-900">
@@ -110,7 +110,7 @@ export default async function AnalyticsPage() {
         <Card className="shadow-sm border-slate-200 hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">Deployed Solutions</CardTitle>
-            <CheckCircle className="w-4 h-4 text-blue-500" />
+            <span className="material-symbols-outlined text-lg text-[#2563EB]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-slate-900">{stats.deployed_solutions}</div>
