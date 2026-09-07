@@ -23,19 +23,17 @@ const ROLE_TABS: Record<UserRole, NavTab[]> = {
     { href: '/worker', key: 'tasks', icon: 'construction' },
   ],
   supervisor: [
-    { href: '/supervisor', key: 'assign', icon: 'assignment_ind' },
+    { href: '/dashboard', key: 'home', icon: 'home' },
   ],
   officer: [
-    { href: '/supervisor/verify', key: 'verify', icon: 'verified' },
+    { href: '/dashboard', key: 'home', icon: 'home' },
   ],
   admin: [
     { href: '/admin',             key: 'admin',  icon: 'admin_panel_settings' },
-    { href: '/supervisor',        key: 'assign', icon: 'assignment_ind' },
-    { href: '/supervisor/verify', key: 'verify', icon: 'verified' },
   ],
   // SIH 26043
-  community_org:    [{ href: '/dashboard',   key: 'home',   icon: 'groups' }],
-  pri_ulb_official: [{ href: '/dashboard',   key: 'home',   icon: 'account_balance' }],
+  community_org:    [{ href: '/ngo',        key: 'home',   icon: 'groups' }],
+  pri_ulb_official: [{ href: '/dashboard',  key: 'home',   icon: 'account_balance' }],
   university_admin: [{ href: '/university',  key: 'home',   icon: 'school' }],
   faculty_mentor:   [{ href: '/university',  key: 'home',   icon: 'person_celebrate' }],
   student:          [{ href: '/university',  key: 'home',   icon: 'backpack' }],

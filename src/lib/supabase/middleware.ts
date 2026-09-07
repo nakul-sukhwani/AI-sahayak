@@ -5,11 +5,11 @@ import type { UserRole } from '@/types/user';
 const ROLE_REDIRECTS: Record<UserRole, string> = {
   citizen:          '/dashboard',
   worker:           '/worker',
-  supervisor:       '/supervisor',
-  officer:          '/supervisor/verify',
+  supervisor:       '/dashboard',
+  officer:          '/dashboard',
   admin:            '/admin',
   // SIH 26043
-  community_org:    '/dashboard',
+  community_org:    '/ngo',
   pri_ulb_official: '/dashboard',
   university_admin: '/university',
   faculty_mentor:   '/university',
@@ -18,10 +18,11 @@ const ROLE_REDIRECTS: Record<UserRole, string> = {
 };
 
 const PROTECTED_PREFIXES: { prefix: string; roles: UserRole[] }[] = [
-  { prefix: '/dashboard', roles: ['citizen', 'supervisor', 'officer', 'admin'] },
+  { prefix: '/dashboard', roles: ['citizen', 'pri_ulb_official', 'supervisor', 'officer', 'admin'] },
+  { prefix: '/ngo', roles: ['community_org', 'admin'] },
   { prefix: '/worker', roles: ['worker'] },
-  { prefix: '/supervisor/verify', roles: ['officer', 'admin'] },
-  { prefix: '/supervisor', roles: ['supervisor', 'admin'] },
+  { prefix: '/university', roles: ['university_admin', 'faculty_mentor', 'student', 'admin'] },
+  { prefix: '/industry', roles: ['industry_partner', 'admin'] },
   { prefix: '/admin', roles: ['admin'] },
 ];
 

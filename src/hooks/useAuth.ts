@@ -19,11 +19,11 @@ interface UseAuthReturn {
 const ROLE_REDIRECTS: Record<UserRole, string> = {
   citizen:          '/dashboard',
   worker:           '/worker',
-  supervisor:       '/supervisor',
-  officer:          '/supervisor/verify',
+  supervisor:       '/dashboard',
+  officer:          '/dashboard',
   admin:            '/admin',
   // SIH 26043
-  community_org:    '/dashboard',
+  community_org:    '/ngo',
   pri_ulb_official: '/dashboard',
   university_admin: '/university',
   faculty_mentor:   '/university',

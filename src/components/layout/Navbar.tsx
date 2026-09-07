@@ -23,21 +23,17 @@ const ROLE_LINKS: Record<UserRole, NavLink[]> = {
     { href: '/worker', key: 'my_tasks', icon: 'construction' },
   ],
   supervisor: [
-    { href: '/supervisor',        key: 'assignment_queue', icon: 'assignment_ind' },
-    { href: '/supervisor/verify', key: 'verify_proof',     icon: 'verified' },
+    { href: '/dashboard', key: 'my_complaints', icon: 'home' },
   ],
   officer: [
-    { href: '/supervisor/verify', key: 'verify_proof',  icon: 'verified' },
-    { href: '/supervisor',        key: 'all_complaints', icon: 'list_alt' },
+    { href: '/dashboard', key: 'my_complaints', icon: 'home' },
   ],
   admin: [
     { href: '/admin',             key: 'admin',         icon: 'admin_panel_settings' },
-    { href: '/supervisor',        key: 'all_complaints', icon: 'list_alt' },
-    { href: '/supervisor/verify', key: 'verify_proof',  icon: 'verified' },
   ],
   // SIH 26043
   community_org: [
-    { href: '/dashboard',     key: 'my_complaints', icon: 'groups' },
+    { href: '/ngo',           key: 'home',          icon: 'groups' },
     { href: '/dashboard/new', key: 'report_issue',  icon: 'add_circle' },
   ],
   pri_ulb_official: [

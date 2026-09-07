@@ -44,10 +44,10 @@ export default function LandingPage() {
             Report civic issues instantly. Our AI automatically classifies complaints, assigns the right department, and verifies the proof of work submitted by municipal workers.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/login" className="w-full sm:w-auto px-8 py-4 bg-[#001e40] text-white text-base font-semibold rounded-xl hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+            <Link href="/login" className="w-full sm:w-auto px-8 py-4 bg-[#001e40] text-white text-base font-semibold rounded-xl hover:-translate-y-1 hover:shadow-xl hover:bg-[#002a5c] transition-all duration-200 shadow-lg shadow-[#001e40]/30">
               Report an Issue Now
             </Link>
-            <Link href="#how-it-works" className="w-full sm:w-auto px-8 py-4 bg-white text-[#001e40] border border-[#E2E8F0] text-base font-semibold rounded-xl hover:bg-[#f7f9fb] transition-colors">
+            <Link href="#how-it-works" className="w-full sm:w-auto px-8 py-4 bg-white text-[#001e40] border-2 border-[#001e40] text-base font-semibold rounded-xl hover:bg-[#001e40] hover:text-white transition-all duration-200">
               How it works
             </Link>
           </div>
