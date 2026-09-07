@@ -11,8 +11,10 @@ import type { Complaint } from '@/types/complaint';
 import type { WorkProof } from '@/types/work-proof';
 
 const QuerySchema = z.object({
-  id:       z.string().uuid('Invalid complaint ID'),
-  district: z.string().min(1).max(60).default('Ranchi'),
+  id:        z.string().uuid('Invalid complaint ID'),
+  district:  z.string().min(1).max(80).default('Ranchi'),
+  addressee: z.string().min(1).max(80).default('District Collector'),
+  deadline:  z.coerce.number().int().min(1).max(60).default(7),
 });
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -38,13 +40,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // 3. Validate query params
     const parsed = QuerySchema.safeParse({
-      id:       request.nextUrl.searchParams.get('id'),
-      district: request.nextUrl.searchParams.get('district') ?? 'Ranchi',
+      id:        request.nextUrl.searchParams.get('id'),
+      district:  request.nextUrl.searchParams.get('district')  ?? 'Ranchi',
+      addressee: request.nextUrl.searchParams.get('addressee') ?? 'District Collector',
+      deadline:  request.nextUrl.searchParams.get('deadline')  ?? '7',
     });
     if (!parsed.success) {
       return NextResponse.json({ error: 'Valid complaint ID is required' }, { status: 400 });
     }
-    const { id, district } = parsed.data;
+    const { id, district, addressee, deadline } = parsed.data;
 
     // 4. Fetch complaint
     const { data: complaint, error: fetchError } = await supabase
@@ -112,6 +116,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       orgAddress,
       daysOpen,
       district,
+      addressee,
+      deadlineDays: deadline,
       beforeImageBytes,
       afterImageBytes,
       proofAiObservation: workProof?.ai_observation ?? null,

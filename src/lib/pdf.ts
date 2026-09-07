@@ -8,6 +8,8 @@ interface NGOLetterData {
   orgAddress: string | null;
   daysOpen: number;
   district: string;
+  addressee: string;
+  deadlineDays: number;
   beforeImageBytes: Uint8Array | null;
   afterImageBytes: Uint8Array | null;
   proofAiObservation: string | null;
@@ -18,7 +20,7 @@ interface NGOLetterData {
  * Includes complaint details, overdue notice, before/after images, and signature block.
  */
 export async function generateNGOLetter(data: NGOLetterData): Promise<Uint8Array> {
-  const { complaint, orgName, orgAddress, daysOpen, district, beforeImageBytes, afterImageBytes, proofAiObservation } = data;
+  const { complaint, orgName, orgAddress, daysOpen, district, addressee, deadlineDays, beforeImageBytes, afterImageBytes, proofAiObservation } = data;
 
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]); // A4
@@ -67,7 +69,7 @@ export async function generateNGOLetter(data: NGOLetterData): Promise<Uint8Array
 
   // ── Addressee ────────────────────────────────────────────────────────
   page.drawText('To,', { x: 40, y, size: 9, font: reg, color: darkGray }); y -= 14;
-  page.drawText(`The District Collector,`, { x: 40, y, size: 10, font: bold, color: navy }); y -= 14;
+  page.drawText(`The ${addressee},`, { x: 40, y, size: 10, font: bold, color: navy }); y -= 14;
   page.drawText(`District ${district}, Jharkhand`, { x: 40, y, size: 10, font: bold, color: navy }); y -= 14;
   page.drawText('Government of Jharkhand, India', { x: 40, y, size: 9, font: reg, color: darkGray }); y -= 20;
 
@@ -114,7 +116,7 @@ export async function generateNGOLetter(data: NGOLetterData): Promise<Uint8Array
   }
 
   // ── Para 3 — Demand ────────────────────────────────────────────────
-  const para3 = `We therefore respectfully request your office to: (1) Immediately direct the concerned department to resolve the said issue within 7 days of receipt of this letter; (2) Provide a written response to our organisation acknowledging this complaint and the steps being taken; (3) Ensure accountability of the field staff responsible for this area.`;
+  const para3 = `We therefore respectfully request your office to: (1) Immediately direct the concerned department to resolve the said issue within ${deadlineDays} days of receipt of this letter; (2) Provide a written response to our organisation acknowledging this complaint and the steps being taken; (3) Ensure accountability of the field staff responsible for this area.`;
   y = drawWrappedText(page, reg, para3, 40, y, width - 80, 10, darkGray);
   y -= 12;
 
