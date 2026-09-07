@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { NGOLetterModal } from '@/components/ngo/NGOLetterModal';
+import { DynamicDashboardBackground } from '@/components/ui/DynamicDashboardBackground';
 
 export const metadata: Metadata = {
   title: 'NGO Dashboard — Nagrik Seva',
@@ -69,12 +70,8 @@ export default async function NGODashboardPage() {
 
   return (
     <div className="relative">
-      {/* Dot-grid page decoration */}
-      <div
-        className="pointer-events-none fixed inset-0 nx-dot-grid"
-        style={{ zIndex: 0, opacity: 0.35 }}
-        aria-hidden="true"
-      />
+      {/* Dynamic ambient & interactive background */}
+      <DynamicDashboardBackground variant="ngo" />
 
       <div className="relative z-10">
         {/* ── Hero panel ──────────────────────────────────────────── */}

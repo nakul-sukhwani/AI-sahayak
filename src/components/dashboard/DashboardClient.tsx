@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { ComplaintCard } from '@/components/complaints/ComplaintCard';
+import { DynamicDashboardBackground } from '@/components/ui/DynamicDashboardBackground';
 import type { Complaint } from '@/types/complaint';
 
 interface DashboardClientProps {
@@ -18,12 +19,8 @@ export function DashboardClient({ displayName, complaints }: DashboardClientProp
 
   return (
     <div className="relative">
-      {/* Dot-grid page decoration */}
-      <div
-        className="pointer-events-none fixed inset-0 nx-dot-grid"
-        style={{ zIndex: 0, opacity: 0.35 }}
-        aria-hidden="true"
-      />
+      {/* Dynamic ambient & interactive background */}
+      <DynamicDashboardBackground variant="citizen" />
 
       <div className="relative z-10">
         {/* ── Hero panel ─────────────────────────────────────────── */}

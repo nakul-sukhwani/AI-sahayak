@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ActivityMap } from '@/components/admin/ActivityMap';
 import { AnalyticsCharts } from '@/components/admin/AnalyticsCharts';
 import { AdminComplaintsTable } from '@/components/admin/AdminComplaintsTable';
+import { DynamicDashboardBackground } from '@/components/ui/DynamicDashboardBackground';
 import type { Complaint } from '@/types/complaint';
 
 export const metadata: Metadata = {
@@ -82,12 +83,8 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="relative">
-      {/* ── Dot-grid page decoration ─────────────────────────────── */}
-      <div
-        className="pointer-events-none fixed inset-0 nx-dot-grid"
-        style={{ zIndex: 0, opacity: 0.4 }}
-        aria-hidden="true"
-      />
+      {/* Dynamic ambient & interactive background */}
+      <DynamicDashboardBackground variant="admin" />
 
       <div className="relative z-10">
         {/* ── Hero panel ─────────────────────────────────────────── */}

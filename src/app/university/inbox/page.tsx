@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { ChallengeInbox } from '@/components/university/ChallengeInbox';
+import { DynamicDashboardBackground } from '@/components/ui/DynamicDashboardBackground';
 
 export const metadata = {
   title: 'University Inbox | Nagrik Seva',
@@ -65,12 +66,8 @@ export default async function InboxPage() {
 
   return (
     <div className="relative">
-      {/* Dot-grid page decoration */}
-      <div
-        className="pointer-events-none fixed inset-0 nx-dot-grid"
-        style={{ zIndex: 0, opacity: 0.35 }}
-        aria-hidden="true"
-      />
+      {/* Dynamic ambient & interactive background */}
+      <DynamicDashboardBackground variant="university" />
 
       <div className="relative z-10">
         {/* ── Hero panel ───────────────────────────────────────────── */}
