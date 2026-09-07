@@ -25,7 +25,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] flex flex-col md:flex-row">
+    <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'var(--nx-bg)' }}>
       {/* Desktop Sidebar */}
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 pb-14 md:pb-0">

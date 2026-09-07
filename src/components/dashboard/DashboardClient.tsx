@@ -18,62 +18,87 @@ export function DashboardClient({ displayName, complaints }: DashboardClientProp
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-6 flex items-start justify-between gap-4">
+      {/* ── Page header ────────────────────────────────────────── */}
+      <div className="mb-6 pb-5 border-b border-[#dde3ed] flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#191c1e] tracking-tight">
+          <h1 className="text-xl font-bold text-[#002147] tracking-tight">
             {t('welcome')}, {displayName}
           </h1>
-          <p className="text-sm text-[#545f72] mt-1">
+          <p className="text-sm text-[#718096] mt-0.5">
             {complaints.length} {t('complaints_filed')}
           </p>
         </div>
         <Link
           href="/dashboard/new"
-          className="flex items-center gap-1.5 px-4 py-2.5 bg-[#001e40] text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity flex-shrink-0"
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white rounded uppercase tracking-wider flex-shrink-0 transition-colors"
+          style={{ background: 'var(--nx-citizen)', letterSpacing: '0.05em' }}
         >
-          <span className="material-symbols-outlined text-base">add</span>
+          <span className="material-symbols-outlined text-sm">add</span>
           {t('report_issue')}
         </Link>
       </div>
 
-      {/* Stats row */}
+      {/* ── Stats ──────────────────────────────────────────────── */}
       {complaints.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-3 gap-4 mb-7">
           {[
-            { label: t('active'), count: active.length, color: 'text-[#2563EB]', bg: 'bg-[#dbeafe]' },
-            { label: t('resolved'), count: resolved.filter((c) => c.status === 'resolved').length, color: 'text-[#059669]', bg: 'bg-[#d1fae5]' },
-            { label: t('total'), count: complaints.length, color: 'text-[#001e40]', bg: 'bg-[#f7f9fb]' },
+            { label: t('active'),   count: active.length,                                              accent: '#1565c0', bg: 'var(--nx-admin-light)',   icon: 'pending_actions' },
+            { label: t('resolved'), count: resolved.filter((c) => c.status === 'resolved').length,     accent: '#1b5e20', bg: 'var(--nx-citizen-light)', icon: 'task_alt' },
+            { label: t('total'),    count: complaints.length,                                           accent: '#002147', bg: 'var(--nx-navy-light)',     icon: 'assignment' },
           ].map((stat) => (
-            <div key={stat.label} className={`${stat.bg} rounded-xl p-3 text-center border border-[#E2E8F0]`}>
-              <p className={`text-2xl font-bold ${stat.color}`}>{stat.count}</p>
-              <p className="text-xs text-[#545f72] mt-0.5">{stat.label}</p>
+            <div
+              key={stat.label}
+              className="nx-card p-4 text-center flex flex-col items-center gap-1.5"
+              style={{ background: stat.bg, borderColor: 'rgba(0,0,0,0.06)' }}
+            >
+              <span
+                className="material-symbols-outlined text-2xl"
+                style={{ color: stat.accent, fontVariationSettings: "'FILL' 1" }}
+              >
+                {stat.icon}
+              </span>
+              <p className="text-2xl font-bold" style={{ color: stat.accent }}>{stat.count}</p>
+              <p className="text-xs text-[#718096] capitalize">{stat.label}</p>
             </div>
           ))}
         </div>
       )}
 
-      {/* Empty state */}
+      {/* ── Empty state ─────────────────────────────────────────── */}
       {complaints.length === 0 && (
-        <div className="text-center py-16 flex flex-col items-center gap-4">
-          <span className="material-symbols-outlined text-5xl text-[#c3c6d1]">assignment</span>
+        <div className="nx-card py-20 text-center flex flex-col items-center gap-5">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: 'var(--nx-citizen-light)' }}>
+            <span
+              className="material-symbols-outlined text-3xl"
+              style={{ color: 'var(--nx-citizen)' }}
+            >
+              assignment
+            </span>
+          </div>
           <div>
-            <p className="text-base font-medium text-[#191c1e]">{t('no_complaints')}</p>
-            <p className="text-sm text-[#545f72] mt-1">{t('start_first_issue')}</p>
+            <p className="text-base font-semibold text-[#1a2332]">{t('no_complaints')}</p>
+            <p className="text-sm text-[#718096] mt-1">{t('start_first_issue')}</p>
           </div>
           <Link
             href="/dashboard/new"
-            className="px-6 py-3 bg-[#001e40] text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
+            className="px-6 py-2.5 text-sm font-semibold text-white rounded transition-colors"
+            style={{ background: 'var(--nx-citizen)' }}
           >
             {t('report_first_issue')}
           </Link>
         </div>
       )}
 
-      {/* Active complaints */}
+      {/* ── Active complaints ───────────────────────────────────── */}
       {active.length > 0 && (
-        <section className="mb-6">
-          <h2 className="text-sm font-semibold text-[#43474f] uppercase tracking-widest mb-3">
+        <section className="mb-7">
+          <h2 className="text-[10px] font-bold text-[#718096] uppercase tracking-[0.12em] mb-3 flex items-center gap-2">
+            <span
+              className="material-symbols-outlined text-sm"
+              style={{ color: 'var(--nx-admin)' }}
+            >
+              pending_actions
+            </span>
             {t('active')} ({active.length})
           </h2>
           <div className="flex flex-col gap-3">
@@ -84,10 +109,16 @@ export function DashboardClient({ displayName, complaints }: DashboardClientProp
         </section>
       )}
 
-      {/* Resolved complaints */}
+      {/* ── Resolved complaints ─────────────────────────────────── */}
       {resolved.length > 0 && (
         <section>
-          <h2 className="text-sm font-semibold text-[#43474f] uppercase tracking-widest mb-3">
+          <h2 className="text-[10px] font-bold text-[#718096] uppercase tracking-[0.12em] mb-3 flex items-center gap-2">
+            <span
+              className="material-symbols-outlined text-sm"
+              style={{ color: 'var(--nx-citizen)' }}
+            >
+              task_alt
+            </span>
             {t('resolved')} ({resolved.length})
           </h2>
           <div className="flex flex-col gap-3">

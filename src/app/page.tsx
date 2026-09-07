@@ -2,163 +2,260 @@ import Link from 'next/link';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navbar */}
-      <header className="border-b border-[#E2E8F0] bg-white sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--nx-bg)' }}>
+
+      {/* ── Utility bar ─────────────────────────────────────────── */}
+      <div className="gov-utility-bar">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 h-9 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#001e40] flex items-center justify-center">
-              <span className="material-symbols-outlined text-white text-lg">public</span>
-            </div>
-            <span className="text-xl font-bold text-[#191c1e] tracking-tight">Nagrik Seva</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-semibold text-[#001e40] hover:text-[#2563EB] transition-colors">
-              Log in
-            </Link>
-            <Link href="/login" className="hidden sm:inline-flex items-center justify-center px-4 py-2 bg-[#001e40] text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity">
-              Report Issue
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-[#f7f9fb] pt-16 md:pt-24 pb-20 md:pb-32 px-4">
-        {/* Background decorative elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#dbeafe] rounded-full blur-3xl opacity-50 translate-x-1/3 -translate-y-1/3" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#fef3c7] rounded-full blur-3xl opacity-50 -translate-x-1/3 translate-y-1/3" />
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#E2E8F0] mb-6 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" />
-            <span className="text-xs font-semibold text-[#43474f] uppercase tracking-wide">AI-Powered Civic Platform</span>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-[#191c1e] tracking-tight leading-tight mb-6">
-            Smarter Cities, <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#001e40] to-[#2563EB]">
-              Powered by AI & Citizens
+            <span className="text-base">🇮🇳</span>
+            <span className="text-xs font-medium tracking-wide text-white/85 hidden sm:inline">
+              Government of India
             </span>
-          </h1>
-          <p className="text-lg md:text-xl text-[#545f72] mb-10 max-w-2xl mx-auto leading-relaxed">
-            Report civic issues instantly. Our AI automatically classifies complaints, assigns the right department, and verifies the proof of work submitted by municipal workers.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/login" className="w-full sm:w-auto px-8 py-4 bg-[#001e40] text-white text-base font-semibold rounded-xl hover:-translate-y-1 hover:shadow-xl hover:bg-[#002a5c] transition-all duration-200 shadow-lg shadow-[#001e40]/30">
-              Report an Issue Now
-            </Link>
-            <Link href="#how-it-works" className="w-full sm:w-auto px-8 py-4 bg-white text-[#001e40] border-2 border-[#001e40] text-base font-semibold rounded-xl hover:bg-[#001e40] hover:text-white transition-all duration-200">
-              How it works
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-white/60 hidden sm:inline">Skip to main content</span>
+            <Link href="/login" className="text-xs text-white/85 hover:text-white font-medium transition-colors">
+              Portal Login →
             </Link>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Features / How it works */}
-      <section id="how-it-works" className="py-20 md:py-32 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#191c1e] tracking-tight mb-4">A Closed-Loop System</h2>
-          <p className="text-[#545f72] max-w-2xl mx-auto">From reporting to resolution, Nagrik Seva brings accountability and speed through AI.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              icon: 'photo_camera',
-              title: '1. Citizen Reports',
-              desc: 'Take a photo of the issue. Our AI instantly classifies the problem (e.g. Pothole) and determines the severity.',
-              color: 'text-[#2563EB]',
-              bg: 'bg-[#dbeafe]',
-            },
-            {
-              icon: 'smart_toy',
-              title: '2. AI Smart Routing',
-              desc: 'The complaint is automatically routed to the correct municipal department based on image analysis and location.',
-              color: 'text-[#7C3AED]',
-              bg: 'bg-[#ede9fe]',
-            },
-            {
-              icon: 'verified',
-              title: '3. Proof & Verification',
-              desc: 'Worker submits an "after" photo upon completion. AI verifies the fix by comparing before/after photos.',
-              color: 'text-[#059669]',
-              bg: 'bg-[#d1fae5]',
-            },
-          ].map((feature, i) => (
-            <div key={i} className="bg-white border border-[#E2E8F0] rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
-              <div className={`w-14 h-14 rounded-xl ${feature.bg} flex items-center justify-center mb-6`}>
-                <span className={`material-symbols-outlined text-2xl ${feature.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {feature.icon}
-                </span>
-              </div>
-              <h3 className="text-xl font-bold text-[#191c1e] mb-3">{feature.title}</h3>
-              <p className="text-[#545f72] leading-relaxed">{feature.desc}</p>
+      {/* ── Brand header ─────────────────────────────────────────── */}
+      <div className="gov-brand-header">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-14 h-14 rounded-full bg-[#002147] flex items-center justify-center shadow-md flex-shrink-0">
+              <span
+                className="material-symbols-outlined text-white text-2xl"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                account_balance
+              </span>
             </div>
-          ))}
-        </div>
-      </section>
+            <div>
+              <h1 className="text-xl font-bold text-[#002147] leading-tight tracking-tight">
+                Nagrik Seva
+              </h1>
+              <p className="text-[12px] text-[#4a5568] leading-tight">
+                Municipal Corporation &amp; Urban Development
+              </p>
+            </div>
+          </div>
 
-      {/* Roles Section */}
-      <section className="bg-[#001e40] text-white py-20 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Designed for Every Stakeholder</h2>
-            <p className="text-[#c3c6d1] text-lg mb-8 leading-relaxed">
-              Nagrik Seva provides tailored dashboards for citizens, field workers, supervisors, and verification officers.
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            {[
+              { label: 'Home', href: '/', icon: 'home' },
+              { label: 'About Us', href: '#about', icon: '' },
+              { label: 'Contact Us', href: '#contact', icon: 'phone' },
+              { label: 'Helpdesk', href: '#', icon: 'help' },
+            ].map((n) => (
+              <Link
+                key={n.label}
+                href={n.href}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-[#4a5568] hover:text-[#002147] rounded transition-colors"
+              >
+                {n.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* ── Tab nav ────────────────────────────────────────────────── */}
+      <nav className="nx-tab-nav border-b border-white/10">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 flex items-end">
+          <Link href="/" className="nx-tab-link active flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-sm">home</span>
+            Home
+          </Link>
+          <Link href="#about" className="nx-tab-link flex items-center gap-1.5">About Us</Link>
+          <Link href="#contact" className="nx-tab-link flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-sm">phone</span>
+            Contact Us
+          </Link>
+          <Link href="#" className="nx-tab-link flex items-center gap-1.5">
+            <span className="material-symbols-outlined text-sm">mail</span>
+            Helpdesk
+          </Link>
+        </div>
+      </nav>
+
+      {/* ── Hero banner ─────────────────────────────────────────────── */}
+      <main id="main-content" className="flex-1">
+        {/* Banner image strip */}
+        <div
+          className="relative h-52 md:h-64 overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #002147 0%, #003166 50%, #1565c0 100%)' }}
+        >
+          {/* Decorative circles */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-4 right-16 w-40 h-40 rounded-full border-4 border-white" />
+            <div className="absolute -bottom-8 right-32 w-28 h-28 rounded-full border-2 border-white" />
+            <div className="absolute top-8 left-1/3 w-20 h-20 rounded-full border-2 border-white" />
+          </div>
+
+          <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
+            {/* Ashoka emblem */}
+            <div className="w-16 h-16 rounded-full bg-white/15 border-2 border-white/30 flex items-center justify-center mb-3">
+              <span
+                className="material-symbols-outlined text-white text-3xl"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                account_balance
+              </span>
+            </div>
+            <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tight">
+              Nagrik Seva
+            </h2>
+            <p className="text-white/80 text-sm md:text-base mt-1">
+              Municipal Corporation &amp; Urban Development
             </p>
-            <ul className="space-y-4">
-              {[
-                { label: 'Citizens', desc: 'Track complaints and download PDF receipts' },
-                { label: 'Field Workers', desc: 'Receive tasks and submit completion proofs' },
-                { label: 'Supervisors', desc: 'Review AI suggestions and manage workforce' },
-                { label: 'Officers', desc: 'Final review of AI-verified resolution proofs' },
-              ].map((role, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="material-symbols-outlined text-[#3b82f6] mt-0.5">check_circle</span>
-                  <div>
-                    <strong className="block text-white">{role.label}</strong>
-                    <span className="text-sm text-[#c3c6d1]">{role.desc}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="bg-[#f7f9fb] p-8 rounded-2xl text-[#191c1e] shadow-2xl transform md:rotate-2">
-            {/* Mock Dashboard Preview */}
-            <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-4 mb-4">
-              <span className="font-bold text-lg">My Complaints</span>
-              <span className="px-3 py-1 bg-[#d1fae5] text-[#059669] text-xs font-bold rounded-full">Resolved</span>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-1/2 aspect-square bg-[#e2e8f0] rounded-lg relative overflow-hidden flex items-center justify-center group">
-                <span className="text-xs font-bold text-white uppercase bg-black/50 px-2 py-1 rounded absolute top-2 left-2 z-10">Before</span>
-                <span className="material-symbols-outlined text-4xl text-black/20">broken_image</span>
-              </div>
-              <div className="w-1/2 aspect-square bg-[#e2e8f0] rounded-lg relative overflow-hidden flex items-center justify-center">
-                 <span className="text-xs font-bold text-white uppercase bg-[#059669]/90 px-2 py-1 rounded absolute top-2 left-2 z-10">After</span>
-                 <span className="material-symbols-outlined text-4xl text-black/20">image</span>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-[#ede9fe] border border-[#7C3AED]/30 rounded-lg flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#7C3AED]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-              <span className="text-sm font-semibold text-[#7C3AED]">AI Confirmed Resolution (98%)</span>
-            </div>
           </div>
         </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-[#E2E8F0] py-12 px-4 text-center">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <div className="w-6 h-6 rounded-md bg-[#001e40] flex items-center justify-center">
-            <span className="material-symbols-outlined text-white text-sm">public</span>
+        {/* ── Welcome + Portal Cards ─────────────────────────────── */}
+        <div className="bg-white border-b border-[#dde3ed] py-10 px-4">
+          <div className="max-w-4xl mx-auto text-center mb-10">
+            <h2 className="text-2xl font-bold text-[#002147] mb-2">Welcome</h2>
+            <p className="text-[#4a5568]">Please select your portal to log in</p>
           </div>
-          <span className="text-lg font-bold text-[#191c1e]">Nagrik Seva</span>
+
+          <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+            {/* Citizen */}
+            <Link href="/login" className="group block nx-card nx-card-green p-6 text-center hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-full bg-[#1b5e20] flex items-center justify-center mx-auto mb-3">
+                <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>groups</span>
+              </div>
+              <p className="text-xs font-bold text-[#1b5e20] uppercase tracking-widest mb-1">Citizen Portal</p>
+              <p className="text-xs text-[#4a5568]">Report civic issues and track status with AI</p>
+              <div className="mt-4 px-4 py-1.5 bg-[#1b5e20] text-white text-xs font-semibold rounded inline-flex items-center gap-1">
+                Login <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </div>
+            </Link>
+
+            {/* Worker */}
+            <Link href="/login" className="group block nx-card nx-card-amber p-6 text-center hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-full bg-[#b45309] flex items-center justify-center mx-auto mb-3">
+                <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>engineering</span>
+              </div>
+              <p className="text-xs font-bold text-[#b45309] uppercase tracking-widest mb-1">Field Worker Portal</p>
+              <p className="text-xs text-[#4a5568]">Manage field tasks and update issue resolutions</p>
+              <div className="mt-4 px-4 py-1.5 bg-[#b45309] text-white text-xs font-semibold rounded inline-flex items-center gap-1">
+                Login <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </div>
+            </Link>
+
+            {/* Admin */}
+            <Link href="/login" className="group block nx-card nx-card-navy p-6 text-center hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-full bg-[#002147] flex items-center justify-center mx-auto mb-3">
+                <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>admin_panel_settings</span>
+              </div>
+              <p className="text-xs font-bold text-[#002147] uppercase tracking-widest mb-1">Officer Portal</p>
+              <p className="text-xs text-[#4a5568]">Access municipal analytics, maps &amp; issue resolution</p>
+              <div className="mt-4 px-4 py-1.5 bg-[#002147] text-white text-xs font-semibold rounded inline-flex items-center gap-1">
+                Login <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </div>
+            </Link>
+
+            {/* NGO */}
+            <Link href="/login" className="group block nx-card nx-card-teal p-6 text-center hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-full bg-[#00695c] flex items-center justify-center mx-auto mb-3">
+                <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>volunteer_activism</span>
+              </div>
+              <p className="text-xs font-bold text-[#00695c] uppercase tracking-widest mb-1">NGO Portal</p>
+              <p className="text-xs text-[#4a5568]">Track accountability and escalate unresolved issues</p>
+              <div className="mt-4 px-4 py-1.5 bg-[#00695c] text-white text-xs font-semibold rounded inline-flex items-center gap-1">
+                Login <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </div>
+            </Link>
+          </div>
         </div>
-        <p className="text-sm text-[#545f72] max-w-md mx-auto">
-          An AI-powered platform for smarter, cleaner, and better cities. <br/>
-          (Prototype for demonstration purposes)
-        </p>
+
+        {/* ── How it works ──────────────────────────────────────────── */}
+        <section id="about" className="py-16 px-4 max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold text-[#002147] tracking-tight mb-2">A Closed-Loop System</h2>
+            <p className="text-[#4a5568] max-w-xl mx-auto text-sm">
+              From reporting to resolution — AI brings speed and accountability.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                step: '01',
+                icon: 'photo_camera',
+                title: 'Citizen Reports',
+                desc: 'Take a photo of the issue. AI instantly classifies the problem and determines severity.',
+                accent: '#1565c0',
+                bg: '#e3f0fd',
+              },
+              {
+                step: '02',
+                icon: 'smart_toy',
+                title: 'AI Smart Routing',
+                desc: 'The complaint is automatically routed to the correct department based on image analysis.',
+                accent: '#5c35a8',
+                bg: '#f0ebfc',
+              },
+              {
+                step: '03',
+                icon: 'verified',
+                title: 'Proof & Verification',
+                desc: 'Worker submits an "after" photo upon completion. AI verifies the fix by comparing photos.',
+                accent: '#1b5e20',
+                bg: '#e8f5e9',
+              },
+            ].map((f) => (
+              <div key={f.step} className="nx-card p-6 flex flex-col gap-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-xs font-bold text-[#4a5568] bg-[#f4f6fa] border border-[#dde3ed] px-2 py-0.5 rounded font-mono flex-shrink-0">
+                    STEP {f.step}
+                  </span>
+                </div>
+                <div
+                  className="w-12 h-12 rounded-lg flex items-center justify-center"
+                  style={{ background: f.bg }}
+                >
+                  <span
+                    className="material-symbols-outlined text-xl"
+                    style={{ color: f.accent, fontVariationSettings: "'FILL' 1" }}
+                  >
+                    {f.icon}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-[#1a2332] mb-1">{f.title}</h3>
+                  <p className="text-sm text-[#4a5568] leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* ── Footer ─────────────────────────────────────────────────── */}
+      <footer className="nx-footer">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center">
+              <span className="material-symbols-outlined text-white text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>account_balance</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">Government of India</p>
+              <p className="text-xs text-white/60">Nagrik Seva — Municipal Grievance Portal</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-6">
+            {['Terms & Conditions', 'Privacy Policy', 'Helpdesk'].map((l) => (
+              <a key={l} href="#" className="text-xs text-white/65 hover:text-white transition-colors">
+                {l}
+              </a>
+            ))}
+          </div>
+        </div>
       </footer>
     </div>
   );

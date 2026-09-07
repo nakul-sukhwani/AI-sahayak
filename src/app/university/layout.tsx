@@ -27,9 +27,9 @@ export default async function UniversityLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--nx-bg)' }}>
       <Navbar />
-      <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-8 py-6 pb-20 md:pb-6">
+      <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-8 py-6 pb-24 md:pb-8">
         {children}
       </main>
       <MobileNav />

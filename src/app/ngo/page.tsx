@@ -8,12 +8,21 @@ export const metadata: Metadata = {
   description: 'Monitor government accountability and track civic issue resolution in your community.',
 };
 
-// A complaint is considered "overdue" if it's been open for more than 7 days
 const OVERDUE_DAYS = 7;
 
 function getDaysOpen(created_at: string): number {
   return Math.floor((Date.now() - new Date(created_at).getTime()) / (1000 * 3600 * 24));
 }
+
+const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
+  pending:     { bg: '#fff3e0', color: '#e65100' },
+  open:        { bg: '#e3f0fd', color: '#1565c0' },
+  assigned:    { bg: '#f3e5f5', color: '#6a1b9a' },
+  in_progress: { bg: '#e0f7fa', color: '#00695c' },
+  resolved:    { bg: '#e8f5e9', color: '#1b5e20' },
+  closed:      { bg: '#f4f6fa', color: '#718096' },
+  rejected:    { bg: '#ffebee', color: '#b71c1c' },
+};
 
 export default async function NGODashboardPage() {
   const isLocalDev = process.env.NODE_ENV === 'development';
@@ -58,114 +67,163 @@ export default async function NGODashboardPage() {
   const pending = myComplaints.filter(c => !['resolved', 'closed'].includes(c.status));
   const resolved = myComplaints.filter(c => c.status === 'resolved');
 
-  const statusColors: Record<string, string> = {
-    pending:     'bg-[#fef3c7] text-[#92400e]',
-    open:        'bg-[#eff6ff] text-[#1d4ed8]',
-    assigned:    'bg-[#f3e8ff] text-[#6d28d9]',
-    in_progress: 'bg-[#cffafe] text-[#0e7490]',
-    resolved:    'bg-[#d1fae5] text-[#065f46]',
-    closed:      'bg-[#f1f5f9] text-[#64748b]',
-    rejected:    'bg-[#fee2e2] text-[#b91c1c]',
-  };
-
   return (
-    <>
-      {/* Header */}
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      {/* ── Page header ──────────────────────────────────────────── */}
+      <div className="mb-6 pb-5 border-b border-[#dde3ed] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-[#191c1e] tracking-tight">
-            {orgName}
-          </h1>
-          <p className="text-sm text-[#545f72] mt-1">
+          <div className="flex items-center gap-2 mb-0.5">
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ background: 'var(--nx-ngo-light)' }}
+            >
+              <span
+                className="material-symbols-outlined text-sm"
+                style={{ color: 'var(--nx-ngo)', fontVariationSettings: "'FILL' 1" }}
+              >
+                volunteer_activism
+              </span>
+            </div>
+            <span
+              className="text-[10px] font-bold uppercase tracking-widest"
+              style={{ color: 'var(--nx-ngo)' }}
+            >
+              NGO Portal
+            </span>
+          </div>
+          <h1 className="text-xl font-bold text-[#002147] tracking-tight">{orgName}</h1>
+          <p className="text-sm text-[#718096] mt-0.5">
             Monitoring government accountability for civic issues in your community.
           </p>
         </div>
         <Link
           href="/dashboard/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#001e40] text-white text-sm font-semibold rounded-xl hover:bg-[#002a5c] transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded uppercase tracking-wider transition-colors flex-shrink-0"
+          style={{ background: 'var(--nx-ngo)' }}
         >
-          <span className="material-symbols-outlined text-base">add_circle</span>
+          <span className="material-symbols-outlined text-sm">add_circle</span>
           File a Complaint
         </Link>
       </div>
 
-      {/* Accountability Alert Banner */}
+      {/* ── Overdue alert ────────────────────────────────────────── */}
       {overdue.length > 0 && (
-        <div className="mb-6 bg-[#fff7ed] border border-[#f97316] rounded-xl p-4 flex items-start gap-3">
-          <span className="material-symbols-outlined text-[#f97316] text-2xl flex-shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <div
+          className="mb-6 rounded border-l-4 p-4 flex items-start gap-3"
+          style={{ background: 'var(--nx-warning-light)', borderLeftColor: 'var(--nx-warning)' }}
+        >
+          <span
+            className="material-symbols-outlined text-2xl flex-shrink-0"
+            style={{ color: 'var(--nx-warning)', fontVariationSettings: "'FILL' 1" }}
+          >
             warning
           </span>
           <div>
-            <p className="text-sm font-bold text-[#c2410c]">
-              {overdue.length} complaint{overdue.length > 1 ? 's are' : ' is'} overdue (beyond {OVERDUE_DAYS} days)!
+            <p className="text-sm font-bold" style={{ color: 'var(--nx-warning)' }}>
+              {overdue.length} complaint{overdue.length > 1 ? 's are' : ' is'} overdue
+              (beyond {OVERDUE_DAYS} days)
             </p>
-            <p className="text-xs text-[#9a3412] mt-0.5">
-              The government has not resolved these issues within the expected timeframe. Consider escalating or re-filing.
+            <p className="text-xs mt-0.5 text-[#718096]">
+              Government has not resolved these issues within the expected timeframe. Consider escalating or re-filing.
             </p>
           </div>
         </div>
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      {/* ── Stats ─────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-7">
         {[
-          { label: 'Total Filed', value: total, icon: 'assignment', color: 'text-[#2563eb]', bg: 'bg-[#eff6ff]' },
-          { label: 'Pending', value: pending.length, icon: 'pending_actions', color: 'text-[#d97706]', bg: 'bg-[#fffbeb]' },
-          { label: 'Overdue', value: overdue.length, icon: 'schedule', color: 'text-[#dc2626]', bg: 'bg-[#fee2e2]' },
-          { label: 'Resolved', value: resolved.length, icon: 'task_alt', color: 'text-[#059669]', bg: 'bg-[#d1fae5]' },
+          { label: 'Total Filed', value: total,           icon: 'assignment',    accent: '#1565c0', bgVar: 'var(--nx-admin-light)' },
+          { label: 'Pending',     value: pending.length,  icon: 'pending_actions', accent: '#e65100', bgVar: 'var(--nx-warning-light)' },
+          { label: 'Overdue',     value: overdue.length,  icon: 'schedule',      accent: '#b71c1c', bgVar: 'var(--nx-error-light)' },
+          { label: 'Resolved',    value: resolved.length, icon: 'task_alt',      accent: '#1b5e20', bgVar: 'var(--nx-success-light)' },
         ].map((s) => (
-          <div key={s.label} className="bg-white border border-[#E2E8F0] p-4 rounded-xl shadow-sm flex flex-col gap-2">
-            <div className={`w-9 h-9 rounded-lg ${s.bg} flex items-center justify-center`}>
-              <span className={`material-symbols-outlined text-xl ${s.color}`} style={{ fontVariationSettings: "'FILL' 1" }}>
-                {s.icon}
-              </span>
-            </div>
-            <p className="text-2xl font-bold text-[#191c1e]">{s.value}</p>
-            <p className="text-xs text-[#545f72]">{s.label}</p>
+          <div
+            key={s.label}
+            className="nx-card p-4 flex flex-col gap-1.5"
+            style={{ background: s.bgVar, borderColor: 'rgba(0,0,0,0.06)' }}
+          >
+            <span
+              className="material-symbols-outlined text-xl"
+              style={{ color: s.accent, fontVariationSettings: "'FILL' 1" }}
+            >
+              {s.icon}
+            </span>
+            <p className="text-2xl font-bold" style={{ color: s.accent }}>{s.value}</p>
+            <p className="text-xs text-[#718096]">{s.label}</p>
           </div>
         ))}
       </div>
 
-      {/* Overdue Issues — Accountability Tracker */}
+      {/* ── Accountability tracker ────────────────────────────────── */}
       {overdue.length > 0 && (
-        <div className="bg-white border border-[#f97316]/40 rounded-xl shadow-sm overflow-hidden mb-6">
-          <div className="p-4 border-b border-[#f97316]/20 bg-[#fff7ed] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#f97316]" style={{ fontVariationSettings: "'FILL' 1" }}>gavel</span>
+        <div
+          className="nx-card overflow-hidden mb-6"
+          style={{ borderColor: 'rgba(230,81,0,0.3)' }}
+        >
+          <div
+            className="px-5 py-3 border-b flex items-center gap-2"
+            style={{ background: 'var(--nx-warning-light)', borderColor: 'rgba(230,81,0,0.2)' }}
+          >
+            <span
+              className="material-symbols-outlined text-base"
+              style={{ color: 'var(--nx-warning)', fontVariationSettings: "'FILL' 1" }}
+            >
+              gavel
+            </span>
             <div>
-              <h2 className="text-sm font-bold text-[#9a3412]">Accountability Tracker — Overdue Issues</h2>
-              <p className="text-xs text-[#c2410c]">These complaints exceeded the {OVERDUE_DAYS}-day resolution window. You can re-file to escalate.</p>
+              <h2 className="text-sm font-bold" style={{ color: '#c2410c' }}>
+                Accountability Tracker — Overdue Issues
+              </h2>
+              <p className="text-xs text-[#718096]">
+                These complaints exceeded the {OVERDUE_DAYS}-day resolution window.
+              </p>
             </div>
           </div>
-          <div className="divide-y divide-[#fef3c7]">
+          <div className="divide-y divide-[#f4f6fa]">
             {overdue.map((c) => {
               const days = getDaysOpen(c.created_at);
               return (
-                <div key={c.id} className="flex items-center justify-between px-4 py-3.5 gap-3">
+                <div key={c.id} className="flex items-center justify-between px-5 py-3.5 gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-lg bg-[#fee2e2] flex items-center justify-center flex-shrink-0">
-                      <span className="material-symbols-outlined text-[#dc2626] text-base">schedule</span>
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: 'var(--nx-error-light)' }}
+                    >
+                      <span
+                        className="material-symbols-outlined text-base"
+                        style={{ color: 'var(--nx-error)' }}
+                      >
+                        schedule
+                      </span>
                     </div>
                     <div className="min-w-0">
-                      <Link href={`/dashboard/${c.id}`} className="text-sm font-medium text-[#191c1e] truncate hover:text-[#2563eb] transition-colors block">
+                      <Link
+                        href={`/dashboard/${c.id}`}
+                        className="text-sm font-medium text-[#1a2332] truncate hover:text-[#1565c0] transition-colors block"
+                      >
                         {c.title || c.issue_type}
                       </Link>
-                      <p className="text-xs text-[#dc2626] mt-0.5 font-medium">
+                      <p className="text-xs mt-0.5 font-medium" style={{ color: 'var(--nx-error)' }}>
                         Open for {days} days · {c.status.replace('_', ' ')}
                       </p>
                     </div>
                   </div>
-                  <Link
-                    href="/dashboard/new"
-                    className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#dc2626] text-white text-xs font-semibold rounded-lg hover:bg-[#b91c1c] transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-sm">refresh</span>
-                    Re-file
-                  </Link>
-                  <NGOLetterModal
-                    complaintId={c.id}
-                    complaintTitle={c.title || c.issue_type}
-                    daysOpen={days}
-                  />
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Link
+                      href="/dashboard/new"
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white rounded transition-colors"
+                      style={{ background: 'var(--nx-error)' }}
+                    >
+                      <span className="material-symbols-outlined text-sm">refresh</span>
+                      Re-file
+                    </Link>
+                    <NGOLetterModal
+                      complaintId={c.id}
+                      complaintTitle={c.title || c.issue_type}
+                      daysOpen={days}
+                    />
+                  </div>
                 </div>
               );
             })}
@@ -173,56 +231,91 @@ export default async function NGODashboardPage() {
         </div>
       )}
 
-      {/* All Complaints */}
-      <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-sm overflow-hidden mb-6">
-        <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between">
+      {/* ── All Complaints ────────────────────────────────────────── */}
+      <div className="nx-card overflow-hidden mb-6">
+        <div
+          className="px-5 py-3 border-b border-[#dde3ed] flex items-center justify-between"
+          style={{ background: 'var(--nx-ngo-light)' }}
+        >
           <div>
-            <h2 className="text-sm font-semibold text-[#191c1e]">All Filed Complaints</h2>
-            <p className="text-xs text-[#545f72] mt-0.5">Track resolution status of all your submissions.</p>
+            <h2 className="text-sm font-bold text-[#002147]">All Filed Complaints</h2>
+            <p className="text-xs text-[#718096] mt-0.5">Track resolution status of all your submissions.</p>
           </div>
-          <Link href="/feed" className="text-xs text-[#2563eb] font-medium hover:underline">
+          <Link
+            href="/feed"
+            className="text-xs font-semibold transition-colors"
+            style={{ color: 'var(--nx-ngo)' }}
+          >
             Public feed →
           </Link>
         </div>
 
         {myComplaints.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <div className="w-14 h-14 bg-[#f1f5f9] rounded-full flex items-center justify-center">
-              <span className="material-symbols-outlined text-3xl text-[#94a3b8]">groups</span>
+          <div
+            className="flex flex-col items-center justify-center py-16 gap-3"
+            style={{ background: 'var(--nx-ngo-light)' }}
+          >
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center"
+              style={{ background: 'rgba(0,105,92,0.1)' }}
+            >
+              <span
+                className="material-symbols-outlined text-3xl"
+                style={{ color: 'var(--nx-ngo)', opacity: 0.6 }}
+              >
+                groups
+              </span>
             </div>
-            <p className="text-sm font-medium text-[#545f72]">No complaints filed yet.</p>
-            <Link href="/dashboard/new" className="text-sm text-[#2563eb] font-medium hover:underline">
+            <p className="text-sm font-medium text-[#4a5568]">No complaints filed yet.</p>
+            <Link
+              href="/dashboard/new"
+              className="text-sm font-semibold transition-colors"
+              style={{ color: 'var(--nx-ngo)' }}
+            >
               File your first complaint →
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-[#f1f5f9]">
+          <div className="divide-y divide-[#f4f6fa]">
             {myComplaints.map((c) => {
               const days = getDaysOpen(c.created_at);
               const isOverdue = !['resolved', 'closed'].includes(c.status) && days > OVERDUE_DAYS;
+              const statusStyle = STATUS_STYLES[c.status] ?? { bg: '#f4f6fa', color: '#718096' };
               return (
                 <Link
                   key={c.id}
                   href={`/dashboard/${c.id}`}
-                  className="flex items-center justify-between px-4 py-3.5 hover:bg-[#f8fafc] transition-colors group"
+                  className="flex items-center justify-between px-5 py-3.5 hover:bg-[#f8fbfa] transition-colors group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isOverdue ? 'bg-[#fee2e2]' : 'bg-[#eff6ff]'}`}>
-                      <span className={`material-symbols-outlined text-base ${isOverdue ? 'text-[#dc2626]' : 'text-[#2563eb]'}`}>
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ background: isOverdue ? 'var(--nx-error-light)' : 'var(--nx-ngo-light)' }}
+                    >
+                      <span
+                        className="material-symbols-outlined text-base"
+                        style={{ color: isOverdue ? 'var(--nx-error)' : 'var(--nx-ngo)' }}
+                      >
                         {isOverdue ? 'schedule' : 'assignment'}
                       </span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-[#191c1e] truncate group-hover:text-[#2563eb] transition-colors">
+                      <p className="text-sm font-medium text-[#1a2332] truncate group-hover:text-[#00695c] transition-colors">
                         {c.title || c.issue_type}
                       </p>
-                      <p className={`text-xs mt-0.5 ${isOverdue ? 'text-[#dc2626] font-medium' : 'text-[#94a3b8]'}`}>
+                      <p
+                        className="text-xs mt-0.5"
+                        style={{ color: isOverdue ? 'var(--nx-error)' : '#718096', fontWeight: isOverdue ? 600 : 400 }}
+                      >
                         {isOverdue ? `⚠ ${days} days open` : `${days} day${days !== 1 ? 's' : ''} ago`}
                         {' · '}{new Date(c.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                       </p>
                     </div>
                   </div>
-                  <span className={`ml-4 flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${statusColors[c.status] ?? 'bg-[#f1f5f9] text-[#64748b]'}`}>
+                  <span
+                    className="nx-badge ml-4 flex-shrink-0 capitalize"
+                    style={{ background: statusStyle.bg, color: statusStyle.color }}
+                  >
                     {c.status.replace('_', ' ')}
                   </span>
                 </Link>
@@ -232,19 +325,28 @@ export default async function NGODashboardPage() {
         )}
       </div>
 
-      {/* Info box */}
-      <div className="bg-[#f0f9ff] border border-[#bae6fd] rounded-xl p-4 flex items-start gap-3">
-        <span className="material-symbols-outlined text-[#0284c7] flex-shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+      {/* ── Info box ─────────────────────────────────────────────── */}
+      <div
+        className="rounded border-l-4 p-4 flex items-start gap-3"
+        style={{ background: 'var(--nx-info-light)', borderLeftColor: 'var(--nx-info)' }}
+      >
+        <span
+          className="material-symbols-outlined flex-shrink-0"
+          style={{ color: 'var(--nx-info)', fontVariationSettings: "'FILL' 1" }}
+        >
           info
         </span>
         <div>
-          <p className="text-sm font-semibold text-[#0369a1]">How NGO Accountability Works</p>
-          <p className="text-xs text-[#0c4a6e] mt-1 leading-relaxed">
-            Your NGO can file civic complaints on behalf of the community. Any issue not resolved within <strong>{OVERDUE_DAYS} days</strong> is flagged as overdue. 
-            You can re-file the complaint to escalate it and ensure the government stays accountable.
+          <p className="text-sm font-bold" style={{ color: 'var(--nx-info)' }}>
+            How NGO Accountability Works
+          </p>
+          <p className="text-xs text-[#4a5568] mt-1 leading-relaxed">
+            Your NGO can file civic complaints on behalf of the community. Any issue not resolved within{' '}
+            <strong>{OVERDUE_DAYS} days</strong> is flagged as overdue. You can re-file the complaint to
+            escalate it and generate an official letter to the District Collector or SDM to ensure accountability.
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,19 +1,58 @@
 @import "tailwindcss";
 
-/* ── Design tokens — Nagrik Seva / Stitch ─────────────────────────── */
+/* ── UI Nexus — Government Portal Design Tokens ────────────────── */
 :root {
-  --color-primary:       #001e40;
-  --color-secondary:     #545f72;
-  --color-background:    #f7f9fb;
-  --color-surface:       #ffffff;
-  --color-border:        #E2E8F0;
-  --color-success:       #059669;
-  --color-warning:       #D97706;
-  --color-error:         #DC2626;
-  --color-ai-accent:     #7C3AED;
+  /* Core navy — header, buttons, sidebar */
+  --nx-navy:           #002147;
+  --nx-navy-hover:     #003166;
+  --nx-navy-light:     #e8eef6;
+
+  /* Surfaces */
+  --nx-bg:             #f4f6fa;
+  --nx-surface:        #ffffff;
+  --nx-border:         #dde3ed;
+  --nx-border-strong:  #b8c4d6;
+
+  /* Text */
+  --nx-text-primary:   #1a2332;
+  --nx-text-secondary: #4a5568;
+  --nx-text-muted:     #718096;
+
+  /* Portal accent colours — each dashboard has its own tint */
+  --nx-citizen:        #1b5e20; /* deep green */
+  --nx-citizen-light:  #e8f5e9;
+  --nx-worker:         #b45309; /* amber-brown */
+  --nx-worker-light:   #fef3e2;
+  --nx-admin:          #1565c0; /* gov blue */
+  --nx-admin-light:    #e3f0fd;
+  --nx-ngo:            #00695c; /* teal */
+  --nx-ngo-light:      #e0f2f1;
+  --nx-university:     #4a148c; /* deep purple */
+  --nx-university-light: #f3e5f5;
+
+  /* Status */
+  --nx-success:        #2e7d32;
+  --nx-success-light:  #e8f5e9;
+  --nx-warning:        #e65100;
+  --nx-warning-light:  #fff3e0;
+  --nx-error:          #b71c1c;
+  --nx-error-light:    #ffebee;
+  --nx-info:           #01579b;
+  --nx-info-light:     #e1f5fe;
+
+  /* Legacy aliases kept for backward compat */
+  --color-primary:     var(--nx-navy);
+  --color-secondary:   var(--nx-text-secondary);
+  --color-background:  var(--nx-bg);
+  --color-surface:     var(--nx-surface);
+  --color-border:      var(--nx-border);
+  --color-success:     var(--nx-success);
+  --color-warning:     var(--nx-warning);
+  --color-error:       var(--nx-error);
+  --color-ai-accent:   #5c35a8;
 }
 
-/* ── Base ─────────────────────────────────────────────────────────── */
+/* ── Base ─────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -24,14 +63,14 @@ html {
 }
 
 body {
-  font-family: var(--font-inter), 'Inter', system-ui, sans-serif;
-  background: var(--color-background);
-  color: #191c1e;
+  font-family: 'Noto Sans', 'Inter', system-ui, sans-serif;
+  background: var(--nx-bg);
+  color: var(--nx-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Material Symbols config — used across all Stitch screens */
+/* ── Material Symbols ─────────────────────────────────────────── */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   vertical-align: middle;
@@ -39,35 +78,186 @@ body {
   display: inline-block;
 }
 
-/* ── Animations ───────────────────────────────────────────────────── */
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ── Govt utility bar ─────────────────────────────────────────── */
+.gov-utility-bar {
+  background: var(--nx-navy);
+  color: rgba(255,255,255,0.85);
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
+/* ── Brand header ─────────────────────────────────────────────── */
+.gov-brand-header {
+  background: var(--nx-surface);
+  border-bottom: 3px solid var(--nx-navy);
+}
+
+/* ── Tab-style navigation ─────────────────────────────────────── */
+.nx-tab-nav {
+  background: var(--nx-navy);
+}
+.nx-tab-link {
+  color: rgba(255,255,255,0.75);
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.nx-tab-link:hover {
+  color: #fff;
+  border-bottom-color: rgba(255,255,255,0.5);
+}
+.nx-tab-link.active {
+  color: #fff;
+  border-bottom-color: #fff;
+  font-weight: 600;
+}
+
+/* ── Form card panels (portal-coloured) ───────────────────────── */
+.nx-card {
+  background: var(--nx-surface);
+  border: 1px solid var(--nx-border);
+  border-radius: 8px;
+}
+.nx-card-navy  { background: #d6dfee; border-color: #b8c4d6; }
+.nx-card-green { background: #e8f5e9; border-color: #a5d6a7; }
+.nx-card-amber { background: #fef3e2; border-color: #f6c17a; }
+.nx-card-teal  { background: #e0f2f1; border-color: #80cbc4; }
+.nx-card-purple{ background: #f3e5f5; border-color: #ce93d8; }
+
+/* ── Portal-coloured input fields ─────────────────────────────── */
+.nx-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--nx-border-strong);
+  font-size: 14px;
+  color: var(--nx-text-primary);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background: #fff;
+}
+.nx-input:focus {
+  outline: none;
+  border-color: var(--nx-navy);
+  box-shadow: 0 0 0 3px rgba(0,33,71,0.12);
+}
+
+/* ── Primary button ───────────────────────────────────────────── */
+.nx-btn-primary {
+  width: 100%;
+  padding: 12px 20px;
+  background: var(--nx-navy);
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  transition: background 0.15s;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.nx-btn-primary:hover:not(:disabled) {
+  background: var(--nx-navy-hover);
+}
+.nx-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────── */
+.nx-sidebar {
+  background: var(--nx-navy);
+  color: rgba(255,255,255,0.8);
+  min-height: 100vh;
+  width: 240px;
+  flex-shrink: 0;
+}
+.nx-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  color: rgba(255,255,255,0.7);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+}
+.nx-sidebar-link:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+.nx-sidebar-link.active {
+  background: rgba(255,255,255,0.14);
+  color: #fff;
+  font-weight: 600;
+  border-left-color: #fff;
+}
+
+/* ── Ashoka watermark (background decoration) ─────────────────── */
+.nx-watermark {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.03;
+  right: -60px;
+  bottom: -60px;
+  font-size: 420px;
+  line-height: 1;
+  user-select: none;
+  color: var(--nx-navy);
+}
+
+/* ── Footer ───────────────────────────────────────────────────── */
+.nx-footer {
+  background: var(--nx-navy);
+  color: rgba(255,255,255,0.75);
+}
+
+/* ── Status badges ────────────────────────────────────────────── */
+.nx-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Animations ───────────────────────────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
 @keyframes pulse-ring {
   0%   { transform: scale(1); opacity: 0.8; }
   100% { transform: scale(1.8); opacity: 0; }
 }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
-/* ── Safe area for mobile bottom nav ─────────────────────────────── */
+/* ── Utility ──────────────────────────────────────────────────── */
 .safe-area-pb {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-
-/* ── Focus visible — accessibility ───────────────────────────────── */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--nx-navy);
   outline-offset: 2px;
 }
-
-/* ── Scrollbar styling ────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #c3c6d1; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #737780; }
+::-webkit-scrollbar-thumb { background: #b8c4d6; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #6b7a8d; }

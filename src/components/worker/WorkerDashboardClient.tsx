@@ -19,33 +19,73 @@ export function WorkerDashboardClient({
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-[#191c1e] tracking-tight">
-          {t('tasks_title')} — {displayName}
-        </h1>
-        <p className="text-sm text-[#545f72] mt-1">
-          {activeTasks.length} {t('active')} · {completedTasks.length} {t('done')}
-        </p>
+      {/* ── Page header ──────────────────────────────────────────── */}
+      <div className="mb-6 pb-5 border-b border-[#dde3ed] flex items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-0.5">
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ background: 'var(--nx-worker-light)' }}
+            >
+              <span
+                className="material-symbols-outlined text-sm"
+                style={{ color: 'var(--nx-worker)', fontVariationSettings: "'FILL' 1" }}
+              >
+                engineering
+              </span>
+            </div>
+            <span
+              className="text-[10px] font-bold uppercase tracking-widest"
+              style={{ color: 'var(--nx-worker)' }}
+            >
+              Field Worker Portal
+            </span>
+          </div>
+          <h1 className="text-xl font-bold text-[#002147] tracking-tight">
+            {t('tasks_title')} — {displayName}
+          </h1>
+          <p className="text-sm text-[#718096] mt-0.5">
+            {activeTasks.length} {t('active')} · {completedTasks.length} {t('done')}
+          </p>
+        </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      {/* ── Stats ─────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-4 mb-7">
         {[
-          { label: t('active'), count: activeTasks.length, color: 'text-[#D97706]', bg: 'bg-[#fef3c7]' },
-          { label: t('done'), count: completedTasks.filter((c) => c.status === 'resolved').length, color: 'text-[#059669]', bg: 'bg-[#d1fae5]' },
-          { label: t('total'), count: activeTasks.length + completedTasks.length, color: 'text-[#001e40]', bg: 'bg-[#f7f9fb]' },
+          { label: t('active'), count: activeTasks.length,                                          accent: '#b45309', bg: 'var(--nx-worker-light)', icon: 'pending_actions' },
+          { label: t('done'),   count: completedTasks.filter((c) => c.status === 'resolved').length, accent: '#1b5e20', bg: 'var(--nx-citizen-light)', icon: 'task_alt' },
+          { label: t('total'),  count: activeTasks.length + completedTasks.length,                   accent: '#002147', bg: 'var(--nx-navy-light)',    icon: 'assignment' },
         ].map((s) => (
-          <div key={s.label} className={`${s.bg} rounded-xl p-3 text-center border border-[#E2E8F0]`}>
-            <p className={`text-2xl font-bold ${s.color}`}>{s.count}</p>
-            <p className="text-xs text-[#545f72] mt-0.5">{s.label}</p>
+          <div
+            key={s.label}
+            className="nx-card p-4 text-center flex flex-col items-center gap-1.5"
+            style={{ background: s.bg, borderColor: 'rgba(0,0,0,0.06)' }}
+          >
+            <span
+              className="material-symbols-outlined text-2xl"
+              style={{ color: s.accent, fontVariationSettings: "'FILL' 1" }}
+            >
+              {s.icon}
+            </span>
+            <p className="text-2xl font-bold" style={{ color: s.accent }}>{s.count}</p>
+            <p className="text-xs text-[#718096] capitalize">{s.label}</p>
           </div>
         ))}
       </div>
 
-      {/* Active Tasks */}
-      <section className="mb-6">
-        <h2 className="text-sm font-semibold text-[#43474f] uppercase tracking-widest mb-3">
+      {/* ── Active Tasks ─────────────────────────────────────────── */}
+      <section className="mb-7">
+        <h2
+          className="text-[10px] font-bold uppercase tracking-[0.12em] mb-3 flex items-center gap-2"
+          style={{ color: '#718096' }}
+        >
+          <span
+            className="material-symbols-outlined text-sm"
+            style={{ color: 'var(--nx-worker)' }}
+          >
+            pending_actions
+          </span>
           {t('active_tasks')} ({activeTasks.length})
         </h2>
         {activeTasks.length > 0 ? (
@@ -55,18 +95,35 @@ export function WorkerDashboardClient({
             ))}
           </div>
         ) : (
-          <div className="text-center py-10 bg-white rounded-xl border border-[#E2E8F0] p-4">
-            <span className="material-symbols-outlined text-4xl text-[#c3c6d1]">task_alt</span>
-            <p className="text-sm font-medium text-[#191c1e] mt-2">{t('no_active_tasks')}</p>
-            <p className="text-xs text-[#545f72] mt-0.5">{t('no_active_tasks_desc')}</p>
+          <div
+            className="nx-card py-16 text-center flex flex-col items-center gap-3"
+            style={{ background: 'var(--nx-worker-light)', borderColor: 'rgba(180,83,9,0.15)' }}
+          >
+            <span
+              className="material-symbols-outlined text-4xl"
+              style={{ color: 'var(--nx-worker)', opacity: 0.5 }}
+            >
+              task_alt
+            </span>
+            <p className="text-sm font-semibold text-[#1a2332]">{t('no_active_tasks')}</p>
+            <p className="text-xs text-[#718096]">{t('no_active_tasks_desc')}</p>
           </div>
         )}
       </section>
 
-      {/* Recent Completed */}
+      {/* ── Completed Tasks ──────────────────────────────────────── */}
       {completedTasks.length > 0 && (
         <section>
-          <h2 className="text-sm font-semibold text-[#43474f] uppercase tracking-widest mb-3">
+          <h2
+            className="text-[10px] font-bold uppercase tracking-[0.12em] mb-3 flex items-center gap-2"
+            style={{ color: '#718096' }}
+          >
+            <span
+              className="material-symbols-outlined text-sm"
+              style={{ color: 'var(--nx-citizen)' }}
+            >
+              task_alt
+            </span>
             {t('recent_completed')} ({completedTasks.length})
           </h2>
           <div className="flex flex-col gap-3">

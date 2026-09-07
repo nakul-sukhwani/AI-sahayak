@@ -33,11 +33,11 @@ export default async function NGOLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] flex flex-col md:flex-row">
+    <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'var(--nx-bg)' }}>
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 pb-14 md:pb-0">
         <Navbar />
-        <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-8 py-6">
+        <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 md:px-8 py-6 pb-24 md:pb-8">
           {children}
         </main>
       </div>
