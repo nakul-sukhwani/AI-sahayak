@@ -68,43 +68,48 @@ export default async function NGODashboardPage() {
   const resolved = myComplaints.filter(c => c.status === 'resolved');
 
   return (
-    <div>
-      {/* ── Page header ──────────────────────────────────────────── */}
-      <div className="mb-6 pb-5 border-b border-[#dde3ed] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-0.5">
-            <div
-              className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ background: 'var(--nx-ngo-light)' }}
-            >
-              <span
-                className="material-symbols-outlined text-sm"
-                style={{ color: 'var(--nx-ngo)', fontVariationSettings: "'FILL' 1" }}
-              >
-                volunteer_activism
-              </span>
+    <div className="relative">
+      {/* Dot-grid page decoration */}
+      <div
+        className="pointer-events-none fixed inset-0 nx-dot-grid"
+        style={{ zIndex: 0, opacity: 0.35 }}
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10">
+        {/* ── Hero panel ──────────────────────────────────────────── */}
+        <div className="nx-hero-panel nx-hero-ngo">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span
+                  className="material-symbols-outlined text-sm"
+                  style={{ color: 'var(--nx-ngo)', fontVariationSettings: "'FILL' 1" }}
+                >
+                  volunteer_activism
+                </span>
+                <span
+                  className="text-[10px] font-bold uppercase tracking-widest"
+                  style={{ color: 'var(--nx-ngo)' }}
+                >
+                  NGO Portal
+                </span>
+              </div>
+              <h1 className="text-xl font-bold text-[#002147] tracking-tight">{orgName}</h1>
+              <p className="text-sm text-[#718096] mt-0.5">
+                Monitoring government accountability for civic issues in your community.
+              </p>
             </div>
-            <span
-              className="text-[10px] font-bold uppercase tracking-widest"
-              style={{ color: 'var(--nx-ngo)' }}
+            <Link
+              href="/dashboard/new"
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded uppercase tracking-wider transition-colors flex-shrink-0"
+              style={{ background: 'var(--nx-ngo)' }}
             >
-              NGO Portal
-            </span>
+              <span className="material-symbols-outlined text-sm">add_circle</span>
+              File a Complaint
+            </Link>
           </div>
-          <h1 className="text-xl font-bold text-[#002147] tracking-tight">{orgName}</h1>
-          <p className="text-sm text-[#718096] mt-0.5">
-            Monitoring government accountability for civic issues in your community.
-          </p>
         </div>
-        <Link
-          href="/dashboard/new"
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded uppercase tracking-wider transition-colors flex-shrink-0"
-          style={{ background: 'var(--nx-ngo)' }}
-        >
-          <span className="material-symbols-outlined text-sm">add_circle</span>
-          File a Complaint
-        </Link>
-      </div>
 
       {/* ── Overdue alert ────────────────────────────────────────── */}
       {overdue.length > 0 && (
@@ -346,6 +351,7 @@ export default async function NGODashboardPage() {
             escalate it and generate an official letter to the District Collector or SDM to ensure accountability.
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

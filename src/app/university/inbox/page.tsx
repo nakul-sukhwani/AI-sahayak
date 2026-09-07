@@ -64,36 +64,48 @@ export default async function InboxPage() {
   }
 
   return (
-    <div>
-      {/* ── Page header ───────────────────────────────────────────── */}
-      <div className="mb-6 pb-5 border-b border-[#dde3ed] flex items-center gap-3">
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ background: 'var(--nx-university-light)' }}
-        >
-          <span
-            className="material-symbols-outlined text-lg"
-            style={{ color: 'var(--nx-university)', fontVariationSettings: "'FILL' 1" }}
-          >
-            school
-          </span>
+    <div className="relative">
+      {/* Dot-grid page decoration */}
+      <div
+        className="pointer-events-none fixed inset-0 nx-dot-grid"
+        style={{ zIndex: 0, opacity: 0.35 }}
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10">
+        {/* ── Hero panel ───────────────────────────────────────────── */}
+        <div className="nx-hero-panel nx-hero-university">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: 'rgba(74,20,140,0.15)' }}
+            >
+              <span
+                className="material-symbols-outlined text-xl"
+                style={{ color: 'var(--nx-university)', fontVariationSettings: "'FILL' 1" }}
+              >
+                school
+              </span>
+            </div>
+            <div>
+              <p
+                className="text-[10px] font-bold uppercase tracking-widest"
+                style={{ color: 'var(--nx-university)' }}
+              >
+                University Portal
+              </p>
+              <h1 className="text-xl font-bold text-[#002147] tracking-tight leading-tight">
+                Institution Inbox
+              </h1>
+              <p className="text-sm text-[#718096] mt-0.5">
+                Review societal challenges routed to your institution by the government.
+              </p>
+            </div>
+          </div>
         </div>
-        <div>
-          <p
-            className="text-[10px] font-bold uppercase tracking-widest"
-            style={{ color: 'var(--nx-university)' }}
-          >
-            University Portal
-          </p>
-          <h1 className="text-xl font-bold text-[#002147] tracking-tight leading-tight">
-            Institution Inbox
-          </h1>
-        </div>
+
+        <ChallengeInbox universityId={universityId} isAdmin={isAdmin} />
       </div>
-      <p className="text-sm text-[#718096] mb-7">
-        Review societal challenges routed to your institution by the government.
-      </p>
-      <ChallengeInbox universityId={universityId} isAdmin={isAdmin} />
     </div>
   );
 }

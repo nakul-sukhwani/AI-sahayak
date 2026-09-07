@@ -261,3 +261,132 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #b8c4d6; border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: #6b7a8d; }
+
+/* ── Dashboard Aesthetic Backgrounds ──────────────────────────── */
+
+/* Subtle dot-grid — works on top of var(--nx-bg) */
+.nx-dot-grid {
+  background-image:
+    radial-gradient(circle, rgba(0,33,71,0.10) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Hero panel — the tinted header strip at page top (overrides on each portal) */
+.nx-hero-panel {
+  position: relative;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.nx-hero-panel::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  opacity: 0.12;
+  pointer-events: none;
+}
+.nx-hero-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -24px; right: 64px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+/* Portal-specific hero panels */
+.nx-hero-citizen  { background: linear-gradient(135deg, rgba(27,94,32,0.07) 0%, rgba(27,94,32,0.02) 100%); border: 1px solid rgba(27,94,32,0.15); }
+.nx-hero-citizen::before { background: #1b5e20; }
+.nx-hero-citizen::after  { background: #1b5e20; }
+
+.nx-hero-worker   { background: linear-gradient(135deg, rgba(180,83,9,0.07) 0%, rgba(180,83,9,0.02) 100%); border: 1px solid rgba(180,83,9,0.15); }
+.nx-hero-worker::before  { background: #b45309; }
+.nx-hero-worker::after   { background: #b45309; }
+
+.nx-hero-admin    { background: linear-gradient(135deg, rgba(21,101,192,0.07) 0%, rgba(21,101,192,0.02) 100%); border: 1px solid rgba(21,101,192,0.15); }
+.nx-hero-admin::before   { background: #1565c0; }
+.nx-hero-admin::after    { background: #1565c0; }
+
+.nx-hero-ngo      { background: linear-gradient(135deg, rgba(0,105,92,0.07) 0%, rgba(0,105,92,0.02) 100%); border: 1px solid rgba(0,105,92,0.15); }
+.nx-hero-ngo::before     { background: #00695c; }
+.nx-hero-ngo::after      { background: #00695c; }
+
+.nx-hero-university { background: linear-gradient(135deg, rgba(74,20,140,0.07) 0%, rgba(74,20,140,0.02) 100%); border: 1px solid rgba(74,20,140,0.15); }
+.nx-hero-university::before { background: #4a148c; }
+.nx-hero-university::after  { background: #4a148c; }
+
+.nx-hero-navy     { background: linear-gradient(135deg, rgba(0,33,71,0.07) 0%, rgba(0,33,71,0.02) 100%); border: 1px solid rgba(0,33,71,0.15); }
+.nx-hero-navy::before    { background: #002147; }
+.nx-hero-navy::after     { background: #002147; }
+
+/* Stat card with hover lift */
+.nx-stat-card {
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.nx-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,33,71,0.10);
+}
+
+/* Section divider with accent dot */
+.nx-section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #718096;
+  margin-bottom: 12px;
+}
+.nx-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--nx-border), transparent);
+}
+
+/* Table styles */
+.nx-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.nx-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #718096;
+  background: var(--nx-bg);
+  border-bottom: 2px solid var(--nx-border);
+  white-space: nowrap;
+}
+.nx-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--nx-border);
+  color: var(--nx-text-primary);
+  vertical-align: middle;
+}
+.nx-table tr:hover td { background: rgba(0,33,71,0.02); }
+.nx-table tr:last-child td { border-bottom: none; }
+
+/* Modal overlay */
+.nx-modal-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(0,33,71,0.45);
+  backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.nx-modal {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 24px 48px rgba(0,33,71,0.25);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
