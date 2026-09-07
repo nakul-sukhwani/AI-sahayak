@@ -160,6 +160,14 @@ export default async function NGODashboardPage() {
                     <span className="material-symbols-outlined text-sm">refresh</span>
                     Re-file
                   </Link>
+                  <a
+                    href={`/api/ngo/generate-letter?id=${c.id}&district=Ranchi`}
+                    download
+                    className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-[#001e40] text-white text-xs font-semibold rounded-lg hover:bg-[#002a5c] transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-sm">picture_as_pdf</span>
+                    Generate Letter
+                  </a>
                 </div>
               );
             })}
