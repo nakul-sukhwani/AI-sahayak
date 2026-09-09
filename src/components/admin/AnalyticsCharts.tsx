@@ -15,6 +15,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Area,
 } from 'recharts';
 import type { Complaint } from '@/types/complaint';
 
@@ -22,12 +23,13 @@ interface AnalyticsChartsProps {
   complaints: Complaint[];
 }
 
-type ChartType = 'bar' | 'pie' | 'line';
+type ChartType = 'bar' | 'line' | 'pie';
 
-const COLORS = ['#001e40', '#2563EB', '#059669', '#D97706', '#DC2626', '#8B5CF6'];
+const COLORS = ['#002147', '#1565c0', '#1b5e20', '#b45309', '#00695c', '#4a148c'];
 
 export function AnalyticsCharts({ complaints }: AnalyticsChartsProps) {
   const [activeChart, setActiveChart] = useState<ChartType>('bar');
+  const [timeframe, setTimeframe] = useState<'weekly' | 'monthly'>('weekly');
 
   const { statusData, typeData, timelineData } = useMemo(() => {
     // 1. Status Data
@@ -36,18 +38,19 @@ export function AnalyticsCharts({ complaints }: AnalyticsChartsProps) {
       statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
     });
     const statusData = Object.entries(statusCounts).map(([name, value]) => ({
-      name: name.charAt(0).toUpperCase() + name.slice(1),
+      name: name.replace('_', ' ').charAt(0).toUpperCase() + name.replace('_', ' ').slice(1),
       value,
     }));
 
     // 2. Issue Type Data
     const typeCounts: Record<string, number> = {};
     complaints.forEach((c) => {
-      typeCounts[c.issue_type] = (typeCounts[c.issue_type] || 0) + 1;
+      const type = c.issue_type.replace('_', ' ');
+      typeCounts[type] = (typeCounts[type] || 0) + 1;
     });
     const typeData = Object.entries(typeCounts)
       .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value); // Sort descending
+      .sort((a, b) => b.value - a.value);
 
     // 3. Timeline Data (Group by date)
     const dateCounts: Record<string, number> = {};
@@ -55,65 +58,131 @@ export function AnalyticsCharts({ complaints }: AnalyticsChartsProps) {
       const date = new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       dateCounts[date] = (dateCounts[date] || 0) + 1;
     });
-    
-    // Sort dates (basic string sort for now, assuming recent dates)
+
     const timelineData = Object.entries(dateCounts)
       .map(([date, count]) => ({ date, count }))
-      .reverse(); // Assuming descending from DB, we want ascending for timeline
+      .reverse();
 
     return { statusData, typeData, timelineData };
   }, [complaints]);
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden shadow-sm mb-8">
-      <div className="p-4 border-b border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="bg-white border border-[#dde3ed] rounded-2xl overflow-hidden shadow-sm p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
         <div>
-          <h2 className="text-lg font-semibold text-[#191c1e]">Complaint Analytics</h2>
-          <p className="text-xs text-[#545f72] mt-0.5">Visual breakdown of civic issues.</p>
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-lg text-[#1565c0]">equalizer</span>
+            <h2 className="text-base font-bold text-[#1a2332]">Resolution &amp; Category Velocity</h2>
+          </div>
+          <p className="text-xs text-[#718096] mt-0.5">Live workload distribution across municipal services</p>
         </div>
-        
-        {/* Chart Selector */}
-        <div className="flex bg-[#f7f9fb] p-1 rounded-lg border border-[#E2E8F0] w-fit">
-          <button
-            onClick={() => setActiveChart('bar')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-              activeChart === 'bar' ? 'bg-white text-[#001e40] shadow-sm' : 'text-[#545f72] hover:text-[#191c1e]'
-            }`}
-          >
-            Issue Types (Bar)
-          </button>
-          <button
-            onClick={() => setActiveChart('pie')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-              activeChart === 'pie' ? 'bg-white text-[#001e40] shadow-sm' : 'text-[#545f72] hover:text-[#191c1e]'
-            }`}
-          >
-            Status (Pie)
-          </button>
-          <button
-            onClick={() => setActiveChart('line')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
-              activeChart === 'line' ? 'bg-white text-[#001e40] shadow-sm' : 'text-[#545f72] hover:text-[#191c1e]'
-            }`}
-          >
-            Timeline (Line)
-          </button>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Timeframe Toggle (Quixotic style) */}
+          <div className="flex bg-[#f4f6fa] p-1 rounded-xl border border-[#dde3ed]">
+            <button
+              onClick={() => setTimeframe('weekly')}
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                timeframe === 'weekly' ? 'bg-white text-[#002147] shadow-sm' : 'text-[#718096] hover:text-[#1a2332]'
+              }`}
+            >
+              Weekly
+            </button>
+            <button
+              onClick={() => setTimeframe('monthly')}
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                timeframe === 'monthly' ? 'bg-white text-[#002147] shadow-sm' : 'text-[#718096] hover:text-[#1a2332]'
+              }`}
+            >
+              Monthly
+            </button>
+          </div>
+
+          {/* Chart Type Selector */}
+          <div className="flex bg-[#f4f6fa] p-1 rounded-xl border border-[#dde3ed]">
+            <button
+              onClick={() => setActiveChart('bar')}
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                activeChart === 'bar' ? 'bg-[#002147] text-white shadow-sm' : 'text-[#718096] hover:text-[#1a2332]'
+              }`}
+            >
+              Categories
+            </button>
+            <button
+              onClick={() => setActiveChart('line')}
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                activeChart === 'line' ? 'bg-[#002147] text-white shadow-sm' : 'text-[#718096] hover:text-[#1a2332]'
+              }`}
+            >
+              Timeline
+            </button>
+            <button
+              onClick={() => setActiveChart('pie')}
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                activeChart === 'pie' ? 'bg-[#002147] text-white shadow-sm' : 'text-[#718096] hover:text-[#1a2332]'
+              }`}
+            >
+              Status
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="p-4 h-[350px] w-full">
+      <div className="h-[280px] w-full">
         {activeChart === 'bar' && (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={typeData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#545f72' }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#545f72' }} />
-              <Tooltip
-                cursor={{ fill: '#f0f4ff' }}
-                contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+            <BarChart data={typeData.slice(0, 8)} margin={{ top: 15, right: 20, left: -10, bottom: 25 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 11, fill: '#718096' }}
+                interval={0}
+                angle={-15}
+                textAnchor="end"
               />
-              <Bar dataKey="value" name="Complaints" fill="#2563EB" radius={[4, 4, 0, 0]} barSize={40} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#718096' }} />
+              <Tooltip
+                cursor={{ fill: 'rgba(21,101,192,0.05)', radius: 8 }}
+                contentStyle={{ borderRadius: '12px', border: '1px solid #dde3ed', boxShadow: '0 8px 16px rgba(0,0,0,0.08)' }}
+              />
+              <Bar
+                dataKey="value"
+                name="Complaints"
+                fill="#1565c0"
+                radius={[8, 8, 2, 2]}
+                barSize={32}
+              />
             </BarChart>
+          </ResponsiveContainer>
+        )}
+
+        {activeChart === 'line' && (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={timelineData} margin={{ top: 15, right: 20, left: -10, bottom: 10 }}>
+              <defs>
+                <linearGradient id="lineColor" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#1565c0" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#1565c0" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#718096' }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#718096' }} allowDecimals={false} />
+              <Tooltip
+                contentStyle={{ borderRadius: '12px', border: '1px solid #dde3ed', boxShadow: '0 8px 16px rgba(0,0,0,0.08)' }}
+              />
+              <Line
+                type="monotone"
+                dataKey="count"
+                name="Complaints Logged"
+                stroke="#1565c0"
+                strokeWidth={3}
+                dot={{ r: 4, strokeWidth: 2, fill: '#ffffff', stroke: '#1565c0' }}
+                activeDot={{ r: 6, fill: '#002147' }}
+              />
+            </LineChart>
           </ResponsiveContainer>
         )}
 
@@ -124,37 +193,21 @@ export function AnalyticsCharts({ complaints }: AnalyticsChartsProps) {
                 data={statusData}
                 cx="50%"
                 cy="50%"
-                innerRadius={80}
-                outerRadius={120}
-                paddingAngle={2}
+                innerRadius={70}
+                outerRadius={105}
+                paddingAngle={3}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                labelLine={false}
               >
-                {statusData.map((entry, index) => (
+                {statusData.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                contentStyle={{ borderRadius: '12px', border: '1px solid #dde3ed', boxShadow: '0 8px 16px rgba(0,0,0,0.08)' }}
               />
-              <Legend verticalAlign="bottom" height={36} iconType="circle" />
+              <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px' }} />
             </PieChart>
-          </ResponsiveContainer>
-        )}
-
-        {activeChart === 'line' && (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={timelineData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-              <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#545f72' }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#545f72' }} allowDecimals={false} />
-              <Tooltip
-                contentStyle={{ borderRadius: '8px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-              />
-              <Line type="monotone" dataKey="count" name="Complaints Filed" stroke="#059669" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-            </LineChart>
           </ResponsiveContainer>
         )}
       </div>

@@ -117,60 +117,150 @@ export default function LandingPage() {
         </div>
 
         {/* ── Welcome + Portal Cards ─────────────────────────────── */}
-        <div className="bg-white border-b border-[#dde3ed] py-10 px-4">
-          <div className="max-w-4xl mx-auto text-center mb-10">
-            <h2 className="text-2xl font-bold text-[#002147] mb-2">Welcome</h2>
-            <p className="text-[#4a5568]">Please select your portal to log in</p>
+        <div className="bg-[#f8fafc] border-b border-[#dde3ed] py-12 px-4">
+          <div className="max-w-5xl mx-auto text-center mb-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#e8eef6] text-[#002147] mb-3">
+              <span className="w-2 h-2 rounded-full bg-[#1565c0] animate-pulse"></span>
+              Unified Municipal Portal Network
+            </span>
+            <h2 className="text-3xl font-bold text-[#002147] tracking-tight mb-2">Select Your Workspace</h2>
+            <p className="text-[#4a5568] max-w-xl mx-auto text-sm">
+              Role-specific workspaces for citizens, on-field personnel, municipal officers, and civic oversight.
+            </p>
           </div>
 
-          <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Citizen */}
-            <Link href="/login" className="group block nx-card nx-card-green p-6 text-center hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-full bg-[#1b5e20] flex items-center justify-center mx-auto mb-3">
-                <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>groups</span>
+            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#e8f5e9] text-[#1b5e20] flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>groups</span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#e8f5e9] text-[#1b5e20]">
+                    Public
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-[#1a2332] mb-1">Citizen Portal</h3>
+                <p className="text-xs text-[#4a5568] leading-relaxed mb-6">
+                  Report issues with AI image analysis, track grievance status, and verify resolutions.
+                </p>
               </div>
-              <p className="text-xs font-bold text-[#1b5e20] uppercase tracking-widest mb-1">Citizen Portal</p>
-              <p className="text-xs text-[#4a5568]">Report civic issues and track status with AI</p>
-              <div className="mt-4 px-4 py-1.5 bg-[#1b5e20] text-white text-xs font-semibold rounded inline-flex items-center gap-1">
-                Login <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <div className="space-y-2">
+                <Link
+                  href="/dashboard"
+                  className="w-full py-2.5 px-4 bg-[#1b5e20] hover:bg-[#144718] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                >
+                  <span>Open Citizen Portal</span>
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </Link>
+                <Link
+                  href="/login?portal=citizen"
+                  className="w-full py-1.5 text-center block text-[11px] font-medium text-[#4a5568] hover:text-[#1b5e20] transition-colors"
+                >
+                  Secure OTP Login →
+                </Link>
               </div>
-            </Link>
+            </div>
 
-            {/* Worker */}
-            <Link href="/login" className="group block nx-card nx-card-amber p-6 text-center hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-full bg-[#b45309] flex items-center justify-center mx-auto mb-3">
-                <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>engineering</span>
+            {/* Field Worker */}
+            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#fef3e2] text-[#b45309] flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>engineering</span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#fef3e2] text-[#b45309]">
+                    Field Ops
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-[#1a2332] mb-1">Field Worker Portal</h3>
+                <p className="text-xs text-[#4a5568] leading-relaxed mb-6">
+                  Receive assigned ward tasks, access GPS locations, and submit completion photo proofs.
+                </p>
               </div>
-              <p className="text-xs font-bold text-[#b45309] uppercase tracking-widest mb-1">Field Worker Portal</p>
-              <p className="text-xs text-[#4a5568]">Manage field tasks and update issue resolutions</p>
-              <div className="mt-4 px-4 py-1.5 bg-[#b45309] text-white text-xs font-semibold rounded inline-flex items-center gap-1">
-                Login <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <div className="space-y-2">
+                <Link
+                  href="/worker"
+                  className="w-full py-2.5 px-4 bg-[#b45309] hover:bg-[#92400e] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                >
+                  <span>Open Worker Portal</span>
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </Link>
+                <Link
+                  href="/login?portal=worker"
+                  className="w-full py-1.5 text-center block text-[11px] font-medium text-[#4a5568] hover:text-[#b45309] transition-colors"
+                >
+                  Worker Login →
+                </Link>
               </div>
-            </Link>
+            </div>
 
-            {/* Admin */}
-            <Link href="/login" className="group block nx-card nx-card-navy p-6 text-center hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-full bg-[#002147] flex items-center justify-center mx-auto mb-3">
-                <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>admin_panel_settings</span>
+            {/* Officer / Admin */}
+            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#e3f0fd] text-[#1565c0] flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>admin_panel_settings</span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#e3f0fd] text-[#1565c0]">
+                    Official
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-[#1a2332] mb-1">Officer Portal</h3>
+                <p className="text-xs text-[#4a5568] leading-relaxed mb-6">
+                  Municipal analytics, ward dispatch, AI verification review, and SLA escalation control.
+                </p>
               </div>
-              <p className="text-xs font-bold text-[#002147] uppercase tracking-widest mb-1">Officer Portal</p>
-              <p className="text-xs text-[#4a5568]">Access municipal analytics, maps &amp; issue resolution</p>
-              <div className="mt-4 px-4 py-1.5 bg-[#002147] text-white text-xs font-semibold rounded inline-flex items-center gap-1">
-                Login <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <div className="space-y-2">
+                <Link
+                  href="/admin"
+                  className="w-full py-2.5 px-4 bg-[#002147] hover:bg-[#003166] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                >
+                  <span>Open Officer Portal</span>
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </Link>
+                <Link
+                  href="/login?portal=officer"
+                  className="w-full py-1.5 text-center block text-[11px] font-medium text-[#4a5568] hover:text-[#002147] transition-colors"
+                >
+                  Officer Login →
+                </Link>
               </div>
-            </Link>
+            </div>
 
             {/* NGO */}
-            <Link href="/login" className="group block nx-card nx-card-teal p-6 text-center hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-full bg-[#00695c] flex items-center justify-center mx-auto mb-3">
-                <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>volunteer_activism</span>
+            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#e0f2f1] text-[#00695c] flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>volunteer_activism</span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#e0f2f1] text-[#00695c]">
+                    Oversight
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-[#1a2332] mb-1">NGO Portal</h3>
+                <p className="text-xs text-[#4a5568] leading-relaxed mb-6">
+                  Track civic accountability, identify overdue ward complaints, and file formal demand notices.
+                </p>
               </div>
-              <p className="text-xs font-bold text-[#00695c] uppercase tracking-widest mb-1">NGO Portal</p>
-              <p className="text-xs text-[#4a5568]">Track accountability and escalate unresolved issues</p>
-              <div className="mt-4 px-4 py-1.5 bg-[#00695c] text-white text-xs font-semibold rounded inline-flex items-center gap-1">
-                Login <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              <div className="space-y-2">
+                <Link
+                  href="/ngo"
+                  className="w-full py-2.5 px-4 bg-[#00695c] hover:bg-[#004d40] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                >
+                  <span>Open NGO Portal</span>
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </Link>
+                <Link
+                  href="/login?portal=ngo"
+                  className="w-full py-1.5 text-center block text-[11px] font-medium text-[#4a5568] hover:text-[#00695c] transition-colors"
+                >
+                  NGO Login →
+                </Link>
               </div>
-            </Link>
+            </div>
           </div>
         </div>
 

@@ -289,6 +289,19 @@ export function AdminComplaintsTable({ complaints, workers, proofs }: Complaints
   const [verifyTarget, setVerifyTarget] = useState<{ proof: ProofRow; complaint: Complaint } | null>(null);
   const [page, setPage] = useState(0);
   const PER_PAGE = 15;
+  const getIssueIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'pothole': return 'construction';
+      case 'streetlight': return 'lightbulb';
+      case 'garbage': return 'delete_sweep';
+      case 'water_leak':
+      case 'water': return 'water_drop';
+      case 'drainage':
+      case 'sewage': return 'plumbing';
+      case 'park': return 'park';
+      default: return 'report_problem';
+    }
+  };
 
   const proofMap = new Map(proofs.map((p) => [p.complaint_id, p]));
 
@@ -310,171 +323,185 @@ export function AdminComplaintsTable({ complaints, workers, proofs }: Complaints
   const visible = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
 
   return (
-    <div>
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[180px]">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-base text-[#b8c4d6]">search</span>
-          <input
-            type="search"
-            placeholder="Search complaints…"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-            className="nx-input pl-9"
-          />
+    <div className="bg-white rounded-2xl border border-[#dde3ed] p-5 shadow-sm">
+      {/* Header & Filter Controls (Quixotic style) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <h2 className="text-base font-bold text-[#1a2332] flex items-center gap-2">
+            <span>Recent Grievances</span>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#e3f0fd] text-[#1565c0]">
+              {filtered.length}
+            </span>
+          </h2>
+          <p className="text-xs text-[#718096]">Live queue of citizen reports and field progress</p>
         </div>
 
-        <select
-          value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
-          className="nx-input w-auto min-w-[140px]"
-        >
-          {STATUS_FILTERS.map((s) => (
-            <option key={s} value={s}>{s === 'all' ? 'All Statuses' : STATUS_BADGE[s]?.label ?? s}</option>
-          ))}
-        </select>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Search bar */}
+          <div className="relative min-w-[200px]">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-base text-[#b8c4d6]">search</span>
+            <input
+              type="search"
+              placeholder="Search by issue, ward…"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-[#dde3ed] focus:outline-none focus:border-[#1565c0] bg-[#f8fafc]"
+            />
+          </div>
 
-        <select
-          value={sevFilter}
-          onChange={(e) => { setSevFilter(e.target.value); setPage(0); }}
-          className="nx-input w-auto min-w-[130px]"
-        >
-          {SEV_FILTERS.map((s) => (
-            <option key={s} value={s}>{s === 'all' ? 'All Severities' : s.charAt(0).toUpperCase() + s.slice(1)}</option>
-          ))}
-        </select>
+          {/* Status filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
+            className="text-xs rounded-xl border border-[#dde3ed] px-3 py-1.5 bg-[#f8fafc] text-[#4a5568] focus:outline-none font-medium"
+          >
+            {STATUS_FILTERS.map((s) => (
+              <option key={s} value={s}>{s === 'all' ? 'All Statuses' : STATUS_BADGE[s]?.label ?? s}</option>
+            ))}
+          </select>
 
-        <span className="text-xs text-[#718096] ml-auto flex-shrink-0">
-          {filtered.length} complaint{filtered.length !== 1 ? 's' : ''}
-        </span>
+          {/* Severity filter */}
+          <select
+            value={sevFilter}
+            onChange={(e) => { setSevFilter(e.target.value); setPage(0); }}
+            className="text-xs rounded-xl border border-[#dde3ed] px-3 py-1.5 bg-[#f8fafc] text-[#4a5568] focus:outline-none font-medium"
+          >
+            {SEV_FILTERS.map((s) => (
+              <option key={s} value={s}>{s === 'all' ? 'All Severities' : s.charAt(0).toUpperCase() + s.slice(1)}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* Table */}
-      <div className="nx-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="nx-table">
-            <thead>
+      {/* Table (Quixotic style) */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="border-b border-[#dde3ed] text-[11px] font-bold uppercase tracking-wider text-[#718096]">
+              <th className="py-3 px-3">Grievance / Type</th>
+              <th className="py-3 px-3">Ward / Location</th>
+              <th className="py-3 px-3">Reported At</th>
+              <th className="py-3 px-3">Status</th>
+              <th className="py-3 px-3">Assigned Crew</th>
+              <th className="py-3 px-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#dde3ed]/60">
+            {visible.length === 0 ? (
               <tr>
-                <th>Issue</th>
-                <th>Location</th>
-                <th>Severity</th>
-                <th>Status</th>
-                <th>Age</th>
-                <th>Assigned To</th>
-                <th>Actions</th>
+                <td colSpan={6} className="text-center py-12 text-[#718096] text-xs">
+                  No complaints match the selected filters.
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {visible.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center py-12 text-[#718096] text-sm">
-                    No complaints match the selected filters.
-                  </td>
-                </tr>
-              ) : (
-                visible.map((c) => {
-                  const statusInfo = STATUS_BADGE[c.status] ?? { bg: '#f4f6fa', color: '#718096', label: c.status };
-                  const sevInfo = SEV_BADGE[c.severity] ?? { bg: '#f4f6fa', color: '#718096' };
-                  const proof = proofMap.get(c.id);
-                  const days = daysSince(c.created_at);
-                  const isOverdue = days > 7 && !['resolved', 'closed'].includes(c.status);
+            ) : (
+              visible.map((c) => {
+                const statusInfo = STATUS_BADGE[c.status] ?? { bg: '#f4f6fa', color: '#718096', label: c.status };
+                const proof = proofMap.get(c.id);
+                const dateObj = new Date(c.created_at);
+                const formattedDate = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+                const formattedTime = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-                  return (
-                    <tr key={c.id}>
-                      {/* Issue */}
-                      <td>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                            style={{ background: sevInfo.bg }}
-                          >
-                            <span className="material-symbols-outlined text-sm" style={{ color: sevInfo.color }}>report_problem</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-[#1a2332] capitalize">{c.issue_type.replace('_', ' ')}</p>
-                            {c.subcategory && <p className="text-xs text-[#718096]">{c.subcategory}</p>}
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Location */}
-                      <td>
-                        <p className="text-xs text-[#4a5568] max-w-[140px] truncate">{c.ward_name || c.address || '—'}</p>
-                      </td>
-
-                      {/* Severity */}
-                      <td>
-                        <span
-                          className="nx-badge capitalize"
-                          style={{ background: sevInfo.bg, color: sevInfo.color }}
-                        >
-                          {c.severity}
-                        </span>
-                      </td>
-
-                      {/* Status */}
-                      <td>
-                        <span
-                          className="nx-badge"
+                return (
+                  <tr key={c.id} className="hover:bg-[#f8fafc] transition-colors group">
+                    {/* Issue */}
+                    <td className="py-3.5 px-3">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
                           style={{ background: statusInfo.bg, color: statusInfo.color }}
                         >
-                          {statusInfo.label}
-                        </span>
-                      </td>
-
-                      {/* Age */}
-                      <td>
-                        <span className={`text-xs font-semibold ${isOverdue ? 'text-[#b71c1c]' : 'text-[#718096]'}`}>
-                          {isOverdue ? '⚠ ' : ''}{days}d
-                        </span>
-                      </td>
-
-                      {/* Assigned */}
-                      <td>
-                        <span className="text-xs text-[#718096]">
-                          {c.assigned_to ? (workers.find((w) => w.id === c.assigned_to)?.display_name ?? workers.find((w) => w.id === c.assigned_to)?.full_name ?? 'Worker') : '—'}
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-                      <td>
-                        <div className="flex items-center gap-2">
-                          {/* Assign — only for unassigned complaints */}
-                          {['filed', 'open'].includes(c.status) && (
-                            <button
-                              onClick={() => setAssignTarget(c)}
-                              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-white rounded transition-colors"
-                              style={{ background: 'var(--nx-admin)' }}
-                            >
-                              <span className="material-symbols-outlined text-sm">assignment_ind</span>
-                              Assign
-                            </button>
-                          )}
-
-                          {/* Verify — only when proof is submitted */}
-                          {c.status === 'proof_submitted' && proof && (
-                            <button
-                              onClick={() => setVerifyTarget({ proof, complaint: c })}
-                              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold text-white rounded transition-colors"
-                              style={{ background: 'var(--nx-warning)' }}
-                            >
-                              <span className="material-symbols-outlined text-sm">fact_check</span>
-                              Verify
-                            </button>
-                          )}
-
-                          {/* View detail */}
-                          <a
-                            href={`/dashboard/${c.id}`}
-                            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-[#4a5568] bg-[#f4f6fa] rounded border border-[#dde3ed] hover:bg-[#dde3ed] transition-colors"
-                          >
-                            <span className="material-symbols-outlined text-sm">open_in_new</span>
-                            View
-                          </a>
+                          <span className="material-symbols-outlined text-base">
+                            {getIssueIcon(c.issue_type)}
+                          </span>
                         </div>
-                      </td>
-                    </tr>
-                  );
+                        <div>
+                          <p className="text-xs font-bold text-[#1a2332] capitalize">
+                            {c.issue_type.replace('_', ' ')}
+                          </p>
+                          <p className="text-[11px] text-[#718096] truncate max-w-[180px]">
+                            {c.subcategory || c.description_en || 'Municipal Grievance'}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Location */}
+                    <td className="py-3.5 px-3">
+                      <p className="text-xs font-medium text-[#1a2332] max-w-[150px] truncate">
+                        {c.ward_name || 'Central Ward'}
+                      </p>
+                      <p className="text-[11px] text-[#718096] max-w-[150px] truncate">
+                        {c.address || 'Location registered'}
+                      </p>
+                    </td>
+
+                    {/* Reported At */}
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      <p className="text-xs font-medium text-[#1a2332]">{formattedDate}</p>
+                      <p className="text-[11px] text-[#718096]">{formattedTime}</p>
+                    </td>
+
+                    {/* Status */}
+                    <td className="py-3.5 px-3 whitespace-nowrap">
+                      <span
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
+                        style={{ background: statusInfo.bg, color: statusInfo.color }}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: statusInfo.color }}></span>
+                        {statusInfo.label}
+                      </span>
+                    </td>
+
+                    {/* Assigned */}
+                    <td className="py-3.5 px-3">
+                      {c.assigned_to ? (
+                        <div className="flex items-center gap-1.5 text-xs text-[#1a2332] font-medium">
+                          <span className="w-5 h-5 rounded-full bg-[#e3f0fd] text-[#1565c0] flex items-center justify-center text-[10px] font-bold">
+                            {(workers.find((w) => w.id === c.assigned_to)?.display_name ?? 'W')[0].toUpperCase()}
+                          </span>
+                          <span className="truncate max-w-[100px]">
+                            {workers.find((w) => w.id === c.assigned_to)?.display_name ?? 'Worker'}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-[11px] text-[#b45309] font-medium italic">Unassigned</span>
+                      )}
+                    </td>
+
+                    {/* Actions */}
+                    <td className="py-3.5 px-3 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-2">
+                        {['filed', 'open'].includes(c.status) && (
+                          <button
+                            onClick={() => setAssignTarget(c)}
+                            className="px-3 py-1 bg-[#002147] hover:bg-[#003166] text-white text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1 shadow-sm"
+                          >
+                            <span className="material-symbols-outlined text-xs">person_add</span>
+                            <span>Assign</span>
+                          </button>
+                        )}
+
+                        {c.status === 'proof_submitted' && proof && (
+                          <button
+                            onClick={() => setVerifyTarget({ proof, complaint: c })}
+                            className="px-3 py-1 bg-[#b45309] hover:bg-[#92400e] text-white text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1 shadow-sm"
+                          >
+                            <span className="material-symbols-outlined text-xs">fact_check</span>
+                            <span>Verify</span>
+                          </button>
+                        )}
+
+                        <a
+                          href={`/dashboard/${c.id}`}
+                          className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#4a5568] bg-[#f4f6fa] rounded-lg border border-[#dde3ed] hover:bg-[#dde3ed] transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-xs">open_in_new</span>
+                          <span>View</span>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                );
                 })
               )}
             </tbody>
@@ -505,7 +532,6 @@ export function AdminComplaintsTable({ complaints, workers, proofs }: Complaints
             </div>
           </div>
         )}
-      </div>
 
       {/* Modals */}
       {assignTarget && (

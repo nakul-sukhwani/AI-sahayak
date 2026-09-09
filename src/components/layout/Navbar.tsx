@@ -72,8 +72,30 @@ const ROLE_PORTAL_LABEL: Partial<Record<UserRole, string>> = {
 export function Navbar() {
   const { profile, role, signOut } = useAuth();
   const pathname = usePathname();
-  const links = role ? ROLE_LINKS[role] : [];
-  const portalLabel = role ? (ROLE_PORTAL_LABEL[role] ?? 'Portal') : '';
+
+  const effectiveRole: UserRole = role || (
+    pathname.startsWith('/admin') ? 'admin' :
+    pathname.startsWith('/worker') ? 'worker' :
+    pathname.startsWith('/ngo') ? 'community_org' :
+    pathname.startsWith('/university') ? 'university_admin' :
+    pathname.startsWith('/industry') ? 'industry_partner' :
+    'citizen'
+  );
+
+  const links = ROLE_LINKS[effectiveRole] ?? [];
+  const portalLabel = ROLE_PORTAL_LABEL[effectiveRole] ?? 'Portal';
+
+  const roleStyles: Record<string, { bg: string; color: string; border: string }> = {
+    citizen: { bg: '#e8f5e9', color: '#1b5e20', border: '#a5d6a7' },
+    worker: { bg: '#fef3e2', color: '#b45309', border: '#f6c17a' },
+    admin: { bg: '#e3f0fd', color: '#1565c0', border: '#b8c4d6' },
+    officer: { bg: '#e3f0fd', color: '#1565c0', border: '#b8c4d6' },
+    community_org: { bg: '#e0f2f1', color: '#00695c', border: '#80cbc4' },
+    university_admin: { bg: '#f3e5f5', color: '#4a148c', border: '#ce93d8' },
+    faculty_mentor: { bg: '#f3e5f5', color: '#4a148c', border: '#ce93d8' },
+    student: { bg: '#f3e5f5', color: '#4a148c', border: '#ce93d8' },
+  };
+  const activeStyle = roleStyles[effectiveRole] || roleStyles.admin;
 
   return (
     <header className="sticky top-0 z-40 w-full">
@@ -84,9 +106,9 @@ export function Navbar() {
       <div className="gov-brand-header">
         <div className="max-w-[1440px] mx-auto px-4 md:px-8 h-16 flex items-center justify-between gap-4">
           {/* Left: Emblem + Name */}
-          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
+          <Link href="/" className="flex items-center gap-3 flex-shrink-0 group">
             {/* Ashoka emblem substitute — circular navy badge */}
-            <div className="w-11 h-11 rounded-full bg-[#002147] flex items-center justify-center flex-shrink-0 shadow-sm">
+            <div className="w-11 h-11 rounded-full bg-[#002147] flex items-center justify-center flex-shrink-0 shadow-sm transition-transform group-hover:scale-105">
               <span
                 className="material-symbols-outlined text-white text-xl"
                 style={{ fontVariationSettings: "'FILL' 1" }}
@@ -95,8 +117,8 @@ export function Navbar() {
               </span>
             </div>
             <div>
-              <p className="text-base font-bold text-[#002147] leading-tight tracking-tight">
-                Nagrik Seva
+              <p className="text-base font-bold text-[#002147] leading-tight tracking-tight flex items-center gap-2">
+                <span>Nagrik Seva</span>
               </p>
               <p className="text-[11px] text-[#4a5568] leading-tight">
                 Municipal Corporation &amp; Civic Services
@@ -106,20 +128,23 @@ export function Navbar() {
 
           {/* Right: portal label + user + sign out */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            {portalLabel && (
-              <span className="hidden sm:inline text-xs font-semibold text-[#4a5568] uppercase tracking-widest bg-[#f4f6fa] border border-[#dde3ed] px-2.5 py-1 rounded">
-                {portalLabel}
-              </span>
-            )}
+            <span
+              className="px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase border flex items-center gap-1.5 shadow-sm"
+              style={{ background: activeStyle.bg, color: activeStyle.color, borderColor: activeStyle.border }}
+            >
+              <span className="w-2 h-2 rounded-full" style={{ background: activeStyle.color }}></span>
+              {portalLabel}
+            </span>
+
             {profile && (
-              <span className="hidden md:block text-sm font-medium text-[#1a2332]">
+              <span className="hidden md:block text-xs font-semibold text-[#1a2332] bg-[#f4f6fa] px-2.5 py-1 rounded-lg border border-[#dde3ed]">
                 {profile.display_name ?? profile.full_name ?? 'User'}
               </span>
             )}
             <button
               onClick={signOut}
               aria-label="Sign out"
-              className="flex items-center gap-1.5 text-xs text-[#4a5568] hover:text-[#b71c1c] transition-colors px-2.5 py-1.5 rounded hover:bg-[#ffebee] border border-transparent hover:border-[#ffcdd2]"
+              className="flex items-center gap-1.5 text-xs text-[#4a5568] hover:text-[#b71c1c] transition-colors px-2.5 py-1.5 rounded-lg hover:bg-[#ffebee] border border-transparent hover:border-[#ffcdd2]"
             >
               <span className="material-symbols-outlined text-base">logout</span>
               <span className="hidden sm:block font-medium">Sign Out</span>
