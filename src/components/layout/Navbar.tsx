@@ -30,8 +30,9 @@ const ROLE_LINKS: Record<UserRole, NavLink[]> = {
     { href: '/dashboard', label: 'Dashboard', icon: 'home' },
   ],
   admin: [
-    { href: '/admin', label: 'Admin',   icon: 'admin_panel_settings' },
-    { href: '/feed',  label: 'Feed',    icon: 'public' },
+    { href: '/admin',            label: 'Overview',          icon: 'dashboard' },
+    { href: '/admin/complaints', label: 'Recent Grievances', icon: 'assignment' },
+    { href: '/feed',             label: 'Feed',              icon: 'public' },
   ],
   community_org: [
     { href: '/ngo',           label: 'NGO Dashboard', icon: 'groups' },

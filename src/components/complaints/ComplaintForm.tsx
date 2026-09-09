@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/components/ui/toast';
 import { useLanguage } from '@/context/LanguageContext';
-import { ISSUE_TYPES } from '@/constants/issue-types';
+import { ISSUE_TYPES, getIssueLabel } from '@/constants/issue-types';
 import { SEVERITIES } from '@/constants/severities';
 import { BANGALORE_WARDS } from '@/constants/authorities';
 import type { ProcessedImage } from '@/lib/image';
@@ -75,6 +75,7 @@ export function ComplaintForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCheckingDuplicates, setIsCheckingDuplicates] = useState(false);
   const [clusterInfo, setClusterInfo] = useState<SpatialClusterCheckResult | null>(null);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
 
   // ── Duplicate Cluster Check ──────────────────────────────────────────
   const checkDuplicateAndProceed = async () => {
@@ -445,16 +446,71 @@ export function ComplaintForm() {
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
                 Issue Category *
               </label>
-              <select
-                value={form.issueType}
-                onChange={(e) => setForm((f) => ({ ...f, issueType: e.target.value }))}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 bg-white focus:outline-none focus:border-[#002147] focus:ring-2 focus:ring-[#002147]/10 transition-all"
-              >
-                <option value="">Select issue category…</option>
-                {ISSUE_TYPES.map((tItem) => (
-                  <option key={tItem.value} value={tItem.value}>{tItem.label}</option>
-                ))}
-              </select>
+
+              {form.issueType && !showCategoryPicker ? (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-emerald-50/50 border-2 border-emerald-300 shadow-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                      <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        verified
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-bold text-slate-900">
+                          {getIssueLabel(form.issueType)}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-200 text-emerald-900 border border-emerald-300">
+                          {form.aiResult ? '✓ Verified by AI Vision' : 'Selected'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-0.5 truncate sm:whitespace-normal">
+                        {form.aiResult
+                          ? `Identified from your photo (${Math.round((form.aiResult.confidence_score ?? 0.95) * 100)}% match) · Assigned to ${form.aiResult.suggested_department || 'Roads & Infrastructure'}`
+                          : 'Civic issue category selected'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCategoryPicker(true)}
+                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors flex-shrink-0 shadow-2xs"
+                  >
+                    <span className="material-symbols-outlined text-sm">edit</span>
+                    <span>Change</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-500">Choose the appropriate category:</span>
+                    {form.issueType && (
+                      <button
+                        type="button"
+                        onClick={() => setShowCategoryPicker(false)}
+                        className="text-xs text-emerald-700 hover:underline font-bold flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-sm">check</span>
+                        <span>Keep {getIssueLabel(form.issueType)}</span>
+                      </button>
+                    )}
+                  </div>
+                  <select
+                    value={form.issueType}
+                    onChange={(e) => {
+                      setForm((f) => ({ ...f, issueType: e.target.value }));
+                      if (e.target.value) setShowCategoryPicker(false);
+                    }}
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 bg-white focus:outline-none focus:border-[#002147] focus:ring-2 focus:ring-[#002147]/10 transition-all"
+                  >
+                    <option value="">Select issue category…</option>
+                    {ISSUE_TYPES.map((tItem) => (
+                      <option key={tItem.value} value={tItem.value}>{tItem.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             <div>

@@ -50,8 +50,38 @@ export default async function AdminDashboardPage() {
       .from('work_proof')
       .select('id, complaint_id, after_photo_url, ai_verified, ai_observation, status')
       .in('complaint_id', proofComplaintIds);
-    proofs = (proofsRaw ?? []) as typeof proofs;
+    const rawProofs = (proofsRaw ?? []) as typeof proofs;
+
+    proofs = await Promise.all(
+      rawProofs.map(async (p) => {
+        let afterUrl = p.after_photo_url;
+        if (afterUrl && !afterUrl.startsWith('http') && !afterUrl.startsWith('data:')) {
+          const cleanPath = afterUrl.replace(/^complaints\//, '');
+          const { data: signed } = await supabase.storage
+            .from('complaints')
+            .createSignedUrl(cleanPath, 7200);
+          if (signed?.signedUrl) afterUrl = signed.signedUrl;
+        }
+        return { ...p, after_photo_url: afterUrl };
+      })
+    );
   }
+
+  // Pre-generate signed URLs for complaint photos in proof_submitted complaints
+  const complaintsWithSignedUrls = await Promise.all(
+    complaints.map(async (c) => {
+      if (c.image_url && !c.image_url.startsWith('http') && !c.image_url.startsWith('data:') && proofComplaintIds.includes(c.id)) {
+        const cleanPath = c.image_url.replace(/^complaints\//, '');
+        const { data: signed } = await supabase.storage
+          .from('complaints')
+          .createSignedUrl(cleanPath, 7200);
+        if (signed?.signedUrl) {
+          return { ...c, image_url: signed.signedUrl };
+        }
+      }
+      return c;
+    })
+  );
 
   // ── Stats ─────────────────────────────────────────────────────
   const total        = complaints.length;
@@ -271,7 +301,7 @@ export default async function AdminDashboardPage() {
           {/* Main Complaints Table (8 Cols) */}
           <div id="complaint-table" className="lg:col-span-8">
             <AdminComplaintsTable
-              complaints={complaints}
+              complaints={complaintsWithSignedUrls}
               workers={workers}
               proofs={proofs}
             />

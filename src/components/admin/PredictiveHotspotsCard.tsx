@@ -33,26 +33,26 @@ export function PredictiveHotspotsCard({ report }: PredictiveHotspotsCardProps) 
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-[#1565c0] border border-blue-200">
-                Predictive AI Hotspots
+                Early Area Warnings
               </span>
               <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Forecast
+                Live Status
               </span>
             </div>
             <h2 className="text-lg font-bold text-[#002147] tracking-tight mt-0.5">
-              Infrastructure Vulnerability &amp; Preventive Maintenance
+              Area Health &amp; Early Maintenance Alerts
             </h2>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <div className="px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-            <span className="text-slate-400 font-medium">Monitored Zones:</span>{' '}
+            <span className="text-slate-400 font-medium">Monitored:</span>{' '}
             <strong className="text-slate-900">{report.ward_profiles.length} Wards</strong>
           </div>
           <div className="px-3.5 py-1.5 rounded-xl bg-red-50 border border-red-200 text-xs">
-            <span className="text-red-500 font-medium">Elevated Risk:</span>{' '}
+            <span className="text-red-500 font-medium">Needs Attention:</span>{' '}
             <strong className="text-red-800">{report.high_risk_wards_count} Wards</strong>
           </div>
         </div>
@@ -78,15 +78,21 @@ export function PredictiveHotspotsCard({ report }: PredictiveHotspotsCardProps) 
                         : 'bg-blue-100 text-blue-900'
                     }`}
                   >
-                    {selectedWard.risk_level} · Risk Index: {selectedWard.overall_risk_score}/100
+                    {selectedWard.risk_level === 'CRITICAL'
+                      ? 'Needs Attention'
+                      : selectedWard.risk_level === 'HIGH'
+                      ? 'Watch Closely'
+                      : selectedWard.risk_level === 'MODERATE'
+                      ? 'Moderate Wear'
+                      : 'All Clear'} · Risk Score: {selectedWard.overall_risk_score}/100
                   </span>
                 </div>
                 <p className="text-xs text-slate-700 mt-1 font-medium leading-relaxed">
                   {selectedWard.preventive_advisory}
                 </p>
                 <p className="text-xs text-slate-900 font-semibold mt-0.5 flex items-center gap-1.5 text-amber-950">
-                  <span className="material-symbols-outlined text-sm text-amber-700">bolt</span>
-                  Recommended Pre-Emptive Action: {selectedWard.suggested_action}
+                  <span className="material-symbols-outlined text-sm text-amber-700">build</span>
+                  Suggested Action: {selectedWard.suggested_action}
                 </p>
               </div>
             </div>
@@ -107,8 +113,8 @@ export function PredictiveHotspotsCard({ report }: PredictiveHotspotsCardProps) 
                 </span>
                 <span>
                   {dispatchedWards[selectedWard.ward_name]
-                    ? 'Pre-Emptive Work Order Dispatched!'
-                    : 'Issue Preventive Work Order'}
+                    ? 'Maintenance Team Dispatched!'
+                    : 'Send Maintenance Team'}
                 </span>
               </button>
             </div>
@@ -154,7 +160,7 @@ export function PredictiveHotspotsCard({ report }: PredictiveHotspotsCardProps) 
               <div className="space-y-1.5 text-[11px]">
                 <div>
                   <div className="flex justify-between text-slate-500 text-[10px] font-medium">
-                    <span>Monsoon Drainage</span>
+                    <span>Waterlogging / Drains</span>
                     <span className="font-semibold text-slate-700">{ward.waterlogging_risk}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
@@ -169,7 +175,7 @@ export function PredictiveHotspotsCard({ report }: PredictiveHotspotsCardProps) 
 
                 <div>
                   <div className="flex justify-between text-slate-500 text-[10px] font-medium">
-                    <span>Road Surface Wear</span>
+                    <span>Road Damage / Potholes</span>
                     <span className="font-semibold text-slate-700">{ward.road_wear_score}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
@@ -184,7 +190,7 @@ export function PredictiveHotspotsCard({ report }: PredictiveHotspotsCardProps) 
 
                 <div>
                   <div className="flex justify-between text-slate-500 text-[10px] font-medium">
-                    <span>Electrical Feeder</span>
+                    <span>Streetlights &amp; Power</span>
                     <span className="font-semibold text-slate-700">{ward.electrical_grid_risk}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">

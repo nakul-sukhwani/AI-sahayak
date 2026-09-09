@@ -109,19 +109,19 @@ export function computePredictiveRisks(
     else if (overallRisk >= 50) riskLevel = 'HIGH';
     else if (overallRisk >= 30) riskLevel = 'MODERATE';
 
-    // Tailored preventive advisory
-    let preventiveAdvisory = 'Normal scheduled ward maintenance sufficient.';
-    let suggestedAction = 'Conduct routine weekly inspection.';
+    // Tailored preventive advisory in clear, simple English
+    let preventiveAdvisory = 'Area roads, lights, and drains are in good condition.';
+    let suggestedAction = 'Continue standard weekly inspection.';
 
     if (waterloggingRisk >= 65) {
-      preventiveAdvisory = `High vulnerability to flash waterlogging along low-elevation storm drains. ${stats.water} recent drainage complaints registered.`;
-      suggestedAction = 'Pre-deploy desilting suction trucks to Rajakaluve culverts before expected rainfall.';
+      preventiveAdvisory = `Rainwater drains are starting to block in low areas (${stats.water} recent reports). High risk of water standing on roads when it rains.`;
+      suggestedAction = 'Send drain cleaning trucks to clear roadside drains and gutters before it rains.';
     } else if (roadWearScore >= 60) {
-      preventiveAdvisory = `Cluster wear detected on key transit arteries. Heavy axle loads accelerating surface deterioration.`;
-      suggestedAction = 'Dispatch preventive hot-mix asphalt patching van to arrest pothole propagation.';
+      preventiveAdvisory = `Heavy daily traffic is wearing out the road surface. Small cracks and potholes are starting to form.`;
+      suggestedAction = 'Send road repair van to patch small cracks and holes before large potholes develop.';
     } else if (electricalGridRisk >= 55) {
-      preventiveAdvisory = `Corridor transformer / feeder phase overload suspected based on repeated streetlight outages.`;
-      suggestedAction = 'Schedule BESCOM joint inspection for underground cable insulation testing.';
+      preventiveAdvisory = `Multiple streetlights and power issues reported along this road. Cables may be damaged.`;
+      suggestedAction = 'Send electrician team to inspect power lines and fix streetlights.';
     }
 
     wardProfiles.push({

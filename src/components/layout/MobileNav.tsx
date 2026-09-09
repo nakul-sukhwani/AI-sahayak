@@ -23,8 +23,9 @@ const ROLE_TABS: Record<UserRole, NavTab[]> = {
   supervisor:   [{ href: '/dashboard', label: 'Home',      icon: 'home' }],
   officer:      [{ href: '/dashboard', label: 'Home',      icon: 'home' }],
   admin:        [
-    { href: '/admin', label: 'Admin', icon: 'admin_panel_settings' },
-    { href: '/feed',  label: 'Feed',  icon: 'public' },
+    { href: '/admin',            label: 'Overview',   icon: 'dashboard' },
+    { href: '/admin/complaints', label: 'Grievances', icon: 'assignment' },
+    { href: '/feed',             label: 'Feed',       icon: 'public' },
   ],
   community_org:    [
     { href: '/ngo',           label: 'NGO',    icon: 'groups' },

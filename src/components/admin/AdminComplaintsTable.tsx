@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import type { Complaint } from '@/types/complaint';
 import type { DispatchEvaluation } from '@/lib/dispatch-agent';
 
@@ -243,6 +245,39 @@ function VerifyModal({
   const [loading, startTransition] = useTransition();
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
+  const [beforeUrl, setBeforeUrl] = useState<string | null>(complaint.image_url);
+  const [afterUrl, setAfterUrl] = useState<string | null>(proof.after_photo_url);
+  const [isLoadingBefore, setIsLoadingBefore] = useState(false);
+  const [isLoadingAfter, setIsLoadingAfter] = useState(false);
+  const [beforeFailed, setBeforeFailed] = useState(false);
+  const [afterFailed, setAfterFailed] = useState(false);
+
+  useEffect(() => {
+    // Resolve Before photo if not an absolute HTTP URL
+    if (complaint.image_url && !complaint.image_url.startsWith('http') && !complaint.image_url.startsWith('data:')) {
+      setIsLoadingBefore(true);
+      fetch(`/api/storage/signed-url?path=${encodeURIComponent(complaint.image_url)}`)
+        .then((r) => r.json())
+        .then((d) => { if (d.signedUrl) setBeforeUrl(d.signedUrl); })
+        .catch(() => setBeforeFailed(true))
+        .finally(() => setIsLoadingBefore(false));
+    } else {
+      setBeforeUrl(complaint.image_url);
+    }
+
+    // Resolve After photo if not an absolute HTTP URL
+    if (proof.after_photo_url && !proof.after_photo_url.startsWith('http') && !proof.after_photo_url.startsWith('data:')) {
+      setIsLoadingAfter(true);
+      fetch(`/api/storage/signed-url?path=${encodeURIComponent(proof.after_photo_url)}`)
+        .then((r) => r.json())
+        .then((d) => { if (d.signedUrl) setAfterUrl(d.signedUrl); })
+        .catch(() => setAfterFailed(true))
+        .finally(() => setIsLoadingAfter(false));
+    } else {
+      setAfterUrl(proof.after_photo_url);
+    }
+  }, [complaint.image_url, proof.after_photo_url]);
+
   async function submit(action: 'approved' | 'rejected') {
     if (action === 'rejected' && !reason.trim()) { setMsg({ type: 'err', text: 'Please provide a rejection reason.' }); return; }
     startTransition(async () => {
@@ -259,7 +294,7 @@ function VerifyModal({
 
   return (
     <div className="nx-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="nx-modal">
+      <div className="nx-modal max-w-xl">
         {/* Header */}
         <div className="px-6 py-4 border-b border-[#dde3ed] flex items-center justify-between" style={{ background: 'var(--nx-warning-light)' }}>
           <div>
@@ -275,46 +310,85 @@ function VerifyModal({
           {/* Before/After photos */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#718096] mb-2">Before</p>
-              {complaint.image_url ? (
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#718096]">Before (Problem)</p>
+                {beforeUrl && !beforeFailed && !isLoadingBefore && (
+                  <a href={beforeUrl} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 hover:underline flex items-center gap-0.5">
+                    <span>Full size</span>
+                    <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                  </a>
+                )}
+              </div>
+              {isLoadingBefore ? (
+                <div className="w-full aspect-square bg-[#f4f6fa] rounded-lg border border-[#dde3ed] flex flex-col items-center justify-center gap-2">
+                  <span className="w-5 h-5 border-2 border-[#1565c0] border-t-transparent rounded-full animate-spin" />
+                  <span className="text-[11px] text-[#718096]">Loading photo…</span>
+                </div>
+              ) : beforeUrl && !beforeFailed ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={complaint.image_url} alt="Before" className="w-full aspect-square object-cover rounded-lg border border-[#dde3ed]" />
+                <img
+                  src={beforeUrl}
+                  alt="Before"
+                  onError={() => setBeforeFailed(true)}
+                  className="w-full aspect-square object-cover rounded-lg border border-[#dde3ed] shadow-xs"
+                />
               ) : (
-                <div className="w-full aspect-square bg-[#f4f6fa] rounded-lg border border-[#dde3ed] flex items-center justify-center">
-                  <span className="material-symbols-outlined text-3xl text-[#b8c4d6]">image</span>
+                <div className="w-full aspect-square bg-[#f4f6fa] rounded-lg border border-[#dde3ed] flex flex-col items-center justify-center text-center p-3">
+                  <span className="material-symbols-outlined text-3xl text-[#b8c4d6] mb-1">image_not_supported</span>
+                  <span className="text-[11px] text-[#718096]">No photo or storage unavailable</span>
                 </div>
               )}
             </div>
+
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#718096] mb-2">After (Submitted)</p>
-              {proof.after_photo_url ? (
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#718096]">After (Submitted)</p>
+                {afterUrl && !afterFailed && !isLoadingAfter && (
+                  <a href={afterUrl} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 hover:underline flex items-center gap-0.5">
+                    <span>Full size</span>
+                    <span className="material-symbols-outlined text-[12px]">open_in_new</span>
+                  </a>
+                )}
+              </div>
+              {isLoadingAfter ? (
+                <div className="w-full aspect-square bg-[#f4f6fa] rounded-lg border border-[#dde3ed] flex flex-col items-center justify-center gap-2">
+                  <span className="w-5 h-5 border-2 border-[#1565c0] border-t-transparent rounded-full animate-spin" />
+                  <span className="text-[11px] text-[#718096]">Loading photo…</span>
+                </div>
+              ) : afterUrl && !afterFailed ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={proof.after_photo_url} alt="After" className="w-full aspect-square object-cover rounded-lg border border-[#dde3ed]" />
+                <img
+                  src={afterUrl}
+                  alt="After"
+                  onError={() => setAfterFailed(true)}
+                  className="w-full aspect-square object-cover rounded-lg border border-[#dde3ed] shadow-xs"
+                />
               ) : (
-                <div className="w-full aspect-square bg-[#f4f6fa] rounded-lg border border-[#dde3ed] flex items-center justify-center">
-                  <span className="material-symbols-outlined text-3xl text-[#b8c4d6]">image_not_supported</span>
+                <div className="w-full aspect-square bg-[#f4f6fa] rounded-lg border border-[#dde3ed] flex flex-col items-center justify-center text-center p-3">
+                  <span className="material-symbols-outlined text-3xl text-[#b8c4d6] mb-1">image_not_supported</span>
+                  <span className="text-[11px] text-[#718096]">No photo or storage unavailable</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* AI Observation & Forensic Audit */}
+          {/* AI Observation & Inspection Check */}
           {proof.ai_observation && (
             <div className="nx-card p-3.5 space-y-2" style={{ background: '#faf8ff', borderColor: 'rgba(124,58,237,0.25)' }}>
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-base" style={{ color: '#7C3AED', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
                   <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#7C3AED' }}>
-                    Forensic Quality Audit — {proof.ai_verified ? '✓ Verified' : '⚠ Discrepancy Found'}
+                    AI Photo Check — {proof.ai_verified ? '✓ Work Verified' : '⚠ Issue Detected'}
                   </p>
                 </div>
-                {proof.ai_observation.includes('Fraud Risk: HIGH') ? (
+                {proof.ai_observation.includes('Fraud Risk: HIGH') || proof.ai_observation.toLowerCase().includes('different place') || proof.ai_observation.toLowerCase().includes('different location') ? (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-700 border border-red-200">
-                    High Fraud Risk
+                    Location Mismatch
                   </span>
                 ) : (
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700">
-                    Low Fraud Risk
+                    Photo Matches
                   </span>
                 )}
               </div>
@@ -394,6 +468,8 @@ export function AdminComplaintsTable({ complaints, workers, proofs }: Complaints
   const [assignTarget, setAssignTarget] = useState<Complaint | null>(null);
   const [verifyTarget, setVerifyTarget] = useState<{ proof: ProofRow; complaint: Complaint } | null>(null);
   const [page, setPage] = useState(0);
+  const pathname = usePathname();
+  const isDedicatedPage = pathname?.startsWith('/admin/complaints');
   const PER_PAGE = 15;
   const getIssueIcon = (type: string) => {
     switch (type.toLowerCase()) {
@@ -433,12 +509,24 @@ export function AdminComplaintsTable({ complaints, workers, proofs }: Complaints
       {/* Header & Filter Controls (Quixotic style) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
-          <h2 className="text-base font-bold text-[#1a2332] flex items-center gap-2">
-            <span>Recent Grievances</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#e3f0fd] text-[#1565c0]">
-              {filtered.length}
-            </span>
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-bold text-[#1a2332] flex items-center gap-2">
+              <span>Recent Grievances</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#e3f0fd] text-[#1565c0]">
+                {filtered.length}
+              </span>
+            </h2>
+            {!isDedicatedPage && (
+              <Link
+                href="/admin/complaints"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1565c0] hover:text-[#002147] bg-[#e3f0fd]/60 hover:bg-[#e3f0fd] px-2 py-0.5 rounded-lg border border-[#b8c4d6]/60 transition-colors"
+                title="Open dedicated full-screen grievance management view"
+              >
+                <span>Full Tab</span>
+                <span className="material-symbols-outlined text-xs">arrow_forward</span>
+              </Link>
+            )}
+          </div>
           <p className="text-xs text-[#718096]">Live queue of citizen reports and field progress</p>
         </div>
 
