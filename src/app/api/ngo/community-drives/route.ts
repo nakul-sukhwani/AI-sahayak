@@ -64,7 +64,7 @@ let globalDrives: CommunityDrive[] = [
 ];
 
 const CreateDriveSchema = z.object({
-  action: z.enum(['create', 'join']),
+  action: z.enum(['create', 'join', 'leave']),
   drive_id: z.string().optional(),
   title: z.string().min(5).max(120).optional(),
   description: z.string().min(10).max(500).optional(),
@@ -109,6 +109,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const { action, drive_id, title, description, drive_type, ward_name, meeting_point, scheduled_date, max_volunteers } = parsed.data;
+
+    if (action === 'leave') {
+      if (!drive_id) return NextResponse.json({ error: 'drive_id required to cancel RSVP' }, { status: 400 });
+      const target = globalDrives.find((d) => d.id === drive_id);
+      if (!target) return NextResponse.json({ error: 'Drive not found' }, { status: 404 });
+
+      target.volunteers_count = Math.max(0, target.volunteers_count - 1);
+      target.is_joined = false;
+
+      return NextResponse.json({
+        success: true,
+        message: `Cancelled volunteer RSVP for ${target.title}.`,
+        drive: target,
+      });
+    }
 
     if (action === 'join') {
       if (!drive_id) return NextResponse.json({ error: 'drive_id required to join' }, { status: 400 });
