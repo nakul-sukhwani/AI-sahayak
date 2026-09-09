@@ -105,36 +105,38 @@ export function Navbar() {
 
       {/* Brand header */}
       <div className="gov-brand-header">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-4 md:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
           {/* Left: Emblem + Name */}
-          <Link href="/" className="flex items-center gap-3 flex-shrink-0 group">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 min-w-0 group">
             {/* Ashoka emblem substitute — circular navy badge */}
-            <div className="w-11 h-11 rounded-full bg-[#002147] flex items-center justify-center flex-shrink-0 shadow-sm transition-transform group-hover:scale-105">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#002147] flex items-center justify-center flex-shrink-0 shadow-sm transition-transform group-hover:scale-105">
               <span
-                className="material-symbols-outlined text-white text-xl"
+                className="material-symbols-outlined text-white text-lg sm:text-xl"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 account_balance
               </span>
             </div>
-            <div>
-              <p className="text-base font-bold text-[#002147] leading-tight tracking-tight flex items-center gap-2">
-                <span>Nagrik Seva</span>
+            <div className="min-w-0">
+              <p className="text-sm sm:text-base font-bold text-[#002147] leading-tight tracking-tight truncate">
+                Nagrik Seva
               </p>
-              <p className="text-[11px] text-[#4a5568] leading-tight">
-                Municipal Corporation &amp; Civic Services
+              <p className="text-[10px] sm:text-[11px] text-[#4a5568] leading-tight truncate">
+                <span className="hidden sm:inline">Municipal Corporation &amp; Civic Services</span>
+                <span className="sm:hidden">Civic Services</span>
               </p>
             </div>
           </Link>
 
           {/* Right: portal label + user + sign out */}
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
             <span
-              className="px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase border flex items-center gap-1.5 shadow-sm"
+              className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wide uppercase border flex items-center gap-1 sm:gap-1.5 shadow-sm whitespace-nowrap"
               style={{ background: activeStyle.bg, color: activeStyle.color, borderColor: activeStyle.border }}
             >
-              <span className="w-2 h-2 rounded-full" style={{ background: activeStyle.color }}></span>
-              {portalLabel}
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0" style={{ background: activeStyle.color }}></span>
+              <span className="hidden sm:inline">{portalLabel}</span>
+              <span className="sm:hidden">{portalLabel.replace(' Portal', '')}</span>
             </span>
 
             {profile && (
@@ -145,19 +147,19 @@ export function Navbar() {
             <button
               onClick={signOut}
               aria-label="Sign out"
-              className="flex items-center gap-1.5 text-xs text-[#4a5568] hover:text-[#b71c1c] transition-colors px-2.5 py-1.5 rounded-lg hover:bg-[#ffebee] border border-transparent hover:border-[#ffcdd2]"
+              className="flex items-center gap-1 sm:gap-1.5 text-xs text-[#4a5568] hover:text-[#b71c1c] transition-colors p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg hover:bg-[#ffebee] border border-transparent hover:border-[#ffcdd2] flex-shrink-0"
             >
-              <span className="material-symbols-outlined text-base">logout</span>
+              <span className="material-symbols-outlined text-lg sm:text-base">logout</span>
               <span className="hidden sm:block font-medium">Sign Out</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Tab nav bar — Modern Bento Pill Navigation */}
+      {/* Tab nav bar — Modern Bento Pill Navigation (Desktop only; mobile uses fixed bottom MobileNav) */}
       {links.length > 0 && (
-        <nav className="bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.04)]">
-          <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <nav className="hidden md:block bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.04)]">
+          <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar scrollbar-none">
             {links.map((link) => {
               const isActive =
                 pathname === link.href ||

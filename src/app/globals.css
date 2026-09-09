@@ -57,6 +57,12 @@
   box-sizing: border-box;
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
 html {
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
@@ -68,6 +74,37 @@ body {
   color: var(--nx-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Universal Scrollbar Hiding Utilities (Zero ugly scrollbars on mobile/desktop) ── */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar,
+[data-no-scrollbar]::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+.no-scrollbar,
+.scrollbar-none,
+[data-no-scrollbar] {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Touch & Mobile device scrollbar cleanup */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
 }
 
 /* ── Material Symbols ─────────────────────────────────────────── */

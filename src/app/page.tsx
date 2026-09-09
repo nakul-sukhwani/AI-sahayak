@@ -24,33 +24,35 @@ export default function LandingPage() {
 
       {/* ── Brand header ─────────────────────────────────────────── */}
       <div className="gov-brand-header">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-[#002147] flex items-center justify-center shadow-md flex-shrink-0">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-4 md:px-8 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-[#002147] flex items-center justify-center shadow-md flex-shrink-0">
               <span
-                className="material-symbols-outlined text-white text-2xl"
+                className="material-symbols-outlined text-white text-xl sm:text-2xl"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 account_balance
               </span>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-[#002147] leading-tight tracking-tight">
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl font-bold text-[#002147] leading-tight tracking-tight truncate">
                 Nagrik Seva
               </h1>
-              <p className="text-[12px] text-[#4a5568] leading-tight">
-                Municipal Corporation &amp; Urban Development
+              <p className="text-[10px] sm:text-[12px] text-[#4a5568] leading-tight truncate">
+                <span className="hidden sm:inline">Municipal Corporation &amp; Urban Development</span>
+                <span className="sm:hidden">Urban Development</span>
               </p>
             </div>
           </div>
 
           {/* Quick Action Button */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Link
               href="/login"
-              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#002147] hover:bg-[#003166] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+              className="px-2.5 py-1.5 sm:px-4 sm:py-2 bg-[#002147] hover:bg-[#003166] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1 sm:gap-1.5 whitespace-nowrap"
             >
-              <span>Access Portals</span>
+              <span className="hidden sm:inline">Access Portals</span>
+              <span className="sm:hidden">Login</span>
               <span className="material-symbols-outlined text-sm">login</span>
             </Link>
           </div>
@@ -58,8 +60,8 @@ export default function LandingPage() {
       </div>
 
       {/* ── Tab nav ────────────────────────────────────────────────── */}
-      <nav className="nx-tab-nav border-b border-white/10 overflow-x-auto scrollbar-none">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 flex items-end min-w-max">
+      <nav className="nx-tab-nav border-b border-white/10 overflow-x-auto no-scrollbar scrollbar-none">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-4 md:px-8 flex items-end min-w-max">
           <Link href="/" className="nx-tab-link active flex items-center gap-1.5">
             <span className="material-symbols-outlined text-sm">home</span>
             Home

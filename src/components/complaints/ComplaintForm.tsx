@@ -204,7 +204,7 @@ export function ComplaintForm() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Modern Bento Step Indicator Dock */}
       <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 p-2.5 sm:p-3 shadow-sm">
-        <div className="flex items-center justify-between gap-1 sm:gap-2 overflow-x-auto no-scrollbar">
+        <div className="flex items-center justify-between gap-1 sm:gap-2 overflow-x-auto no-scrollbar scrollbar-none">
           {STEPS.map((s, i) => {
             const isDone = i < currentStepIndex;
             const isCurrent = i === currentStepIndex;

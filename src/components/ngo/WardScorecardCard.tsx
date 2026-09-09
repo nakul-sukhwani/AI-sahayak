@@ -97,7 +97,7 @@ export function WardScorecardCard({ report, orgName = 'Civic Organization' }: Wa
       </div>
 
       {/* Grade Filter Pill Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scrollbar-none">
         <span className="text-xs font-semibold text-slate-500 mr-1">Filter:</span>
         {['all', 'A', 'B', 'C', 'D'].map((g) => (
           <button

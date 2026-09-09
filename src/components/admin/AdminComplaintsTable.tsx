@@ -578,7 +578,7 @@ export function AdminComplaintsTable({ complaints, workers, proofs, statutoryWar
       </div>
 
       {/* Table (Quixotic style) */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto no-scrollbar scrollbar-none">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-[#dde3ed] text-[11px] font-bold uppercase tracking-wider text-[#718096]">

@@ -95,7 +95,7 @@ export function FeedClient({ feed }: FeedClientProps) {
       <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 p-4 shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scrollbar-none py-0.5">
             {categories.map((cat) => {
               const isSelected = selectedCategory === cat.value;
               return (
