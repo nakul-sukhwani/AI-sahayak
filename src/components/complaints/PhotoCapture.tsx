@@ -188,7 +188,7 @@ export function PhotoCapture({
         <>
           {localPreview ? (
             /* Preview state */
-            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-[#E2E8F0]">
+            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-900 group">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={localPreview}
@@ -196,58 +196,98 @@ export function PhotoCapture({
                 className="w-full h-full object-cover"
               />
 
-              {/* Retake overlay */}
+              {/* Top pill badge */}
+              <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Camera Frame Locked</span>
+              </div>
+
+              {/* Retake overlay pill */}
               <button
                 type="button"
                 onClick={openCamera}
                 disabled={disabled || isBusy}
                 className="absolute bottom-3 right-3 flex items-center gap-1.5
-                           bg-black/60 text-white text-xs font-medium px-3 py-2 rounded-lg
-                           hover:bg-black/80 transition-colors"
+                           bg-white/90 hover:bg-white text-slate-800 text-xs font-semibold px-3.5 py-2 rounded-full
+                           shadow-md transition-all duration-150 backdrop-blur-sm hover:scale-105 active:scale-95"
               >
-                <span className="material-symbols-outlined text-sm">photo_camera</span>
-                Retake
+                <span className="material-symbols-outlined text-base text-slate-600">photo_camera</span>
+                Retake Photo
               </button>
 
               {/* Processing / validating overlay */}
               {isBusy && (
-                <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center gap-2">
-                  <Spinner size="md" />
-                  <p className="text-sm text-[#545f72]">
-                    {isProcessing ? 'Processing image…' : 'Verifying authenticity…'}
-                  </p>
+                <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
+                  <div className="w-10 h-10 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin" />
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-slate-800">
+                      {isProcessing ? 'Optimizing Image…' : 'Detecting Authenticity…'}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Checking for synthetic/AI artifacts & metadata
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
           ) : (
-            /* Empty capture zone */
+            /* Modern HUD Camera Viewfinder */
             <button
               type="button"
               onClick={openCamera}
               disabled={disabled || isBusy}
-              className="w-full aspect-[4/3] flex flex-col items-center justify-center gap-3
-                         border-2 border-dashed border-[#c3c6d1] rounded-xl
-                         bg-[#f7f9fb] hover:border-[#001e40] hover:bg-white
-                         transition-colors group disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative w-full aspect-[4/3] sm:aspect-[16/10] flex flex-col items-center justify-center gap-3
+                         border-2 border-dashed border-slate-300 rounded-2xl
+                         bg-slate-50/70 hover:bg-emerald-50/20 hover:border-[#1b5e20]
+                         transition-all duration-300 group disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
             >
+              {/* HUD Corner Brackets */}
+              <span className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-slate-400 group-hover:border-[#1b5e20] transition-colors rounded-tl" />
+              <span className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-slate-400 group-hover:border-[#1b5e20] transition-colors rounded-tr" />
+              <span className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-slate-400 group-hover:border-[#1b5e20] transition-colors rounded-bl" />
+              <span className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-slate-400 group-hover:border-[#1b5e20] transition-colors rounded-br" />
+
               {isBusy ? (
                 <>
-                  <Spinner size="md" />
-                  <p className="text-sm text-[#545f72]">
-                    {isProcessing ? 'Processing image…' : 'Verifying authenticity…'}
-                  </p>
+                  <div className="w-10 h-10 rounded-full border-2 border-emerald-600 border-t-transparent animate-spin" />
+                  <div className="text-center">
+                    <p className="text-sm font-semibold text-slate-800">
+                      {isProcessing ? 'Processing image…' : 'Running authenticity gate…'}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">Validating real camera capture</p>
+                  </div>
                 </>
               ) : (
                 <>
-                  <span
-                    className="material-symbols-outlined text-4xl text-[#737780] group-hover:text-[#001e40] transition-colors"
-                    style={{ fontVariationSettings: "'FILL' 0" }}
-                  >
-                    photo_camera
-                  </span>
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-[#191c1e]">{label}</p>
-                    <p className="text-xs text-[#545f72] mt-0.5">JPEG, PNG or WebP · max 500KB · real photos only</p>
+                  {/* Camera icon button */}
+                  <div className="w-14 h-14 rounded-2xl bg-white shadow-sm border border-slate-200 flex items-center justify-center text-[#1b5e20] group-hover:scale-110 group-hover:bg-[#1b5e20] group-hover:text-white transition-all duration-200">
+                    <span
+                      className="material-symbols-outlined text-2xl"
+                      style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                      photo_camera
+                    </span>
+                  </div>
+                  <div className="text-center px-4">
+                    <p className="text-sm font-bold text-slate-800 group-hover:text-[#1b5e20] transition-colors">
+                      {label}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1 max-w-xs">
+                      Tap to open camera or browse device · JPEG, PNG, WebP up to 500KB
+                    </p>
+                  </div>
+
+                  {/* Feature chips */}
+                  <div className="flex items-center gap-1.5 mt-1 flex-wrap justify-center">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-[#1b5e20] border border-emerald-200">
+                      ✓ Real Photo Gate
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                      🤖 Auto AI Triage
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                      📍 GPS Tagged
+                    </span>
                   </div>
                 </>
               )}

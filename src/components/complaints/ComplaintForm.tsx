@@ -160,54 +160,104 @@ export function ComplaintForm() {
   const currentStepIndex = STEPS.indexOf(step);
 
   return (
-    <div className="max-w-xl mx-auto">
-      {/* Step indicator */}
-      <div className="flex items-center gap-0 mb-6">
-        {STEPS.map((s, i) => (
-          <div key={s} className="flex items-center flex-1 last:flex-none">
-            <div className={[
-              'w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0',
-              i < currentStepIndex ? 'bg-[#059669] text-white' :
-              i === currentStepIndex ? 'bg-[#001e40] text-white' :
-              'bg-[#e0e3e5] text-[#737780]',
-            ].join(' ')}>
-              {i < currentStepIndex
-                ? <span className="material-symbols-outlined text-sm">check</span>
-                : i + 1}
-            </div>
-            {i < STEPS.length - 1 && (
-              <div className={['flex-1 h-0.5 mx-1', i < currentStepIndex ? 'bg-[#059669]' : 'bg-[#e0e3e5]'].join(' ')} />
-            )}
-          </div>
-        ))}
-      </div>
-      <p className="text-sm text-[#545f72] mb-4">
-        {t('step_prefix')} {currentStepIndex + 1} {t('of')} {STEPS.length}: <span className="font-medium text-[#191c1e]">{t(STEP_LABELS[step])}</span>
-      </p>
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Modern Bento Step Indicator Dock */}
+      <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/80 p-2.5 sm:p-3 shadow-sm">
+        <div className="flex items-center justify-between gap-1 sm:gap-2 overflow-x-auto no-scrollbar">
+          {STEPS.map((s, i) => {
+            const isDone = i < currentStepIndex;
+            const isCurrent = i === currentStepIndex;
+            const stepIcons: Record<Step, string> = {
+              photo: 'photo_camera',
+              'ai-result': 'auto_awesome',
+              location: 'pin_drop',
+              details: 'edit_document',
+              review: 'task_alt',
+            };
+            const stepTitles: Record<Step, string> = {
+              photo: '1. Photo',
+              'ai-result': '2. AI Triage',
+              location: '3. Location',
+              details: '4. Details',
+              review: '5. Review',
+            };
 
-      {/* ── Step: Photo ── */}
+            return (
+              <div key={s} className="flex items-center gap-1 sm:gap-2 flex-1 min-w-[50px] sm:min-w-0">
+                <div
+                  className={`flex items-center justify-center gap-1.5 w-full py-2 px-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                    isCurrent
+                      ? 'bg-[#002147] text-white shadow-sm ring-2 ring-[#002147]/20 font-bold'
+                      : isDone
+                      ? 'bg-[#e8f5e9] text-[#1b5e20] border border-[#a5d6a7]'
+                      : 'bg-slate-50 text-slate-400 border border-slate-200/80'
+                  }`}
+                >
+                  <span
+                    className="material-symbols-outlined text-sm"
+                    style={{ fontVariationSettings: isDone || isCurrent ? "'FILL' 1" : "'FILL' 0" }}
+                  >
+                    {isDone ? 'check_circle' : stepIcons[s]}
+                  </span>
+                  <span className="hidden sm:inline whitespace-nowrap text-[11px] lg:text-xs">{stepTitles[s]}</span>
+                  <span className="sm:hidden text-[11px]">{i + 1}</span>
+                </div>
+                {i < STEPS.length - 1 && (
+                  <span className="hidden sm:inline-block text-slate-300 text-xs">›</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Step 1: Photo ── */}
       {step === 'photo' && (
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">{t('capture_issue')}</h2>
-          <p className="text-sm text-[#545f72]">{t('capture_issue_desc')}</p>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-4">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#1b5e20]">
+              Step 1 of 5 · Visual Evidence
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight mt-0.5">
+              {t('capture_issue') || 'Capture the Problem'}
+            </h2>
+            <p className="text-sm text-[#545f72] mt-1">
+              {t('capture_issue_desc') || 'Take a clear photograph of the civic problem. Our multi-modal AI will analyze it automatically.'}
+            </p>
+          </div>
+
           <PhotoCapture
             onCapture={handlePhotoCapture}
             onError={(msg) => toast(msg, 'error')}
             disabled={isUploading || isAnalyzing}
           />
+
           {(isUploading || isAnalyzing) && (
-            <div className="flex items-center gap-2 text-sm text-[#545f72]">
+            <div className="flex items-center justify-center gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700">
               <Spinner size="sm" />
-              {isUploading ? 'Uploading photo…' : 'AI analyzing image…'}
+              <span className="font-semibold">
+                {isUploading ? 'Uploading high-res photograph…' : 'Multi-modal AI analyzing problem & severity…'}
+              </span>
             </div>
           )}
         </div>
       )}
 
-      {/* ── Step: AI Result ── */}
+      {/* ── Step 2: AI Result ── */}
       {step === 'ai-result' && form.aiResult && (
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">{t('review_ai_title')}</h2>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-4">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-purple-700">
+              Step 2 of 5 · Automated Classification
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight mt-0.5">
+              {t('review_ai_title') || 'Review AI Triage Findings'}
+            </h2>
+            <p className="text-sm text-[#545f72] mt-1">
+              Our vision model has analyzed your image and suggested the issue category, severity, and jurisdiction.
+            </p>
+          </div>
+
           <AIResultCard
             result={form.aiResult}
             onAccept={() => { setForm((f) => ({ ...f, aiAccepted: true })); setStep('location'); }}
@@ -216,147 +266,303 @@ export function ComplaintForm() {
         </div>
       )}
 
-      {/* ── Step: Location ── */}
+      {/* ── Step 3: Location ── */}
       {step === 'location' && (
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">{t('pin_location_title')}</h2>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-5">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+              Step 3 of 5 · Geo-Verification
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight mt-0.5">
+              {t('pin_location_title') || 'Pin Complaint Location'}
+            </h2>
+            <p className="text-sm text-[#545f72] mt-1">
+              Use live GPS or drag the marker to pin the exact location where field crews should be dispatched.
+            </p>
+          </div>
+
           <MapPicker
             onLocationChange={(lat, lng, addr) => setForm((f) => ({ ...f, latitude: lat, longitude: lng, address: addr }))}
           />
-          <div>
-            <label className="block text-sm font-medium text-[#191c1e] mb-1.5">Ward (optional)</label>
-            <select
-              value={form.wardName}
-              onChange={(e) => setForm((f) => ({ ...f, wardName: e.target.value }))}
-              className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] bg-white focus:outline-none focus:border-[#001e40]"
-            >
-              <option value="">Select ward…</option>
-              {BANGALORE_WARDS.map((w) => <option key={w} value={w}>{w}</option>)}
-            </select>
-          </div>
-          <Button
-            onClick={() => setStep('details')}
-            disabled={!form.latitude || !form.longitude}
-          >
-            {t('continue_btn')}
-          </Button>
-        </div>
-      )}
 
-      {/* ── Step: Details ── */}
-      {step === 'details' && (
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">{t('confirm_details_title')}</h2>
-          <div>
-            <label className="block text-sm font-medium text-[#191c1e] mb-1.5">Issue Type</label>
-            <select
-              value={form.issueType}
-              onChange={(e) => setForm((f) => ({ ...f, issueType: e.target.value }))}
-              className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] bg-white focus:outline-none focus:border-[#001e40]"
-            >
-              <option value="">Select issue type…</option>
-              {ISSUE_TYPES.map((tItem) => <option key={tItem.value} value={tItem.value}>{tItem.label}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[#191c1e] mb-1.5">Severity</label>
-            <div className="grid grid-cols-2 gap-2">
-              {SEVERITIES.map((s) => (
-                <button
-                  key={s.value}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, severity: s.value }))}
-                  className={[
-                    'px-3 py-2.5 rounded-lg border text-sm font-medium text-left transition-colors',
-                    form.severity === s.value
-                      ? 'border-[#001e40] bg-[#001e40] text-white'
-                      : 'border-[#E2E8F0] text-[#191c1e] hover:border-[#001e40]',
-                  ].join(' ')}
-                >
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[#191c1e] mb-1.5">Description</label>
-            <textarea
-              value={form.descriptionEn}
-              onChange={(e) => setForm((f) => ({ ...f, descriptionEn: e.target.value }))}
-              rows={3}
-              placeholder="Describe the issue in your own words…"
-              className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] bg-white focus:outline-none focus:border-[#001e40] resize-none"
-            />
-            <div className="mt-2">
-              <VoiceInput onTranscript={(v) => setForm((f) => ({ ...f, descriptionEn: f.descriptionEn + ' ' + v }))} />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[#191c1e] mb-1.5">Additional notes (optional)</label>
-            <textarea
-              value={form.userNotes}
-              onChange={(e) => setForm((f) => ({ ...f, userNotes: e.target.value }))}
-              rows={2}
-              placeholder="Any other context for the municipal team…"
-              className="w-full px-3 py-2.5 border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] bg-white focus:outline-none focus:border-[#001e40] resize-none"
-            />
-          </div>
-          {/* Anonymous toggle */}
-          <label className="flex items-center gap-3 cursor-pointer">
+          <div className="pt-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Municipal Ward (Optional)
+            </label>
             <div className="relative">
-              <input
-                type="checkbox"
-                checked={form.isAnonymous}
-                onChange={(e) => setForm((f) => ({ ...f, isAnonymous: e.target.checked }))}
-                className="sr-only peer"
-              />
-              <div className="w-10 h-5 bg-[#E2E8F0] rounded-full peer-checked:bg-[#001e40] transition-colors" />
-              <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5" />
+              <select
+                value={form.wardName}
+                onChange={(e) => setForm((f) => ({ ...f, wardName: e.target.value }))}
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 bg-white focus:outline-none focus:border-[#002147] focus:ring-2 focus:ring-[#002147]/10 transition-all"
+              >
+                <option value="">Select Ward / Division…</option>
+                {BANGALORE_WARDS.map((w) => <option key={w} value={w}>{w}</option>)}
+              </select>
             </div>
-            <div>
-              <p className="text-sm font-medium text-[#191c1e]">File anonymously</p>
-              <p className="text-xs text-[#545f72]">Your name won't appear in the complaint</p>
-            </div>
-          </label>
-          <Button onClick={() => setStep('review')} disabled={!form.issueType || !form.descriptionEn}>
-            {t('continue_to_review')}
-          </Button>
-        </div>
-      )}
-
-      {/* ── Step: Review ── */}
-      {step === 'review' && (
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-[#191c1e]">{t('review_submit_title')}</h2>
-          <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 space-y-3 text-sm">
-            {form.processedImage && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={form.processedImage.dataUrl} alt="Complaint" className="w-full aspect-[4/3] object-cover rounded-lg" />
-            )}
-            <div className="grid grid-cols-2 gap-2">
-              <div><p className="text-xs text-[#545f72] uppercase tracking-wide">Issue</p><p className="font-medium capitalize">{form.issueType.replace(/_/g, ' ')}</p></div>
-              <div><p className="text-xs text-[#545f72] uppercase tracking-wide">Severity</p><p className="font-medium capitalize">{form.severity}</p></div>
-              {form.wardName && <div><p className="text-xs text-[#545f72] uppercase tracking-wide">Ward</p><p className="font-medium">{form.wardName}</p></div>}
-              <div><p className="text-xs text-[#545f72] uppercase tracking-wide">Anonymous</p><p className="font-medium">{form.isAnonymous ? 'Yes' : 'No'}</p></div>
-            </div>
-            <div><p className="text-xs text-[#545f72] uppercase tracking-wide mb-1">Description</p><p className="leading-relaxed text-[#191c1e]">{form.descriptionEn}</p></div>
-            {form.address && <div><p className="text-xs text-[#545f72] uppercase tracking-wide mb-1">Location</p><p className="text-[#545f72] text-xs">{form.address}</p></div>}
           </div>
-          {form.authority && <AuthoritySuggestion authority={form.authority} aiDepartment={form.aiResult?.suggested_department} />}
-          <Button onClick={handleSubmit} isLoading={isSubmitting} className="w-full">
-            {t('submit_complaint')}
-          </Button>
-          <button type="button" onClick={() => setStep('details')} className="text-sm text-[#545f72] hover:text-[#191c1e] text-center transition-colors">
-            ← {t('back_to_edit')}
-          </button>
+
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setStep('ai-result')}
+              className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-semibold transition-colors flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-base">arrow_back</span>
+              {t('back_btn') || 'Back'}
+            </button>
+            <Button
+              onClick={() => setStep('details')}
+              disabled={!form.latitude || !form.longitude}
+              className="flex-1 py-2.5 text-sm font-semibold shadow-sm"
+            >
+              {t('continue_btn') || 'Continue to Details'} →
+            </Button>
+          </div>
         </div>
       )}
 
-      {/* Back nav (except photo + ai-result which have their own flow) */}
-      {step === 'location' && (
-        <button type="button" onClick={() => setStep('ai-result')} className="mt-3 text-sm text-[#545f72] hover:text-[#191c1e] transition-colors">
-          ← {t('back_btn')}
-        </button>
+      {/* ── Step 4: Details ── */}
+      {step === 'details' && (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-5">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#1b5e20]">
+              Step 4 of 5 · Civic Problem Details
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight mt-0.5">
+              {t('confirm_details_title') || 'Confirm Issue Details'}
+            </h2>
+            <p className="text-sm text-[#545f72] mt-1">
+              Verify the issue category, severity level, and add any specific directions for the repair team.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Issue Category *
+              </label>
+              <select
+                value={form.issueType}
+                onChange={(e) => setForm((f) => ({ ...f, issueType: e.target.value }))}
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 bg-white focus:outline-none focus:border-[#002147] focus:ring-2 focus:ring-[#002147]/10 transition-all"
+              >
+                <option value="">Select issue category…</option>
+                {ISSUE_TYPES.map((tItem) => (
+                  <option key={tItem.value} value={tItem.value}>{tItem.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Severity Level *
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {SEVERITIES.map((s) => {
+                  const isSelected = form.severity === s.value;
+                  const severityBadges: Record<string, { bg: string; text: string; border: string }> = {
+                    low: { bg: '#d1fae5', text: '#059669', border: '#a7f3d0' },
+                    medium: { bg: '#dbeafe', text: '#2563EB', border: '#bfdbfe' },
+                    high: { bg: '#fef3c7', text: '#D97706', border: '#fde68a' },
+                    critical: { bg: '#fee2e2', text: '#DC2626', border: '#fecaca' },
+                  };
+                  const badge = severityBadges[s.value] || severityBadges.medium;
+
+                  return (
+                    <button
+                      key={s.value}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, severity: s.value }))}
+                      className={`px-3 py-2.5 rounded-xl border text-xs font-bold text-center transition-all ${
+                        isSelected
+                          ? 'shadow-sm ring-2 ring-slate-800 scale-[1.02]'
+                          : 'opacity-70 hover:opacity-100 hover:scale-[1.01]'
+                      }`}
+                      style={{
+                        background: badge.bg,
+                        color: badge.text,
+                        borderColor: isSelected ? badge.text : badge.border,
+                      }}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Description *
+              </label>
+              <textarea
+                value={form.descriptionEn}
+                onChange={(e) => setForm((f) => ({ ...f, descriptionEn: e.target.value }))}
+                rows={3}
+                placeholder="Describe the issue in your own words (e.g. deep pothole near traffic junction causing traffic slowdown)…"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 bg-white focus:outline-none focus:border-[#002147] focus:ring-2 focus:ring-[#002147]/10 resize-none transition-all"
+              />
+              <div className="mt-2 flex items-center justify-between">
+                <VoiceInput onTranscript={(v) => setForm((f) => ({ ...f, descriptionEn: f.descriptionEn + ' ' + v }))} />
+                <span className="text-[11px] text-slate-400">Supports Hindi &amp; English dictation</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                Landmarks / Additional Notes (Optional)
+              </label>
+              <textarea
+                value={form.userNotes}
+                onChange={(e) => setForm((f) => ({ ...f, userNotes: e.target.value }))}
+                rows={2}
+                placeholder="Nearby landmarks, shop names, or best time to access the site…"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-800 bg-white focus:outline-none focus:border-[#002147] focus:ring-2 focus:ring-[#002147]/10 resize-none transition-all"
+              />
+            </div>
+
+            {/* Anonymous Filing Bento Pill */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-slate-200/80 flex items-center justify-center text-slate-600">
+                  <span className="material-symbols-outlined text-lg">visibility_off</span>
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-slate-800">File Anonymously</p>
+                  <p className="text-[11px] text-slate-500">Your name and personal info will not appear on public feed</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                <input
+                  type="checkbox"
+                  checked={form.isAnonymous}
+                  onChange={(e) => setForm((f) => ({ ...f, isAnonymous: e.target.checked }))}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#002147]"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setStep('location')}
+              className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-sm font-semibold transition-colors flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-base">arrow_back</span>
+              {t('back_btn') || 'Back'}
+            </button>
+            <Button
+              onClick={() => setStep('review')}
+              disabled={!form.issueType || !form.descriptionEn}
+              className="flex-1 py-2.5 text-sm font-semibold shadow-sm"
+            >
+              {t('continue_to_review') || 'Proceed to Review'} →
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Step 5: Review & Submit ── */}
+      {step === 'review' && (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-5">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700">
+              Step 5 of 5 · Official Lodgement
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight mt-0.5">
+              {t('review_submit_title') || 'Final Review & Lodgement'}
+            </h2>
+            <p className="text-sm text-[#545f72] mt-1">
+              Confirm the civic docket details before official dispatch into municipal SLA tracking.
+            </p>
+          </div>
+
+          {/* Civic Docket Bento Card */}
+          <div className="rounded-2xl border border-slate-200/90 overflow-hidden bg-slate-50/50">
+            {form.processedImage && (
+              <div className="relative aspect-[16/9] w-full bg-slate-900">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={form.processedImage.dataUrl}
+                  alt="Complaint Preview"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>Evidence Photo Attached</span>
+                </div>
+              </div>
+            )}
+
+            <div className="p-5 space-y-4">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#002147] text-white">
+                  {form.issueType.replace(/_/g, ' ').toUpperCase()}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                  Severity: {form.severity}
+                </span>
+                {form.wardName && (
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
+                    📍 {form.wardName}
+                  </span>
+                )}
+                {form.isAnonymous && (
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">
+                    🛡️ Anonymous
+                  </span>
+                )}
+              </div>
+
+              <div className="border-t border-slate-200/80 pt-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                  Description
+                </p>
+                <p className="text-sm text-slate-800 leading-relaxed">
+                  {form.descriptionEn}
+                </p>
+              </div>
+
+              {form.address && (
+                <div className="border-t border-slate-200/80 pt-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Geo-coordinates &amp; Address
+                  </p>
+                  <p className="text-xs text-slate-600 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm text-blue-600">location_on</span>
+                    {form.address}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {form.authority && (
+            <AuthoritySuggestion authority={form.authority} aiDepartment={form.aiResult?.suggested_department} />
+          )}
+
+          <div className="flex flex-col gap-3 pt-2">
+            <Button
+              onClick={handleSubmit}
+              isLoading={isSubmitting}
+              className="w-full py-3.5 text-sm font-bold shadow-md bg-[#002147] hover:bg-[#001833] text-white rounded-xl"
+            >
+              <span className="material-symbols-outlined text-base mr-1.5" style={{ fontVariationSettings: "'FILL' 1" }}>
+                send
+              </span>
+              {t('submit_complaint') || 'Officially Lodge Complaint'}
+            </Button>
+            <button
+              type="button"
+              onClick={() => setStep('details')}
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 text-center transition-colors"
+            >
+              ← {t('back_to_edit') || 'Back to edit details'}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

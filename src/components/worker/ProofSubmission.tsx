@@ -132,55 +132,59 @@ export function ProofSubmission({ complaintId, onSuccess }: ProofSubmissionProps
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="relative">
-        <label className="block text-sm font-medium text-[#191c1e] mb-1.5">
-          After photo (proof of completion) *
+        <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+          Resolution Proof Photo (After Repair) *
         </label>
         <PhotoCapture
           onCapture={handleProofCapture}
           onError={(msg) => toast(msg, 'error')}
           disabled={isUploading || isSubmitting}
-          label="Capture completion photo"
+          label="Capture site completion photo"
+          skipAiDetection={true}
         />
         {isUploading && (
-          <p className="text-xs text-[#545f72] mt-1">Uploading photo…</p>
+          <p className="text-xs text-amber-700 mt-1 font-medium">Uploading proof photo to secure storage…</p>
         )}
         {proofImage && capturedAt && (
-          <div className="absolute bottom-3 right-3 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1 rounded text-[11px] font-mono pointer-events-none">
-            🕒 {new Date(capturedAt).toLocaleString('en-IN', { hour12: true })}
+          <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-md text-white px-3 py-1 rounded-full text-[11px] font-mono pointer-events-none shadow-sm flex items-center gap-1">
+            <span>🕒</span>
+            <span>{new Date(capturedAt).toLocaleString('en-IN', { hour12: true })}</span>
           </div>
         )}
       </div>
 
-      <div className="flex items-center justify-between p-3 rounded-lg border bg-[#f7f9fb] text-xs">
+      <div className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/90 bg-slate-50 text-xs">
         {gps ? (
-          <span className="text-[#059669] font-medium">
-            📍 Live GPS Acquired ({gps.lat.toFixed(4)}, {gps.lng.toFixed(4)})
+          <span className="text-emerald-700 font-bold flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            📍 Live On-Site GPS: {gps.lat.toFixed(4)}, {gps.lng.toFixed(4)}
           </span>
         ) : (
-          <span className="text-[#545f72]">
-            📍 {gpsLoading ? 'Acquiring GPS coordinates…' : 'GPS location not acquired'}
+          <span className="text-slate-500 flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">location_searching</span>
+            {gpsLoading ? 'Acquiring high-precision GPS…' : 'GPS location required for proof'}
           </span>
         )}
         <button
           type="button"
           onClick={acquireGPS}
           disabled={gpsLoading}
-          className="text-[#001e40] font-semibold hover:underline disabled:opacity-50"
+          className="text-[#b45309] font-bold hover:underline disabled:opacity-50 text-xs"
         >
-          {gps ? 'Refresh GPS' : 'Acquire GPS'}
+          {gps ? 'Re-acquire GPS' : 'Acquire GPS'}
         </button>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="damage-type-select" className="text-sm font-medium text-[#191c1e]">
-          Damage Classification *
+        <label htmlFor="damage-type-select" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+          Work Classification *
         </label>
         <select
           id="damage-type-select"
           value={damageType}
           onChange={(e) => setDamageType(e.target.value as DamageType)}
           required
-          className="w-full px-3 py-2.5 bg-white border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] focus:outline-none focus:border-[#001e40]"
+          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#b45309] focus:ring-2 focus:ring-[#b45309]/10 transition-all"
         >
           {DAMAGE_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -194,7 +198,7 @@ export function ProofSubmission({ complaintId, onSuccess }: ProofSubmissionProps
         <Input
           id="custom-damage-input"
           label="Specify Damage Type *"
-          placeholder="Describe damage classification…"
+          placeholder="Describe work completed…"
           value={customDamage}
           onChange={(e) => setCustomDamage(e.target.value)}
           required
@@ -202,24 +206,24 @@ export function ProofSubmission({ complaintId, onSuccess }: ProofSubmissionProps
       )}
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="worker-issues" className="text-sm font-medium text-[#191c1e]">
-          On-site Issues / Observations
+        <label htmlFor="worker-issues" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+          Field Notes &amp; Site Observations
         </label>
         <textarea
           id="worker-issues"
           value={workerIssues}
           onChange={(e) => setWorkerIssues(e.target.value)}
           rows={2}
-          placeholder="Any obstacles, traffic restrictions, or extra damage…"
-          className="w-full px-3 py-2 border border-[#E2E8F0] rounded-lg text-sm text-[#191c1e] bg-white focus:outline-none focus:border-[#001e40] resize-none"
+          placeholder="Detail materials used, traffic diversions, or follow-up needed…"
+          className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 bg-white focus:outline-none focus:border-[#b45309] focus:ring-2 focus:ring-[#b45309]/10 resize-none transition-all"
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input
           id="tools-required"
-          label="Tools Used (comma separated)"
-          placeholder="e.g. Shovel, Asphalt"
+          label="Equipment & Materials"
+          placeholder="e.g. Cold mix asphalt, Tamper"
           value={tools}
           onChange={(e) => setTools(e.target.value)}
         />
@@ -228,7 +232,7 @@ export function ProofSubmission({ complaintId, onSuccess }: ProofSubmissionProps
           type="number"
           min={1}
           max={50}
-          label="Team Members Present"
+          label="Crew Members On Duty"
           value={teamCount}
           onChange={(e) => setTeamCount(Math.max(1, parseInt(e.target.value, 10) || 1))}
         />
@@ -238,9 +242,9 @@ export function ProofSubmission({ complaintId, onSuccess }: ProofSubmissionProps
         type="submit"
         isLoading={isSubmitting}
         disabled={!proofPath || isUploading}
-        className="w-full mt-1"
+        className="w-full mt-2 py-3 bg-[#b45309] hover:bg-[#92400e] text-white font-bold rounded-xl shadow-sm"
       >
-        Submit Proof & Job Report
+        Submit Verified Proof &amp; Close Work Order
       </Button>
     </form>
   );

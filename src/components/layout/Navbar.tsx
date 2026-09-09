@@ -153,10 +153,10 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Tab nav bar — dark navy */}
+      {/* Tab nav bar — Modern Bento Pill Navigation */}
       {links.length > 0 && (
-        <nav className="nx-tab-nav">
-          <div className="max-w-[1440px] mx-auto px-4 md:px-8 flex items-end overflow-x-auto">
+        <nav className="bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.04)]">
+          <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-2 flex items-center gap-2 overflow-x-auto no-scrollbar">
             {links.map((link) => {
               const isActive =
                 pathname === link.href ||
@@ -165,10 +165,34 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`nx-tab-link flex items-center gap-1.5 whitespace-nowrap ${isActive ? 'active' : ''}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 border ${
+                    isActive
+                      ? 'shadow-sm ring-1 ring-black/5'
+                      : 'border-transparent text-[#545f72] hover:text-[#191c1e] hover:bg-slate-100/80'
+                  }`}
+                  style={
+                    isActive
+                      ? {
+                          background: activeStyle.bg,
+                          color: activeStyle.color,
+                          borderColor: activeStyle.border,
+                        }
+                      : undefined
+                  }
                 >
-                  <span className="material-symbols-outlined text-sm">{link.icon}</span>
+                  <span
+                    className="material-symbols-outlined text-base"
+                    style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+                  >
+                    {link.icon}
+                  </span>
                   {link.label}
+                  {isActive && (
+                    <span
+                      className="w-1.5 h-1.5 rounded-full"
+                      style={{ background: activeStyle.color }}
+                    />
+                  )}
                 </Link>
               );
             })}

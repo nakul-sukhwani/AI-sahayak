@@ -29,53 +29,69 @@ export function ComplaintCard({ complaint }: ComplaintCardProps) {
   const issueName = t(complaint.issue_type as TranslationKey) || getIssueLabel(complaint.issue_type);
 
   return (
-    <Link href={`/dashboard/${complaint.id}`} className="block">
-      <Card hover padding="md">
-        <div className="flex items-start gap-3">
-          {/* Icon — colored by severity */}
+    <Link href={`/dashboard/${complaint.id}`} className="block group">
+      <div className="bg-white rounded-2xl border border-slate-200/90 hover:border-[#1b5e20]/60 p-5 shadow-xs hover:shadow-md transition-all duration-200">
+        <div className="flex items-start gap-4">
+          {/* Category Avatar */}
           <div className={[
-            'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0',
-            complaint.severity === 'critical' ? 'bg-[#fee2e2]' :
-            complaint.severity === 'high'     ? 'bg-[#fef3c7]' :
-            complaint.severity === 'medium'   ? 'bg-[#dbeafe]' :
-                                                'bg-[#d1fae5]',
+            'w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xs transition-transform group-hover:scale-105',
+            complaint.severity === 'critical' ? 'bg-red-50 text-red-600 border border-red-200' :
+            complaint.severity === 'high'     ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+            complaint.severity === 'medium'   ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                                                'bg-emerald-50 text-emerald-700 border border-emerald-200',
           ].join(' ')}>
-            <span className={[
-              'material-symbols-outlined text-xl',
-              complaint.severity === 'critical' ? 'text-[#DC2626]' :
-              complaint.severity === 'high'     ? 'text-[#D97706]' :
-              complaint.severity === 'medium'   ? 'text-[#2563EB]' :
-                                                  'text-[#059669]',
-            ].join(' ')} style={{ fontVariationSettings: "'FILL' 1" }}>
-              report_problem
+            <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+              {complaint.issue_type === 'pothole' ? 'report_problem' :
+               complaint.issue_type === 'streetlight' ? 'lightbulb' :
+               complaint.issue_type === 'garbage' ? 'delete' :
+               complaint.issue_type === 'water_leakage' ? 'water_drop' : 'construction'}
             </span>
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-sm font-semibold text-[#191c1e] truncate">
-                {issueName}
-              </p>
-              <Badge variant={complaint.status as ComplaintStatus} />
+            <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+              <div className="flex items-center gap-2">
+                <p className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#1b5e20] transition-colors truncate">
+                  {issueName}
+                </p>
+                <Badge variant={complaint.status as ComplaintStatus} />
+              </div>
+
+              <span className="text-[11px] font-semibold text-slate-400">
+                {timeAgo(complaint.created_at)}
+              </span>
             </div>
 
-            <p className="text-xs text-[#545f72] mt-0.5 line-clamp-2">
+            <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
               {complaint.description_en}
             </p>
 
-            <div className="mt-2 flex items-center gap-3">
-              <Badge variant={complaint.severity as ComplaintSeverity} />
-              {complaint.ward_name && (
-                <span className="text-xs text-[#737780] flex items-center gap-0.5">
-                  <span className="material-symbols-outlined text-xs">location_on</span>
-                  {complaint.ward_name}
+            <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap text-xs">
+              <div className="flex items-center gap-2">
+                <Badge variant={complaint.severity as ComplaintSeverity} />
+                {complaint.ward_name && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700">
+                    <span className="material-symbols-outlined text-xs text-blue-600">location_on</span>
+                    {complaint.ward_name}
+                  </span>
+                )}
+                {complaint.is_anonymous && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-500">
+                    Anonymous
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1 text-slate-400 group-hover:text-[#1b5e20] font-semibold text-xs transition-colors">
+                <span>View Details</span>
+                <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">
+                  arrow_forward
                 </span>
-              )}
-              <span className="text-xs text-[#737780] ml-auto">{timeAgo(complaint.created_at)}</span>
+              </div>
             </div>
           </div>
         </div>
-      </Card>
+      </div>
     </Link>
   );
 }

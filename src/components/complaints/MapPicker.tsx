@@ -149,7 +149,7 @@ export function MapPicker({
   const displayAddress = selectedAddress ?? geoAddress;
 
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div className="w-full flex flex-col gap-3">
       {/* Leaflet CSS */}
       <link
         rel="stylesheet"
@@ -157,23 +157,44 @@ export function MapPicker({
       />
 
       {/* Map container */}
-      <div className="relative w-full h-56 md:h-72 rounded-xl overflow-hidden border border-[#E2E8F0]">
+      <div className="relative w-full h-64 md:h-80 rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100">
         <div ref={mapContainerRef} className="w-full h-full" />
         {!isMapLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#f7f9fb]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-50">
             <Spinner size="md" />
+            <p className="text-xs text-slate-500 font-medium">Initializing OpenStreetMap…</p>
           </div>
         )}
+
+        {/* Map overlay pill */}
+        <div className="absolute top-3 left-3 z-[400] bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/90 text-[11px] font-semibold text-slate-700 shadow-sm flex items-center gap-1.5 pointer-events-none">
+          <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+          <span>Interactive Pin Drop</span>
+        </div>
       </div>
 
-      {/* GPS button + address display */}
-      <div className="flex items-start gap-2">
+      {/* GPS button + address card */}
+      <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-start gap-2.5">
+          <span className="material-symbols-outlined text-blue-600 text-xl flex-shrink-0 mt-0.5">
+            location_on
+          </span>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Resolved Address
+            </p>
+            <p className="text-xs font-semibold text-slate-800 leading-snug">
+              {displayAddress || 'Tap GPS button or click on map to pin coordinates'}
+            </p>
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={requestLocation}
           disabled={geoLoading || disabled}
-          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[#001e40]
-                     border border-[#001e40] rounded-lg hover:bg-[#f7f9fb] transition-colors
+          className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-[#002147] hover:bg-[#001833]
+                     rounded-xl shadow-sm transition-all duration-150
                      disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
         >
           {geoLoading ? (
@@ -181,22 +202,20 @@ export function MapPicker({
           ) : (
             <span className="material-symbols-outlined text-base">my_location</span>
           )}
-          {geoLoading ? t('locating') : t('use_my_location')}
+          <span>{geoLoading ? t('locating') : (t('use_my_location') || 'Use Live GPS')}</span>
         </button>
-
-        {displayAddress && (
-          <p className="text-xs text-[#545f72] leading-snug pt-2 line-clamp-2">
-            📍 {displayAddress}
-          </p>
-        )}
       </div>
 
       {geoError && (
-        <p className="text-xs text-[#D97706]">{geoError}</p>
+        <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
+          <span className="material-symbols-outlined text-base text-amber-600">warning</span>
+          <span>{geoError}</span>
+        </div>
       )}
 
-      <p className="text-xs text-[#737780]">
-        {t('tap_map_adjust')}
+      <p className="text-[11px] text-slate-400 flex items-center gap-1">
+        <span className="material-symbols-outlined text-sm">touch_app</span>
+        {t('tap_map_adjust') || 'Tap anywhere on the map or drag the blue marker to refine the exact location.'}
       </p>
     </div>
   );

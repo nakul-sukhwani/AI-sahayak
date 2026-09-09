@@ -47,13 +47,31 @@ export function MobileNav() {
   const { role } = useAuth();
   const pathname = usePathname();
 
-  if (!role) return null;
+  const effectiveRole: UserRole = role || (
+    pathname.startsWith('/admin') ? 'admin' :
+    pathname.startsWith('/worker') ? 'worker' :
+    pathname.startsWith('/ngo') ? 'community_org' :
+    pathname.startsWith('/university') ? 'university_admin' :
+    pathname.startsWith('/industry') ? 'industry_partner' :
+    'citizen'
+  );
 
-  const tabs = ROLE_TABS[role];
+  const tabs = ROLE_TABS[effectiveRole] ?? [];
+  if (tabs.length === 0) return null;
+
+  const roleAccents: Record<string, string> = {
+    citizen: '#1b5e20',
+    worker: '#b45309',
+    admin: '#1565c0',
+    officer: '#1565c0',
+    community_org: '#00695c',
+    university_admin: '#4a148c',
+  };
+  const activeColor = roleAccents[effectiveRole] || '#002147';
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#002147] border-t border-white/10 safe-area-pb">
-      <div className="flex items-stretch">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] safe-area-pb">
+      <div className="flex items-center justify-around px-2 py-1.5">
         {tabs.map((tab) => {
           const isActive =
             pathname === tab.href ||
@@ -62,22 +80,30 @@ export function MobileNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={[
-                'flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 min-h-[56px] relative',
-                'text-xs font-medium transition-colors',
-                isActive ? 'text-white' : 'text-white/55 hover:text-white/80',
-              ].join(' ')}
+              className={`flex-1 flex flex-col items-center justify-center py-1.5 px-2 rounded-xl text-[11px] font-semibold transition-all duration-200 ${
+                isActive
+                  ? 'text-slate-900 font-bold'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
             >
-              {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-0.5 bg-white rounded-full" />
-              )}
-              <span
-                className="material-symbols-outlined text-xl leading-none"
-                style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+              <div
+                className={`w-9 h-7 rounded-full flex items-center justify-center transition-all duration-200 ${
+                  isActive ? 'shadow-sm' : ''
+                }`}
+                style={
+                  isActive
+                    ? { background: `${activeColor}18`, color: activeColor }
+                    : undefined
+                }
               >
-                {tab.icon}
-              </span>
-              <span>{tab.label}</span>
+                <span
+                  className="material-symbols-outlined text-xl leading-none"
+                  style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+                >
+                  {tab.icon}
+                </span>
+              </div>
+              <span className="mt-0.5 tracking-tight">{tab.label}</span>
             </Link>
           );
         })}

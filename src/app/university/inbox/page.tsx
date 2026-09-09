@@ -70,33 +70,47 @@ export default async function InboxPage() {
       <DynamicDashboardBackground variant="university" />
 
       <div className="relative z-10">
-        {/* ── Hero panel ───────────────────────────────────────────── */}
-        <div className="nx-hero-panel nx-hero-university">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ background: 'rgba(74,20,140,0.15)' }}
-            >
-              <span
-                className="material-symbols-outlined text-xl"
-                style={{ color: 'var(--nx-university)', fontVariationSettings: "'FILL' 1" }}
+        {/* ── Bento Hero Header Card ───────────────────────────────────────────── */}
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-7 mb-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-purple-50/80 via-purple-50/20 to-transparent pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                style={{ background: '#4a148c', color: '#ffffff' }}
               >
-                school
-              </span>
+                <span
+                  className="material-symbols-outlined text-2xl"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  school
+                </span>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#f3e5f5] text-[#4a148c] border border-[#ce93d8]">
+                    University R&amp;D Hub · Municipal Lab
+                  </span>
+                  <span className="flex items-center gap-1 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+                    Civic Pipeline Online
+                  </span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-[#002147] tracking-tight mt-1">
+                  Institution Challenge Inbox
+                </h1>
+                <p className="text-sm text-[#545f72] max-w-2xl mt-1">
+                  Review and adopt complex civic challenges routed to your university department for student research &amp; engineering proposals.
+                </p>
+              </div>
             </div>
-            <div>
-              <p
-                className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ color: 'var(--nx-university)' }}
-              >
-                University Portal
-              </p>
-              <h1 className="text-xl font-bold text-[#002147] tracking-tight leading-tight">
-                Institution Inbox
-              </h1>
-              <p className="text-sm text-[#718096] mt-0.5">
-                Review societal challenges routed to your institution by the government.
-              </p>
+
+            <div className="flex items-center gap-2">
+              <div className="px-4 py-2 rounded-xl bg-purple-50/80 border border-purple-200/80 text-center shadow-xs">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-purple-700">R&amp;D Mandate</p>
+                <p className="text-xs font-bold text-slate-800 mt-0.5">MOU Partnered</p>
+              </div>
             </div>
           </div>
         </div>
