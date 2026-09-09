@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { ActivityMap } from '@/components/admin/ActivityMap';
 import { AnalyticsCharts } from '@/components/admin/AnalyticsCharts';
 import { AdminComplaintsTable } from '@/components/admin/AdminComplaintsTable';
 import { PredictiveHotspotsCard } from '@/components/admin/PredictiveHotspotsCard';
+import { StatutoryWarningsNoticeBoard, type StatutoryWarningItem } from '@/components/admin/StatutoryWarningsNoticeBoard';
 import { DynamicDashboardBackground } from '@/components/ui/DynamicDashboardBackground';
 import { computePredictiveRisks } from '@/lib/predictive-maintenance';
 import type { Complaint } from '@/types/complaint';
@@ -99,13 +101,39 @@ export default async function AdminDashboardPage() {
     avgDays = totalDays / resolvedComplaints.length;
   }
 
+  // ── Statutory Warnings from NGOs and Citizens ───────────────
+  const adminSupabase = process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
+    : supabase;
+
+  const { data: warningLogs } = await adminSupabase
+    .from('audit_logs')
+    .select('*')
+    .in('action', ['statutory_admin_warning', 'ngo_admin_summons'])
+    .order('created_at', { ascending: false });
+
+  const complaintLookup = new Map(complaints.map((c) => [c.id, c]));
+  const statutoryWarnings: StatutoryWarningItem[] = (warningLogs ?? []).map((w) => {
+    const val = (w.new_value as any) || {};
+    return {
+      id: w.id,
+      complaint_id: w.entity_id,
+      sender_ngo: val.sender_ngo || 'Bangalore Civic Action Alliance',
+      recipient_authority: val.recipient_authority,
+      ward: val.ward,
+      message: val.message || 'Statutory Section 6(1) Notice & Section 20(1) Penalty Warning issued.',
+      sent_at: w.created_at || val.sent_at || new Date().toISOString(),
+      complaint: complaintLookup.get(w.entity_id),
+    };
+  });
+
   const stats = [
     { label: 'Total Complaints',   value: total.toString(),                                icon: 'assignment',           accent: '#1565c0', bgVar: 'var(--nx-admin-light)' },
+    { label: 'Statutory Warnings', value: statutoryWarnings.length.toString(),             icon: 'gavel',                accent: '#b71c1c', bgVar: '#ffebee' },
     { label: 'Unassigned',         value: unassigned.toString(),                           icon: 'pending_actions',      accent: '#e65100', bgVar: 'var(--nx-warning-light)' },
     { label: 'Needs Verification', value: needsVerify.toString(),                          icon: 'fact_check',           accent: '#b45309', bgVar: 'var(--nx-worker-light)' },
     { label: 'AI Auto-Routed',     value: aiRouted.toString(),                             icon: 'smart_toy',            accent: '#5c35a8', bgVar: '#f0ebfc' },
     { label: 'Resolved',           value: resolved.toString(),                             icon: 'task_alt',             accent: '#1b5e20', bgVar: 'var(--nx-success-light)' },
-    { label: 'Avg Resolution',     value: avgDays > 0 ? `${avgDays.toFixed(1)}d` : 'N/A', icon: 'schedule',             accent: '#718096', bgVar: 'var(--nx-bg)' },
   ];
 
   const locations = complaints
@@ -155,6 +183,9 @@ export default async function AdminDashboardPage() {
             </a>
           </div>
         </div>
+
+        {/* ── Urgent Statutory RTI & Civil Society Warnings Notice Board ── */}
+        <StatutoryWarningsNoticeBoard warnings={statutoryWarnings} />
 
         {/* ── Quixotic Top Bento Grid ──────────────────────────────── */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5">
@@ -304,6 +335,7 @@ export default async function AdminDashboardPage() {
               complaints={complaintsWithSignedUrls}
               workers={workers}
               proofs={proofs}
+              statutoryWarningIds={statutoryWarnings.map((w) => w.complaint_id)}
             />
           </div>
 

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { OTPForm } from '@/components/auth/OTPForm';
 import { getTranslation, type SupportedLocale } from '@/lib/translations';
 
-type PortalRole = 'citizen' | 'worker' | 'officer' | 'ngo';
+type PortalRole = 'citizen' | 'worker' | 'officer' | 'ngo' | 'university';
 
 const PORTALS: Record<PortalRole, {
   name: string;
@@ -58,18 +58,30 @@ const PORTALS: Record<PortalRole, {
     targetHref: '/ngo',
     desc: 'Monitor civic accountability, overdue complaints, and formal demand letters',
   },
+  university: {
+    name: 'University Portal',
+    shortLabel: 'University',
+    color: '#4a148c',
+    bgLight: '#f3e5f5',
+    borderColor: '#ce93d8',
+    icon: 'school',
+    targetHref: '/university',
+    desc: 'Review civic challenges, submit R&D proposals, and collaborate on municipal solutions',
+  },
 };
+
+const VALID_PORTALS: PortalRole[] = ['citizen', 'worker', 'officer', 'ngo', 'university'];
 
 function LoginContent() {
   const searchParams = useSearchParams();
   const rawPortal = (searchParams.get('portal') || searchParams.get('role') || 'citizen').toLowerCase();
-  const initialPortal: PortalRole = (['citizen', 'worker', 'officer', 'ngo'].includes(rawPortal) ? rawPortal : 'citizen') as PortalRole;
+  const initialPortal: PortalRole = (VALID_PORTALS.includes(rawPortal as PortalRole) ? rawPortal : 'citizen') as PortalRole;
 
   const [selectedPortal, setSelectedPortal] = useState<PortalRole>(initialPortal);
   const [lang, setLang] = useState<SupportedLocale>('en');
 
   useEffect(() => {
-    if (['citizen', 'worker', 'officer', 'ngo'].includes(rawPortal)) {
+    if (VALID_PORTALS.includes(rawPortal as PortalRole)) {
       setSelectedPortal(rawPortal as PortalRole);
     }
   }, [rawPortal]);
@@ -89,18 +101,18 @@ function LoginContent() {
   const activeInfo = PORTALS[selectedPortal];
 
   return (
-    <main className="flex-1 flex items-center justify-center px-4 py-10 relative overflow-hidden">
+    <main className="flex-1 flex items-center justify-center px-3 sm:px-4 py-6 sm:py-10 relative overflow-hidden">
       {/* Ashoka wheel watermark */}
       <div
-        className="pointer-events-none select-none absolute right-0 bottom-0 text-[#002147] opacity-[0.03] text-[380px] leading-none translate-x-1/4 translate-y-1/4"
+        className="pointer-events-none select-none absolute right-0 bottom-0 text-[#002147] opacity-[0.03] text-[260px] sm:text-[380px] leading-none translate-x-1/4 translate-y-1/4"
         aria-hidden="true"
       >
         ☸
       </div>
 
-      <div className="w-full max-w-lg relative z-10">
+      <div className="w-full max-w-xl relative z-10">
         {/* Role Selector Tabs */}
-        <div className="bg-white/90 backdrop-blur border border-[#dde3ed] p-1.5 rounded-2xl shadow-sm mb-4 flex items-center gap-1.5 overflow-x-auto">
+        <div className="bg-white/90 backdrop-blur border border-[#dde3ed] p-1 sm:p-1.5 rounded-2xl shadow-sm mb-4 grid grid-cols-5 gap-1">
           {(Object.keys(PORTALS) as PortalRole[]).map((key) => {
             const p = PORTALS[key];
             const isSelected = selectedPortal === key;
@@ -109,55 +121,60 @@ function LoginContent() {
                 key={key}
                 type="button"
                 onClick={() => setSelectedPortal(key)}
-                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
+                className={`py-2 px-1 sm:px-2 rounded-xl font-bold flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 transition-all text-center ${
                   isSelected
                     ? 'shadow-sm text-white'
                     : 'text-[#4a5568] hover:bg-[#f4f6fa]'
                 }`}
                 style={isSelected ? { background: p.color } : {}}
               >
-                <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: isSelected ? "'FILL' 1" : "'FILL' 0" }}>
+                <span
+                  className="material-symbols-outlined text-base sm:text-sm flex-shrink-0"
+                  style={{ fontVariationSettings: isSelected ? "'FILL' 1" : "'FILL' 0" }}
+                >
                   {p.icon}
                 </span>
-                <span>{p.shortLabel}</span>
+                <span className="text-[10px] sm:text-xs tracking-tight truncate max-w-full">
+                  {p.shortLabel}
+                </span>
               </button>
             );
           })}
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl border border-[#dde3ed] p-8 shadow-xl relative overflow-hidden">
+        <div className="bg-white rounded-2xl border border-[#dde3ed] p-5 sm:p-8 shadow-xl relative overflow-hidden">
           {/* Subtle top accent bar */}
           <div className="absolute top-0 left-0 right-0 h-1.5 transition-colors duration-300" style={{ background: activeInfo.color }} />
 
           {/* Card header */}
-          <div className="text-center mb-6">
+          <div className="text-center mb-5 sm:mb-6">
             <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm transition-colors duration-300"
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm transition-colors duration-300"
               style={{ background: activeInfo.bgLight, color: activeInfo.color }}
             >
-              <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+              <span className="material-symbols-outlined text-xl sm:text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
                 {activeInfo.icon}
               </span>
             </div>
-            <div className="inline-block px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider mb-1" style={{ background: activeInfo.bgLight, color: activeInfo.color }}>
+            <div className="inline-block px-3 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-1" style={{ background: activeInfo.bgLight, color: activeInfo.color }}>
               {activeInfo.name}
             </div>
-            <h1 className="text-xl font-bold text-[#002147] tracking-tight">
+            <h1 className="text-lg sm:text-xl font-bold text-[#002147] tracking-tight">
               Sign In to Your Workspace
             </h1>
-            <p className="text-xs text-[#4a5568] mt-1">
+            <p className="text-xs text-[#4a5568] mt-1 max-w-sm mx-auto">
               {activeInfo.desc}
             </p>
           </div>
 
           {/* Quick Demo Access banner (for judges, evaluators & testing) */}
           <div
-            className="mb-6 p-3 rounded-xl border flex items-center justify-between gap-3 text-xs"
+            className="mb-5 sm:mb-6 p-3 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
             style={{ background: activeInfo.bgLight, borderColor: activeInfo.borderColor }}
           >
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-base" style={{ color: activeInfo.color }}>
+              <span className="material-symbols-outlined text-base flex-shrink-0" style={{ color: activeInfo.color }}>
                 bolt
               </span>
               <div>
@@ -167,7 +184,7 @@ function LoginContent() {
             </div>
             <Link
               href={activeInfo.targetHref}
-              className="px-3 py-1.5 rounded-lg text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-opacity hover:opacity-90 flex-shrink-0"
+              className="w-full sm:w-auto px-4 py-2 sm:py-1.5 rounded-lg text-white font-bold text-xs flex items-center justify-center gap-1 shadow-sm transition-opacity hover:opacity-90 flex-shrink-0"
               style={{ background: activeInfo.color }}
             >
               <span>Explore</span>
@@ -217,28 +234,29 @@ export default function LoginPage() {
         <div className="max-w-[1440px] mx-auto px-4 md:px-8 h-9 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="text-base">🇮🇳</span>
-            <span className="text-xs font-medium text-white/85 hidden sm:inline">Government of India</span>
+            <span className="text-xs font-medium text-white/85">Government of India</span>
           </div>
-          <a href="/" className="text-xs text-white/70 hover:text-white transition-colors">
-            ← Back to Home
+          <a href="/" className="text-xs text-white/70 hover:text-white transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            <span>Back to Home</span>
           </a>
         </div>
       </div>
 
       {/* ── Brand header ─────────────────────────────────────────── */}
       <div className="gov-brand-header">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-4 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-[#002147] flex items-center justify-center shadow-md flex-shrink-0">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-3 sm:py-4 flex items-center gap-3">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#002147] flex items-center justify-center shadow-md flex-shrink-0">
             <span
-              className="material-symbols-outlined text-white text-xl"
+              className="material-symbols-outlined text-white text-lg sm:text-xl"
               style={{ fontVariationSettings: "'FILL' 1" }}
             >
               account_balance
             </span>
           </div>
           <div>
-            <p className="text-lg font-bold text-[#002147] leading-tight tracking-tight">Nagrik Seva</p>
-            <p className="text-[11px] text-[#4a5568] leading-tight">
+            <p className="text-base sm:text-lg font-bold text-[#002147] leading-tight tracking-tight">Nagrik Seva</p>
+            <p className="text-[10px] sm:text-[11px] text-[#4a5568] leading-tight">
               Municipal Corporation &amp; Civic Services
             </p>
           </div>
@@ -251,12 +269,12 @@ export default function LoginPage() {
 
       {/* ── Footer ───────────────────────────────────────────────── */}
       <footer className="nx-footer">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <div className="flex items-center justify-center gap-2">
             <span className="text-white/70 text-xs">🇮🇳</span>
             <span className="text-xs text-white/70">Government of India</span>
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-5">
             {['Terms & Conditions', 'Privacy Policy', 'Helpdesk'].map((l) => (
               <a key={l} href="#" className="text-xs text-white/60 hover:text-white transition-colors">
                 {l}

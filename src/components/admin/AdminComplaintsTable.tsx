@@ -20,6 +20,7 @@ interface ComplaintsTableProps {
   complaints: Complaint[];
   workers: Worker[];
   proofs: ProofRow[];
+  statutoryWarningIds?: string[];
 }
 
 /* ── Status badge ───────────────────────────────────────────────── */
@@ -32,6 +33,7 @@ const STATUS_BADGE: Record<string, { bg: string; color: string; label: string }>
   resolved:        { bg: '#e8f5e9', color: '#1b5e20', label: 'Resolved' },
   closed:          { bg: '#f4f6fa', color: '#718096', label: 'Closed' },
   rejected:        { bg: '#ffebee', color: '#b71c1c', label: 'Rejected' },
+  statutory_warning: { bg: '#ffebee', color: '#b71c1c', label: '⚠️ Statutory Warnings' },
 };
 const SEV_BADGE: Record<string, { bg: string; color: string }> = {
   critical: { bg: '#ffebee', color: '#b71c1c' },
@@ -458,10 +460,10 @@ function VerifyModal({
 }
 
 /* ── Main table ─────────────────────────────────────────────────── */
-const STATUS_FILTERS = ['all', 'filed', 'assigned', 'in_progress', 'proof_submitted', 'resolved', 'rejected'];
+const STATUS_FILTERS = ['all', 'statutory_warning', 'filed', 'assigned', 'in_progress', 'proof_submitted', 'resolved', 'rejected'];
 const SEV_FILTERS = ['all', 'critical', 'high', 'medium', 'low'];
 
-export function AdminComplaintsTable({ complaints, workers, proofs }: ComplaintsTableProps) {
+export function AdminComplaintsTable({ complaints, workers, proofs, statutoryWarningIds = [] }: ComplaintsTableProps) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sevFilter, setSevFilter] = useState('all');
   const [search, setSearch] = useState('');
@@ -488,7 +490,15 @@ export function AdminComplaintsTable({ complaints, workers, proofs }: Complaints
   const proofMap = new Map(proofs.map((p) => [p.complaint_id, p]));
 
   const filtered = complaints.filter((c) => {
-    if (statusFilter !== 'all' && c.status !== statusFilter) return false;
+    if (statusFilter === 'statutory_warning') {
+      const isWarned = Boolean(
+        statutoryWarningIds.includes(c.id) ||
+        (c.user_notes && c.user_notes.includes('[STATUTORY_WARNING_ACTIVE]'))
+      );
+      if (!isWarned) return false;
+    } else if (statusFilter !== 'all' && c.status !== statusFilter) {
+      return false;
+    }
     if (sevFilter !== 'all' && c.severity !== sevFilter) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -595,23 +605,36 @@ export function AdminComplaintsTable({ complaints, workers, proofs }: Complaints
                 const formattedDate = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
                 const formattedTime = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
+                const hasWarning = Boolean(
+                  statutoryWarningIds.includes(c.id) ||
+                  (c.user_notes && c.user_notes.includes('[STATUTORY_WARNING_ACTIVE]'))
+                );
+
                 return (
-                  <tr key={c.id} className="hover:bg-[#f8fafc] transition-colors group">
+                  <tr key={c.id} id={`complaint-${c.id}`} className={`hover:bg-[#f8fafc] transition-colors group ${hasWarning ? 'bg-red-50/30' : ''}`}>
                     {/* Issue */}
                     <td className="py-3.5 px-3">
                       <div className="flex items-center gap-3">
                         <div
                           className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
-                          style={{ background: statusInfo.bg, color: statusInfo.color }}
+                          style={{ background: hasWarning ? '#ffebee' : statusInfo.bg, color: hasWarning ? '#b71c1c' : statusInfo.color }}
                         >
                           <span className="material-symbols-outlined text-base">
-                            {getIssueIcon(c.issue_type)}
+                            {hasWarning ? 'gavel' : getIssueIcon(c.issue_type)}
                           </span>
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-[#1a2332] capitalize">
-                            {c.issue_type.replace('_', ' ')}
-                          </p>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="text-xs font-bold text-[#1a2332] capitalize">
+                              {c.issue_type.replace('_', ' ')}
+                            </p>
+                            {hasWarning && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-red-100 text-red-800 border border-red-200 animate-pulse">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-600" />
+                                <span>RTI Warning</span>
+                              </span>
+                            )}
+                          </div>
                           <p className="text-[11px] text-[#718096] truncate max-w-[180px]">
                             {c.subcategory || c.description_en || 'Municipal Grievance'}
                           </p>

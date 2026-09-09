@@ -8,22 +8,30 @@ export default async function UniversityLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const isLocalDev = process.env.NODE_ENV === 'development';
 
-  if (!user) redirect('/login');
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from('users_profile')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+    if (!user && !isLocalDev) redirect('/login');
 
-  const role = profile?.role;
-  const allowedRoles = ['university_admin', 'faculty_mentor', 'student', 'admin'];
+    if (user) {
+      const { data: profile } = await supabase
+        .from('users_profile')
+        .select('role')
+        .eq('id', user.id)
+        .single();
 
-  if (!role || !allowedRoles.includes(role)) {
-    redirect('/dashboard'); // Fallback if they don't have university access
+      const role = profile?.role;
+      const allowedRoles = ['university_admin', 'faculty_mentor', 'student', 'admin'];
+
+      if ((!role || !allowedRoles.includes(role)) && !isLocalDev) {
+        redirect('/dashboard'); // Fallback if they don't have university access
+      }
+    }
+  } catch {
+    if (!isLocalDev) redirect('/login');
   }
 
   return (

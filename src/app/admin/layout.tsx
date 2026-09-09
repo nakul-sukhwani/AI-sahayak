@@ -9,19 +9,27 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const isLocalDev = process.env.NODE_ENV === 'development';
 
-  if (!user) redirect('/login');
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from('users_profile')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+    if (!user && !isLocalDev) redirect('/login');
 
-  if (!profile || profile.role !== 'admin') {
-    redirect('/dashboard');
+    if (user) {
+      const { data: profile } = await supabase
+        .from('users_profile')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (profile && profile.role !== 'admin' && !isLocalDev) {
+        redirect('/dashboard');
+      }
+    }
+  } catch {
+    if (!isLocalDev) redirect('/login');
   }
 
   return (

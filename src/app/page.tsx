@@ -44,29 +44,22 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {[
-              { label: 'Home', href: '/', icon: 'home' },
-              { label: 'About Us', href: '#about', icon: '' },
-              { label: 'Contact Us', href: '#contact', icon: 'phone' },
-              { label: 'Helpdesk', href: '#', icon: 'help' },
-            ].map((n) => (
-              <Link
-                key={n.label}
-                href={n.href}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-[#4a5568] hover:text-[#002147] rounded transition-colors"
-              >
-                {n.label}
-              </Link>
-            ))}
-          </nav>
+          {/* Quick Action Button */}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#002147] hover:bg-[#003166] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+            >
+              <span>Access Portals</span>
+              <span className="material-symbols-outlined text-sm">login</span>
+            </Link>
+          </div>
         </div>
       </div>
 
       {/* ── Tab nav ────────────────────────────────────────────────── */}
-      <nav className="nx-tab-nav border-b border-white/10">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 flex items-end">
+      <nav className="nx-tab-nav border-b border-white/10 overflow-x-auto scrollbar-none">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 flex items-end min-w-max">
           <Link href="/" className="nx-tab-link active flex items-center gap-1.5">
             <span className="material-symbols-outlined text-sm">home</span>
             Home
@@ -87,7 +80,7 @@ export default function LandingPage() {
       <main id="main-content" className="flex-1">
         {/* Banner image strip */}
         <div
-          className="relative h-52 md:h-64 overflow-hidden"
+          className="relative py-12 md:py-16 overflow-hidden"
           style={{ background: 'linear-gradient(135deg, #002147 0%, #003166 50%, #1565c0 100%)' }}
         >
           {/* Decorative circles */}
@@ -99,39 +92,39 @@ export default function LandingPage() {
 
           <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-4">
             {/* Ashoka emblem */}
-            <div className="w-16 h-16 rounded-full bg-white/15 border-2 border-white/30 flex items-center justify-center mb-3">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/15 border-2 border-white/30 flex items-center justify-center mb-3">
               <span
-                className="material-symbols-outlined text-white text-3xl"
+                className="material-symbols-outlined text-white text-2xl sm:text-3xl"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 account_balance
               </span>
             </div>
-            <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
               Nagrik Seva
             </h2>
-            <p className="text-white/80 text-sm md:text-base mt-1">
+            <p className="text-white/80 text-xs sm:text-sm md:text-base mt-1">
               Municipal Corporation &amp; Urban Development
             </p>
           </div>
         </div>
 
         {/* ── Welcome + Portal Cards ─────────────────────────────── */}
-        <div className="bg-[#f8fafc] border-b border-[#dde3ed] py-12 px-4">
-          <div className="max-w-5xl mx-auto text-center mb-10">
+        <div className="bg-[#f8fafc] border-b border-[#dde3ed] py-8 sm:py-12 px-4">
+          <div className="max-w-5xl mx-auto text-center mb-8 sm:mb-10">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#e8eef6] text-[#002147] mb-3">
               <span className="w-2 h-2 rounded-full bg-[#1565c0] animate-pulse"></span>
               Unified Municipal Portal Network
             </span>
-            <h2 className="text-3xl font-bold text-[#002147] tracking-tight mb-2">Select Your Workspace</h2>
-            <p className="text-[#4a5568] max-w-xl mx-auto text-sm">
-              Role-specific workspaces for citizens, on-field personnel, municipal officers, and civic oversight.
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#002147] tracking-tight mb-2">Select Your Workspace</h2>
+            <p className="text-[#4a5568] max-w-2xl mx-auto text-xs sm:text-sm px-2">
+              Role-specific workspaces for citizens, on-field personnel, municipal officers, civic oversight, and academic research.
             </p>
           </div>
 
-          <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 xl:grid-cols-5 gap-4 sm:gap-6">
             {/* Citizen */}
-            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-5 sm:p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 lg:col-span-2 xl:col-span-1">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl bg-[#e8f5e9] text-[#1b5e20] flex items-center justify-center shadow-sm">
@@ -142,14 +135,14 @@ export default function LandingPage() {
                   </span>
                 </div>
                 <h3 className="text-base font-bold text-[#1a2332] mb-1">Citizen Portal</h3>
-                <p className="text-xs text-[#4a5568] leading-relaxed mb-6">
+                <p className="text-xs text-[#4a5568] leading-relaxed mb-6 min-h-[36px]">
                   Report issues with AI image analysis, track grievance status, and verify resolutions.
                 </p>
               </div>
               <div className="space-y-2">
                 <Link
                   href="/dashboard"
-                  className="w-full py-2.5 px-4 bg-[#1b5e20] hover:bg-[#144718] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                  className="w-full py-2.5 px-3 sm:px-4 bg-[#1b5e20] hover:bg-[#144718] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
                 >
                   <span>Open Citizen Portal</span>
                   <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -164,7 +157,7 @@ export default function LandingPage() {
             </div>
 
             {/* Field Worker */}
-            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-5 sm:p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 lg:col-span-2 xl:col-span-1">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl bg-[#fef3e2] text-[#b45309] flex items-center justify-center shadow-sm">
@@ -175,14 +168,14 @@ export default function LandingPage() {
                   </span>
                 </div>
                 <h3 className="text-base font-bold text-[#1a2332] mb-1">Field Worker Portal</h3>
-                <p className="text-xs text-[#4a5568] leading-relaxed mb-6">
+                <p className="text-xs text-[#4a5568] leading-relaxed mb-6 min-h-[36px]">
                   Receive assigned ward tasks, access GPS locations, and submit completion photo proofs.
                 </p>
               </div>
               <div className="space-y-2">
                 <Link
                   href="/worker"
-                  className="w-full py-2.5 px-4 bg-[#b45309] hover:bg-[#92400e] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                  className="w-full py-2.5 px-3 sm:px-4 bg-[#b45309] hover:bg-[#92400e] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
                 >
                   <span>Open Worker Portal</span>
                   <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -197,7 +190,7 @@ export default function LandingPage() {
             </div>
 
             {/* Officer / Admin */}
-            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-5 sm:p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 lg:col-span-2 xl:col-span-1">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl bg-[#e3f0fd] text-[#1565c0] flex items-center justify-center shadow-sm">
@@ -208,14 +201,14 @@ export default function LandingPage() {
                   </span>
                 </div>
                 <h3 className="text-base font-bold text-[#1a2332] mb-1">Officer Portal</h3>
-                <p className="text-xs text-[#4a5568] leading-relaxed mb-6">
+                <p className="text-xs text-[#4a5568] leading-relaxed mb-6 min-h-[36px]">
                   Municipal analytics, ward dispatch, AI verification review, and SLA escalation control.
                 </p>
               </div>
               <div className="space-y-2">
                 <Link
                   href="/admin"
-                  className="w-full py-2.5 px-4 bg-[#002147] hover:bg-[#003166] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                  className="w-full py-2.5 px-3 sm:px-4 bg-[#002147] hover:bg-[#003166] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
                 >
                   <span>Open Officer Portal</span>
                   <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -230,7 +223,7 @@ export default function LandingPage() {
             </div>
 
             {/* NGO */}
-            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-5 sm:p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 lg:col-span-3 xl:col-span-1">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="w-12 h-12 rounded-xl bg-[#e0f2f1] text-[#00695c] flex items-center justify-center shadow-sm">
@@ -241,14 +234,14 @@ export default function LandingPage() {
                   </span>
                 </div>
                 <h3 className="text-base font-bold text-[#1a2332] mb-1">NGO Portal</h3>
-                <p className="text-xs text-[#4a5568] leading-relaxed mb-6">
+                <p className="text-xs text-[#4a5568] leading-relaxed mb-6 min-h-[36px]">
                   Track civic accountability, identify overdue ward complaints, and file formal demand notices.
                 </p>
               </div>
               <div className="space-y-2">
                 <Link
                   href="/ngo"
-                  className="w-full py-2.5 px-4 bg-[#00695c] hover:bg-[#004d40] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                  className="w-full py-2.5 px-3 sm:px-4 bg-[#00695c] hover:bg-[#004d40] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
                 >
                   <span>Open NGO Portal</span>
                   <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -258,6 +251,39 @@ export default function LandingPage() {
                   className="w-full py-1.5 text-center block text-[11px] font-medium text-[#4a5568] hover:text-[#00695c] transition-colors"
                 >
                   NGO Login →
+                </Link>
+              </div>
+            </div>
+
+            {/* University */}
+            <div className="group bg-white rounded-2xl border border-[#dde3ed] p-5 sm:p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 sm:col-span-2 sm:max-w-md sm:mx-auto lg:max-w-none w-full lg:col-span-3 xl:col-span-1">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-[#f3e5f5] text-[#4a148c] flex items-center justify-center shadow-sm">
+                    <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>school</span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#f3e5f5] text-[#4a148c]">
+                    Academic
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-[#1a2332] mb-1">University Portal</h3>
+                <p className="text-xs text-[#4a5568] leading-relaxed mb-6 min-h-[36px]">
+                  Collaborate on civic challenges, submit R&amp;D proposals, engage faculty mentors, and assign students.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Link
+                  href="/university"
+                  className="w-full py-2.5 px-3 sm:px-4 bg-[#4a148c] hover:bg-[#380e6e] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                >
+                  <span>Open University Portal</span>
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </Link>
+                <Link
+                  href="/login?portal=university"
+                  className="w-full py-1.5 text-center block text-[11px] font-medium text-[#4a5568] hover:text-[#4a148c] transition-colors"
+                >
+                  University Login →
                 </Link>
               </div>
             </div>

@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { DynamicDashboardBackground } from '@/components/ui/DynamicDashboardBackground';
 import { WardScorecardCard } from '@/components/ngo/WardScorecardCard';
 import { CommunityDrivesSection } from '@/components/ngo/CommunityDrivesSection';
 import { GroundAuditModal } from '@/components/ngo/GroundAuditModal';
 import { EscalationLadder } from '@/components/ngo/EscalationLadder';
+import { StatutoryWarningButton } from '@/components/ngo/StatutoryWarningButton';
 import { computeWardScorecards } from '@/lib/ward-scorecard';
 import type { Complaint } from '@/types/complaint';
 
@@ -34,13 +36,18 @@ const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
 export default async function NGODashboardPage() {
   let orgName = 'Community Organization';
   let allComplaints: Complaint[] = [];
+  const warningMap = new Map<string, { sent_at: string; sender_ngo: string }>();
 
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
+    const adminSupabase = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
+      : supabase;
+
     if (user) {
-      const { data: profile } = await supabase
+      const { data: profile } = await adminSupabase
         .from('users_profile')
         .select('full_name, display_name, submitter_org_name')
         .eq('id', user.id)
@@ -51,14 +58,30 @@ export default async function NGODashboardPage() {
       }
     }
 
-    // Fetch citywide complaints for audit & monitoring
-    const { data: rows } = await supabase
+    // Fetch citywide complaints for civil society audit & oversight
+    const { data: rows } = await adminSupabase
       .from('complaints')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(500);
 
-    if (rows) allComplaints = rows as Complaint[];
+    if (rows && rows.length > 0) {
+      allComplaints = rows as Complaint[];
+    }
+
+    // Fetch active statutory warning logs
+    const { data: warningLogs } = await adminSupabase
+      .from('audit_logs')
+      .select('entity_id, created_at, new_value')
+      .in('action', ['statutory_admin_warning', 'ngo_admin_summons']);
+
+    (warningLogs ?? []).forEach((w) => {
+      const val = (w.new_value as any) || {};
+      warningMap.set(w.entity_id, {
+        sent_at: w.created_at || val.sent_at || new Date().toISOString(),
+        sender_ngo: val.sender_ngo || 'Civic NGO Alliance',
+      });
+    });
   } catch {
     // Dev fallback
   }
@@ -66,9 +89,9 @@ export default async function NGODashboardPage() {
   // Scorecards computation
   const wardScorecardReport = computeWardScorecards(allComplaints);
 
-  // Filter queues
+  // Filter queues (7 days or older)
   const overdue = allComplaints.filter(
-    (c) => !['resolved', 'closed', 'rejected'].includes(c.status) && getDaysOpen(c.created_at) > OVERDUE_DAYS
+    (c) => !['resolved', 'closed', 'rejected'].includes(c.status) && getDaysOpen(c.created_at) >= OVERDUE_DAYS
   );
 
   const pending = allComplaints.filter((c) => !['resolved', 'closed', 'rejected'].includes(c.status));
@@ -306,6 +329,53 @@ export default async function NGODashboardPage() {
                       >
                         {c.status.replace(/_/g, ' ')}
                       </span>
+                    </div>
+
+                    {/* SLA Statutory Redressal Banner & Warning Dispatch System (Matching Civic Docket) */}
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-red-50/95 via-orange-50/80 to-amber-50/70 border border-red-200 shadow-2xs space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-red-100 text-red-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="material-symbols-outlined text-base">gavel</span>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-red-200 text-red-900">
+                                SLA Default · {days} Days Overdue
+                              </span>
+                              <span className="text-[11px] font-bold text-red-700">
+                                Statutory Redressal Triggered
+                              </span>
+                            </div>
+                            <h4 className="text-xs font-bold text-slate-900 mt-0.5">
+                              Auto-Escalate under Right to Information (RTI) Act, 2005
+                            </h4>
+                            <p className="text-[11px] text-slate-600 leading-snug max-w-xl">
+                              Municipal turnaround guarantees (7 days) have elapsed. Our legal engine has formulated a statutory Section 6(1) petition citing Section 20(1) daily penalties against the Public Information Officer (PIO).
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-shrink-0 self-start sm:self-auto flex-wrap">
+                          <a
+                            href={`/api/complaints/${c.id}/generate-rti?format=pdf&orgName=${encodeURIComponent(orgName)}`}
+                            download
+                            className="px-3.5 py-2 rounded-xl bg-[#002147] hover:bg-[#003166] text-white text-xs font-bold shadow-2xs inline-flex items-center gap-1.5 transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-sm">download</span>
+                            <span>Download Section 6 RTI Petition</span>
+                          </a>
+
+                          <StatutoryWarningButton
+                            complaintId={c.id}
+                            daysOpen={days}
+                            initialHasWarning={Boolean(warningMap.has(c.id) || c.user_notes?.includes('[STATUTORY_WARNING_ACTIVE]'))}
+                            warningDate={warningMap.get(c.id)?.sent_at ? new Date(warningMap.get(c.id)!.sent_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : null}
+                            orgName={orgName}
+                            variant="banner"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     {/* Multi-Stage Statutory Escalation Ladder */}

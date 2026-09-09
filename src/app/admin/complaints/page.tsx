@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { AdminComplaintsTable } from '@/components/admin/AdminComplaintsTable';
 import { DynamicDashboardBackground } from '@/components/ui/DynamicDashboardBackground';
 import type { Complaint } from '@/types/complaint';
@@ -85,6 +86,23 @@ export default async function AdminComplaintsPage() {
   const assignedCount = complaints.filter((c) => ['assigned', 'in_progress'].includes(c.status)).length;
   const resolvedCount = complaints.filter((c) => c.status === 'resolved').length;
 
+  // ── Query Statutory Warnings ───────────────────────────────────
+  const adminSupabase = process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
+    : supabase;
+
+  const { data: warningLogs } = await adminSupabase
+    .from('audit_logs')
+    .select('entity_id')
+    .in('action', ['statutory_admin_warning', 'ngo_admin_summons']);
+
+  const statutoryWarningIds = Array.from(
+    new Set([
+      ...(warningLogs ?? []).map((w) => w.entity_id),
+      ...complaints.filter((c) => c.user_notes?.includes('[STATUTORY_WARNING_ACTIVE]')).map((c) => c.id),
+    ])
+  );
+
   return (
     <div className="relative min-h-[90vh]">
       <DynamicDashboardBackground variant="admin" />
@@ -116,6 +134,12 @@ export default async function AdminComplaintsPage() {
 
           {/* Status summary pills */}
           <div className="flex items-center gap-2 flex-wrap">
+            {statutoryWarningIds.length > 0 && (
+              <div className="px-3 py-1.5 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-800 flex items-center gap-1.5 animate-pulse">
+                <span className="w-2 h-2 rounded-full bg-red-600" />
+                <span>RTI Warnings: {statutoryWarningIds.length}</span>
+              </div>
+            )}
             <div className="px-3 py-1.5 rounded-xl bg-orange-50 border border-orange-200 text-xs font-bold text-orange-800 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-orange-500" />
               <span>Unassigned: {unassignedCount}</span>
@@ -141,6 +165,7 @@ export default async function AdminComplaintsPage() {
             complaints={complaintsWithSignedUrls}
             workers={workers}
             proofs={proofs}
+            statutoryWarningIds={statutoryWarningIds}
           />
         </div>
       </div>

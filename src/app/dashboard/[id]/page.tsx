@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ComplaintTimeline } from '@/components/complaints/ComplaintTimeline';
 import { MiniMap } from '@/components/ui/minimap';
 import { Badge } from '@/components/ui/badge';
+import { StatutoryWarningButton } from '@/components/ngo/StatutoryWarningButton';
 import { getIssueLabel } from '@/constants/issue-types';
 import type { Complaint } from '@/types/complaint';
 import type { ComplaintSeverity, ComplaintStatus } from '@/types/complaint';
@@ -72,6 +73,23 @@ export default async function ComplaintDetailPage({ params }: Props) {
 
   const daysOpen = Math.floor((Date.now() - new Date(c.created_at).getTime()) / (1000 * 3600 * 24));
   const isOverdue = !['resolved', 'closed', 'rejected'].includes(c.status) && daysOpen >= 7;
+
+  // Check if a statutory warning has been dispatched to admin
+  const { data: warningLog } = await supabase
+    .from('audit_logs')
+    .select('id, created_at, new_value')
+    .eq('entity_id', c.id)
+    .in('action', ['statutory_admin_warning', 'ngo_admin_summons'])
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  const hasWarning = Boolean(
+    (c.user_notes && c.user_notes.includes('[STATUTORY_WARNING_ACTIVE]')) ||
+    (warningLog && warningLog.length > 0)
+  );
+  const warningDate = warningLog?.[0]?.created_at
+    ? new Date(warningLog[0].created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : null;
 
   return (
     <div className="relative min-h-[85vh]">
@@ -150,7 +168,7 @@ export default async function ComplaintDetailPage({ params }: Props) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
                 <a
                   href={`/api/complaints/${c.id}/generate-rti?format=pdf`}
                   download
@@ -159,6 +177,15 @@ export default async function ComplaintDetailPage({ params }: Props) {
                   <span className="material-symbols-outlined text-sm">download</span>
                   <span>Download Section 6 RTI Petition</span>
                 </a>
+
+                <StatutoryWarningButton
+                  complaintId={c.id}
+                  daysOpen={daysOpen}
+                  initialHasWarning={hasWarning}
+                  warningDate={warningDate}
+                  orgName="Citizen Redressal Alliance"
+                  variant="banner"
+                />
               </div>
             </div>
           </div>
