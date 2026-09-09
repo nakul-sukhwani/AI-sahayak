@@ -142,6 +142,8 @@ export function ComplaintForm() {
         issueType: aiData.issue_type,
         severity: aiData.severity,
         descriptionEn: aiData.description_en,
+        latitude: result.exifCoordinates?.latitude ?? f.latitude,
+        longitude: result.exifCoordinates?.longitude ?? f.longitude,
       }));
       setStep('ai-result');
     } catch (err) {
@@ -320,6 +322,8 @@ export function ComplaintForm() {
           </div>
 
           <MapPicker
+            initialLat={form.latitude ?? undefined}
+            initialLng={form.longitude ?? undefined}
             onLocationChange={(lat, lng, addr) => setForm((f) => ({ ...f, latitude: lat, longitude: lng, address: addr }))}
           />
 

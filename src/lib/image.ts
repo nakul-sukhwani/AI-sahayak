@@ -11,11 +11,12 @@ export interface ProcessedImage {
   heightPx: number;
   sizeBytesOriginal: number;
   sizeBytesCompressed: number;
+  exifCoordinates?: { latitude: number; longitude: number } | null;
 }
 
 /**
  * Validates MIME type, compresses the image, and strips EXIF metadata.
- * Throws a user-readable string on failure.
+ * Extracts GPS coordinates if present before stripping.
  */
 export async function processImage(raw: File): Promise<ProcessedImage> {
   if (!ALLOWED_MIME_TYPES.has(raw.type)) {
@@ -24,10 +25,22 @@ export async function processImage(raw: File): Promise<ProcessedImage> {
 
   const sizeBytesOriginal = raw.size;
 
-  // 1. Strip EXIF by re-drawing through canvas (no exifr needed on client)
+  // 1. Extract GPS coordinates from EXIF before stripping
+  let exifCoords: { latitude: number; longitude: number } | null = null;
+  try {
+    const exifr = (await import('exifr')).default;
+    const gps = await exifr.gps(raw);
+    if (gps && typeof gps.latitude === 'number' && typeof gps.longitude === 'number') {
+      exifCoords = { latitude: gps.latitude, longitude: gps.longitude };
+    }
+  } catch {
+    // Non-fatal if photo lacks GPS or exifr fails
+  }
+
+  // 2. Strip EXIF by re-drawing through canvas
   const stripped = await stripExifViaCanvas(raw);
 
-  // 2. Compress
+  // 3. Compress
   const compressed = await imageCompression(stripped, {
     maxSizeMB: MAX_SIZE_BYTES / (1024 * 1024),
     maxWidthOrHeight: MAX_DIMENSION_PX,
@@ -36,7 +49,7 @@ export async function processImage(raw: File): Promise<ProcessedImage> {
     initialQuality: 0.82,
   });
 
-  // 3. Read dimensions from compressed file
+  // 4. Read dimensions from compressed file
   const { width, height, dataUrl } = await getImageMeta(compressed);
 
   if (Math.min(width, height) < 320) {
@@ -50,6 +63,7 @@ export async function processImage(raw: File): Promise<ProcessedImage> {
     heightPx: height,
     sizeBytesOriginal,
     sizeBytesCompressed: compressed.size,
+    exifCoordinates: exifCoords,
   };
 }
 
