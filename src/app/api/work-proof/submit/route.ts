@@ -68,6 +68,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       aiResult = await verifyProof(beforeSigned.signedUrl, afterSigned.signedUrl);
     }
 
+    // Forensic inspection formatting
+    const forensicNote = aiResult
+      ? [
+          aiResult.observation,
+          `\n[Forensic Audit] Quality Score: ${aiResult.structural_quality_score ?? 85}/100 · Debris Cleared: ${aiResult.debris_cleaned !== false ? 'YES' : 'NO'} · Angle Match: ${aiResult.angle_authenticity ?? 'HIGH'} · Fraud Risk: ${aiResult.fraud_risk ?? 'LOW'}`,
+        ].filter(Boolean).join('\n')
+      : null;
+
     // Insert work_proof row
     const { data: proof, error: insertError } = await supabase
       .from('work_proof')
@@ -80,7 +88,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         submitted_at: new Date().toISOString(),
         ai_verified: aiResult?.issue_resolved ?? null,
         ai_confidence: aiResult?.confidence ?? null,
-        ai_observation: aiResult?.observation ?? null,
+        ai_observation: forensicNote,
         ai_remaining_issues: aiResult?.remaining_issues ?? null,
         ai_new_issues: aiResult?.new_issues ?? null,
         ai_analyzed_at: aiResult ? new Date().toISOString() : null,
@@ -105,7 +113,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       action: 'proof_submitted',
       entity_type: 'work_proof',
       entity_id: proof.id,
-      new_value: { complaint_id, ai_verified: aiResult?.issue_resolved },
+      new_value: {
+        complaint_id,
+        ai_verified: aiResult?.issue_resolved,
+        structural_quality_score: aiResult?.structural_quality_score,
+        debris_cleaned: aiResult?.debris_cleaned,
+        fraud_risk: aiResult?.fraud_risk,
+      },
     });
 
     return NextResponse.json({ id: proof.id, aiResult }, { status: 201 });

@@ -30,6 +30,10 @@ export interface AIProofVerificationResult {
   observation: string;
   remaining_issues: string | null;
   new_issues: string | null;
+  structural_quality_score?: number; // 0 to 100
+  debris_cleaned?: boolean;
+  angle_authenticity?: 'HIGH' | 'MEDIUM' | 'LOW';
+  fraud_risk?: 'LOW' | 'MEDIUM' | 'HIGH';
 }
 
 export const AI_PROOF_FALLBACK: AIProofVerificationResult = {
@@ -38,6 +42,10 @@ export const AI_PROOF_FALLBACK: AIProofVerificationResult = {
   observation: 'Automated verification unavailable. Manual review required.',
   remaining_issues: null,
   new_issues: null,
+  structural_quality_score: 0,
+  debris_cleaned: false,
+  angle_authenticity: 'LOW',
+  fraud_risk: 'MEDIUM',
 };
 
 // ── AI Image Detection ────────────────────────────────────────────────

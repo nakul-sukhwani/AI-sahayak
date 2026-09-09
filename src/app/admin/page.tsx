@@ -3,7 +3,9 @@ import { createClient } from '@/lib/supabase/server';
 import { ActivityMap } from '@/components/admin/ActivityMap';
 import { AnalyticsCharts } from '@/components/admin/AnalyticsCharts';
 import { AdminComplaintsTable } from '@/components/admin/AdminComplaintsTable';
+import { PredictiveHotspotsCard } from '@/components/admin/PredictiveHotspotsCard';
 import { DynamicDashboardBackground } from '@/components/ui/DynamicDashboardBackground';
+import { computePredictiveRisks } from '@/lib/predictive-maintenance';
 import type { Complaint } from '@/types/complaint';
 
 export const metadata: Metadata = {
@@ -80,6 +82,8 @@ export default async function AdminDashboardPage() {
     .filter((c) => c.latitude && c.longitude)
     .map((c) => ({ id: c.id, latitude: c.latitude!, longitude: c.longitude!, issue_type: c.issue_type }))
     .slice(0, 50);
+
+  const predictiveReport = computePredictiveRisks(complaints);
 
   return (
     <div className="relative">
@@ -258,6 +262,9 @@ export default async function AdminDashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* ── Predictive Civic Maintenance & Vulnerability Hotspots ── */}
+        <PredictiveHotspotsCard report={predictiveReport} />
 
         {/* ── Quixotic Bottom Bento: Table + Map + System Health ───── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

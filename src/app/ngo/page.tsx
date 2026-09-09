@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { NGOLetterModal } from '@/components/ngo/NGOLetterModal';
+import { NGOAdvocacyModal } from '@/components/ngo/NGOAdvocacyModal';
 import { DynamicDashboardBackground } from '@/components/ui/DynamicDashboardBackground';
 
 export const metadata: Metadata = {
@@ -177,6 +178,70 @@ export default async function NGODashboardPage() {
           </div>
         </div>
 
+        {/* ── Tri-Party Civic Advocacy Hub ─────────────────────────── */}
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-sm p-6 space-y-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-emerald-50/70 via-teal-50/20 to-transparent pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-[#00695c] text-white flex items-center justify-center shadow-xs">
+                <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  hub
+                </span>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-[#00695c] border border-emerald-200">
+                    Tri-Party Civic Bridge
+                  </span>
+                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Active Direct Lines
+                  </span>
+                </div>
+                <h2 className="text-lg font-bold text-[#002147] tracking-tight mt-0.5">
+                  Direct Advocacy Network: NGO ↔ Citizen ↔ Municipal Administration
+                </h2>
+              </div>
+            </div>
+
+            <span className="text-xs text-slate-500 italic">
+              Empowered under RTI Act 2005 &amp; Municipal Transparency Charters
+            </span>
+          </div>
+
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+            {/* Citizen Direct Line */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/70 to-teal-50/40 border border-emerald-200/80 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-lg bg-[#00695c] text-white flex items-center justify-center">
+                  <span className="material-symbols-outlined text-sm">support_agent</span>
+                </span>
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Citizen Legal Aid &amp; Relief Channel
+                </h3>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Connect directly with affected residents. Provide official NGO adoption notices, pro-bono RTI legal representation, and coordinate joint community surveys.
+              </p>
+            </div>
+
+            {/* Municipal Admin Direct Line */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50/70 to-indigo-50/40 border border-blue-200/80 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-lg bg-[#002147] text-white flex items-center justify-center">
+                  <span className="material-symbols-outlined text-sm">policy</span>
+                </span>
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Administrative Summons &amp; Joint Inspection
+                </h3>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Issue statutory summons to Ward Executive Engineers demanding 72-hour joint site inspections and contractor accountability under Section 20(1) penalty rules.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* ── Overdue alert banner ─────────────────────────────────── */}
         {overdue.length > 0 && (
           <div className="bg-[#fff3e0] border border-[#ffb74d] rounded-2xl p-5 flex items-start gap-3 shadow-sm">
@@ -188,7 +253,7 @@ export default async function NGODashboardPage() {
                 {overdue.length} complaint{overdue.length > 1 ? 's are' : ' is'} overdue beyond {OVERDUE_DAYS} days
               </p>
               <p className="text-xs mt-0.5 text-[#4a5568]">
-                Municipal department has failed to resolve within the expected turnaround time. Use the action buttons below to generate a formal Demand Letter.
+                Municipal department has failed to resolve within the expected turnaround time. Use the action buttons below to draft an official RTI Section 6 inquiry or issue administrative summons.
               </p>
             </div>
           </div>
@@ -225,14 +290,12 @@ export default async function NGODashboardPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <Link
-                        href="/dashboard/new"
-                        className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white rounded-xl transition-colors shadow-sm"
-                        style={{ background: 'var(--nx-error)' }}
-                      >
-                        <span className="material-symbols-outlined text-sm">refresh</span>
-                        Re-file
-                      </Link>
+                      <NGOAdvocacyModal
+                        complaintId={c.id}
+                        complaintTitle={c.title || c.issue_type}
+                        daysOpen={days}
+                        orgName={orgName}
+                      />
                       <NGOLetterModal
                         complaintId={c.id}
                         complaintTitle={c.title || c.issue_type}

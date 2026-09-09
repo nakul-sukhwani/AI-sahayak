@@ -70,6 +70,9 @@ export default async function ComplaintDetailPage({ params }: Props) {
     proofSignedUrl = signed?.signedUrl ?? null;
   }
 
+  const daysOpen = Math.floor((Date.now() - new Date(c.created_at).getTime()) / (1000 * 3600 * 24));
+  const isOverdue = !['resolved', 'closed', 'rejected'].includes(c.status) && daysOpen >= 7;
+
   return (
     <div className="relative min-h-[85vh]">
       <div className="max-w-5xl mx-auto space-y-6">
@@ -120,6 +123,46 @@ export default async function ComplaintDetailPage({ params }: Props) {
             </div>
           </div>
         </div>
+
+        {/* ── Overdue RTI Auto-Escalation Banner ── */}
+        {isOverdue && (
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-red-50/95 via-orange-50/80 to-amber-50/70 border-2 border-red-200 shadow-sm space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="material-symbols-outlined text-2xl">gavel</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-200 text-red-900">
+                      SLA Default · {daysOpen} Days Overdue
+                    </span>
+                    <span className="text-xs font-bold text-red-700">
+                      Statutory Redressal Triggered
+                    </span>
+                  </div>
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 mt-1">
+                    Auto-Escalate under Right to Information (RTI) Act, 2005
+                  </h3>
+                  <p className="text-xs text-slate-600 mt-0.5 max-w-2xl leading-relaxed">
+                    Municipal turnaround guarantees (7 days) have elapsed. Our legal engine has formulated a statutory Section 6(1) petition citing Section 20(1) daily penalties against the Public Information Officer (PIO).
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <a
+                  href={`/api/complaints/${c.id}/generate-rti?format=pdf`}
+                  download
+                  className="px-4 py-2.5 rounded-xl bg-[#002147] hover:bg-[#003166] text-white text-xs font-bold shadow-sm inline-flex items-center gap-2 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-sm">download</span>
+                  <span>Download Section 6 RTI Petition</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 2-Column Bento Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

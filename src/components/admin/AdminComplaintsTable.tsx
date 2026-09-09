@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import type { Complaint } from '@/types/complaint';
+import type { DispatchEvaluation } from '@/lib/dispatch-agent';
 
 /* ── Types ─────────────────────────────────────────────────────── */
 interface Worker { id: string; full_name: string | null; display_name: string | null; }
@@ -41,78 +42,166 @@ function daysSince(d: string) {
   return Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
 }
 
-/* ── Assign modal ───────────────────────────────────────────────── */
+/* ── Assign modal with AI Smart Dispatch ────────────────────────── */
 function AssignModal({
   complaint, workers, onClose,
 }: { complaint: Complaint; workers: Worker[]; onClose: () => void }) {
   const [workerId, setWorkerId] = useState('');
   const [loading, startTransition] = useTransition();
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+  const [recommendations, setRecommendations] = useState<DispatchEvaluation[]>([]);
+  const [loadingAI, setLoadingAI] = useState(true);
 
-  async function submit() {
-    if (!workerId) return;
+  useEffect(() => {
+    let active = true;
+    async function fetchRecommendations() {
+      setLoadingAI(true);
+      try {
+        const res = await fetch('/api/complaints/auto-dispatch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ complaint_id: complaint.id }),
+        });
+        const data = await res.json();
+        if (active && data.success && data.evaluations) {
+          setRecommendations(data.evaluations);
+          if (data.recommended_worker?.worker_id) {
+            setWorkerId(data.recommended_worker.worker_id);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load dispatch evaluations', err);
+      } finally {
+        if (active) setLoadingAI(false);
+      }
+    }
+    fetchRecommendations();
+    return () => { active = false; };
+  }, [complaint.id]);
+
+  const topPick = recommendations[0];
+
+  async function submit(targetWorkerId?: string) {
+    const finalWorkerId = targetWorkerId || workerId;
+    if (!finalWorkerId) return;
     startTransition(async () => {
       const res = await fetch(`/api/complaints/${complaint.id}/assign`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assigned_to: workerId }),
+        body: JSON.stringify({ assigned_to: finalWorkerId }),
       });
       const data = await res.json();
-      if (res.ok) { setMsg({ type: 'ok', text: 'Assigned successfully. Refreshing…' }); setTimeout(() => { onClose(); location.reload(); }, 1500); }
-      else setMsg({ type: 'err', text: data.error ?? 'Failed to assign.' });
+      if (res.ok) {
+        setMsg({ type: 'ok', text: 'Assigned successfully. Refreshing…' });
+        setTimeout(() => { onClose(); location.reload(); }, 1200);
+      } else {
+        setMsg({ type: 'err', text: data.error ?? 'Failed to assign.' });
+      }
     });
   }
 
   return (
     <div className="nx-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="nx-modal">
+      <div className="nx-modal max-w-lg">
         {/* Header */}
         <div className="px-6 py-4 border-b border-[#dde3ed] flex items-center justify-between" style={{ background: 'var(--nx-admin-light)' }}>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--nx-admin)' }}>Assign Work</p>
-            <h2 className="text-base font-bold text-[#002147] capitalize">{complaint.issue_type.replace('_', ' ')}</h2>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#002147] text-white flex items-center justify-center shadow-xs">
+              <span className="material-symbols-outlined text-base">auto_awesome</span>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#1565c0]">Autonomous Dispatch</p>
+              <h2 className="text-base font-bold text-[#002147] capitalize">{complaint.issue_type.replace('_', ' ')}</h2>
+            </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded hover:bg-[#dde3ed] transition-colors">
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#dde3ed] transition-colors">
             <span className="material-symbols-outlined text-lg text-[#718096]">close</span>
           </button>
         </div>
 
         <div className="p-6 space-y-4">
-          {/* Details */}
-          <div className="nx-card p-4 space-y-2">
-            <p className="text-xs text-[#718096]">
-              <strong className="text-[#1a2332]">Address:</strong> {complaint.address || '—'}
-            </p>
-            <p className="text-xs text-[#718096]">
-              <strong className="text-[#1a2332]">Description:</strong> {complaint.description_en || '—'}
-            </p>
-            <p className="text-xs text-[#718096]">
-              <strong className="text-[#1a2332]">Open for:</strong> {daysSince(complaint.created_at)} day(s)
+          {/* Complaint Context */}
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-700">Ward / Address:</span>
+              <span className="text-slate-900 font-semibold">{complaint.ward_name || complaint.address || 'Central Bangalore'}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-700">Severity / Priority:</span>
+              <span className="font-bold uppercase tracking-wider text-red-600">{complaint.severity}</span>
+            </div>
+            <p className="text-slate-600 italic line-clamp-2 pt-1 border-t border-slate-200/60">
+              &ldquo;{complaint.description_en}&rdquo;
             </p>
           </div>
 
-          {/* Worker select */}
+          {/* AI Autonomous Recommendation Card */}
+          {loadingAI ? (
+            <div className="p-4 rounded-xl bg-blue-50/70 border border-blue-200 flex items-center gap-3 text-xs text-blue-900">
+              <span className="material-symbols-outlined text-base animate-spin">progress_activity</span>
+              <span>Evaluating technician proximity, skill matrix, and queue capacity…</span>
+            </div>
+          ) : topPick ? (
+            <div className="p-4 rounded-xl bg-gradient-to-br from-[#e3f0fd] to-[#f0f7ff] border-2 border-[#1565c0]/30 shadow-xs space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#1565c0] text-white">
+                    Optimal AI Match · {topPick.dispatch_score}%
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  {topPick.active_tasks_count} active tickets
+                </span>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-bold text-[#002147]">{topPick.worker_name}</h4>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  <span className="font-semibold text-slate-800">{topPick.department}</span> · {topPick.area_name}
+                </p>
+                <p className="text-[11px] text-blue-900/80 font-medium mt-1 bg-white/70 px-2.5 py-1 rounded-lg border border-blue-200/50">
+                  ⚡ {topPick.recommendation_reason}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => submit(topPick.worker_id)}
+                disabled={loading}
+                className="w-full py-2 px-3 bg-[#002147] hover:bg-[#003166] text-white text-xs font-bold rounded-lg shadow-sm flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-sm">flash_on</span>
+                <span>Auto-Dispatch Recommended Technician</span>
+              </button>
+            </div>
+          ) : null}
+
+          {/* Manual Select Worker Option */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-widest text-[#718096] mb-1.5">
-              Select Field Worker
+              Select or Override Field Personnel
             </label>
             <select
               value={workerId}
               onChange={(e) => setWorkerId(e.target.value)}
-              className="nx-input"
+              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#002147] focus:ring-2 focus:ring-[#002147]/10"
             >
-              <option value="">— Choose a worker —</option>
-              {workers.map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.display_name ?? w.full_name ?? w.id.slice(0, 8)}
-                </option>
-              ))}
+              <option value="">— Choose a field worker —</option>
+              {workers.map((w) => {
+                const evalMatch = recommendations.find((r) => r.worker_id === w.id);
+                return (
+                  <option key={w.id} value={w.id}>
+                    {w.display_name ?? w.full_name ?? w.id.slice(0, 8)}
+                    {evalMatch ? ` (${evalMatch.dispatch_score}% Match · ${evalMatch.department})` : ''}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
           {msg && (
             <div
-              className="flex items-center gap-2 p-3 rounded border text-sm font-medium"
+              className="flex items-center gap-2 p-3 rounded-xl border text-xs font-medium"
               style={
                 msg.type === 'ok'
                   ? { background: 'var(--nx-success-light)', color: 'var(--nx-success)', borderColor: '#a5d6a7' }
@@ -124,17 +213,20 @@ function AssignModal({
             </div>
           )}
 
-          <div className="flex gap-3">
-            <button onClick={onClose} className="flex-1 py-2.5 text-sm font-semibold text-[#4a5568] bg-[#f4f6fa] rounded border border-[#dde3ed] hover:bg-[#dde3ed] transition-colors">
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={onClose}
+              className="flex-1 py-2 text-xs font-semibold text-[#4a5568] bg-[#f4f6fa] rounded-xl border border-[#dde3ed] hover:bg-[#dde3ed] transition-colors"
+            >
               Cancel
             </button>
             <button
-              onClick={submit}
+              onClick={() => submit()}
               disabled={!workerId || loading}
-              className="flex-1 py-2.5 text-sm font-bold text-white rounded transition-colors disabled:opacity-50"
+              className="flex-1 py-2 text-xs font-bold text-white rounded-xl transition-colors disabled:opacity-50"
               style={{ background: 'var(--nx-admin)' }}
             >
-              {loading ? 'Assigning…' : 'Assign Worker'}
+              {loading ? 'Assigning…' : 'Confirm Dispatch'}
             </button>
           </div>
         </div>
@@ -206,15 +298,29 @@ function VerifyModal({
             </div>
           </div>
 
-          {/* AI Observation */}
+          {/* AI Observation & Forensic Audit */}
           {proof.ai_observation && (
-            <div className="nx-card p-3 flex items-start gap-2" style={{ background: '#faf8ff', borderColor: 'rgba(124,58,237,0.25)' }}>
-              <span className="material-symbols-outlined text-base flex-shrink-0" style={{ color: '#7C3AED', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5" style={{ color: '#7C3AED' }}>
-                  AI Assessment — {proof.ai_verified ? '✓ Verified' : '⚠ Issues found'}
-                </p>
-                <p className="text-xs text-[#4a5568]">{proof.ai_observation}</p>
+            <div className="nx-card p-3.5 space-y-2" style={{ background: '#faf8ff', borderColor: 'rgba(124,58,237,0.25)' }}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-base" style={{ color: '#7C3AED', fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#7C3AED' }}>
+                    Forensic Quality Audit — {proof.ai_verified ? '✓ Verified' : '⚠ Discrepancy Found'}
+                  </p>
+                </div>
+                {proof.ai_observation.includes('Fraud Risk: HIGH') ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-700 border border-red-200">
+                    High Fraud Risk
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700">
+                    Low Fraud Risk
+                  </span>
+                )}
+              </div>
+
+              <div className="text-xs text-[#4a5568] whitespace-pre-line leading-relaxed">
+                {proof.ai_observation}
               </div>
             </div>
           )}
@@ -476,8 +582,8 @@ export function AdminComplaintsTable({ complaints, workers, proofs }: Complaints
                             onClick={() => setAssignTarget(c)}
                             className="px-3 py-1 bg-[#002147] hover:bg-[#003166] text-white text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1 shadow-sm"
                           >
-                            <span className="material-symbols-outlined text-xs">person_add</span>
-                            <span>Assign</span>
+                            <span className="material-symbols-outlined text-xs">auto_awesome</span>
+                            <span>AI Dispatch</span>
                           </button>
                         )}
 

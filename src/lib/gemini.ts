@@ -55,11 +55,15 @@ const AnalysisSchema = z.object({
 });
 
 const ProofSchema = z.object({
-  issue_resolved:    z.boolean(),
-  confidence:        z.number().min(0).max(1),
-  observation:       z.string(),
-  remaining_issues:  z.string().nullable(),
-  new_issues:        z.string().nullable(),
+  issue_resolved:           z.boolean(),
+  confidence:               z.number().min(0).max(1),
+  observation:              z.string(),
+  remaining_issues:         z.string().nullable(),
+  new_issues:               z.string().nullable(),
+  structural_quality_score: z.number().min(0).max(100).optional(),
+  debris_cleaned:           z.boolean().optional(),
+  angle_authenticity:       z.enum(['HIGH', 'MEDIUM', 'LOW']).optional(),
+  fraud_risk:               z.enum(['LOW', 'MEDIUM', 'HIGH']).optional(),
 });
 
 const ImageDetectionSchema = z.object({

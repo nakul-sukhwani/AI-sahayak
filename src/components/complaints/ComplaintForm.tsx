@@ -43,6 +43,8 @@ interface FormState {
   authority: Authority | null;
 }
 
+import type { SpatialClusterCheckResult } from '@/lib/spatial-clustering';
+
 const INITIAL_FORM: FormState = {
   processedImage: null, imagePath: null,
   aiResult: null, aiAccepted: false,
@@ -71,6 +73,42 @@ export function ComplaintForm() {
   const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingDuplicates, setIsCheckingDuplicates] = useState(false);
+  const [clusterInfo, setClusterInfo] = useState<SpatialClusterCheckResult | null>(null);
+
+  // ── Duplicate Cluster Check ──────────────────────────────────────────
+  const checkDuplicateAndProceed = async () => {
+    if (!form.latitude || !form.longitude) {
+      toast('Please pin a location on the map.', 'error');
+      return;
+    }
+
+    setIsCheckingDuplicates(true);
+    try {
+      const res = await fetch('/api/complaints/cluster-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          latitude: form.latitude,
+          longitude: form.longitude,
+          issue_type: form.issueType || form.aiResult?.issue_type || 'general',
+          radius_meters: 150,
+        }),
+      });
+      const data = (await res.json()) as SpatialClusterCheckResult;
+      if (data && data.is_potential_duplicate && data.master_ticket) {
+        setClusterInfo(data);
+      } else {
+        setClusterInfo(null);
+        setStep('details');
+      }
+    } catch {
+      // Graceful fallback: continue without blocking
+      setStep('details');
+    } finally {
+      setIsCheckingDuplicates(false);
+    }
+  };
 
   // ── Photo step ──────────────────────────────────────────────────────
   const handlePhotoCapture = useCallback(async (result: ProcessedImage) => {
@@ -301,6 +339,58 @@ export function ComplaintForm() {
             </div>
           </div>
 
+          {/* ── Spatial Cluster / Duplicate Detection Banner ── */}
+          {clusterInfo?.is_potential_duplicate && clusterInfo.master_ticket && (
+            <div className="p-5 rounded-2xl bg-amber-50/90 border-2 border-amber-300 shadow-sm space-y-3 animate-in fade-in duration-200">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-200/80 text-amber-800 flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    radar
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-200 text-amber-900">
+                      Spatial Duplicate Alert
+                    </span>
+                    <span className="text-xs font-bold text-amber-900">
+                      Within {clusterInfo.master_ticket.distance_meters}m
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 mt-1">
+                    An active complaint already exists for this spot!
+                  </h3>
+                  <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                    Ticket <span className="font-semibold text-slate-800">#{clusterInfo.master_ticket.id.slice(0, 8)}</span> ({clusterInfo.master_ticket.issue_type.toUpperCase()}) was lodged nearby. Consolidating reports avoids redundant tickets and speeds up municipal action.
+                  </p>
+                  <div className="p-2.5 rounded-xl bg-white/80 border border-amber-200 text-xs text-slate-700 italic my-2 line-clamp-2">
+                    &ldquo;{clusterInfo.master_ticket.description_en}&rdquo;
+                  </div>
+                  <div className="flex items-center gap-2 pt-1 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/dashboard/${clusterInfo.master_ticket!.id}`)}
+                      className="px-3.5 py-2 rounded-xl bg-[#002147] text-white text-xs font-bold shadow-xs hover:bg-[#002147]/90 flex items-center gap-1.5 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-sm">visibility</span>
+                      View & Track Existing Ticket
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setClusterInfo(null);
+                        setStep('details');
+                      }}
+                      className="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors"
+                    >
+                      Different Issue, Proceed Anyway →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center gap-3 pt-2">
             <button
               type="button"
@@ -311,11 +401,21 @@ export function ComplaintForm() {
               {t('back_btn') || 'Back'}
             </button>
             <Button
-              onClick={() => setStep('details')}
-              disabled={!form.latitude || !form.longitude}
-              className="flex-1 py-2.5 text-sm font-semibold shadow-sm"
+              onClick={checkDuplicateAndProceed}
+              disabled={!form.latitude || !form.longitude || isCheckingDuplicates}
+              className="flex-1 py-2.5 text-sm font-semibold shadow-sm flex items-center justify-center gap-2"
             >
-              {t('continue_btn') || 'Continue to Details'} →
+              {isCheckingDuplicates ? (
+                <>
+                  <Spinner size="sm" />
+                  <span>Checking spatial duplicates…</span>
+                </>
+              ) : (
+                <>
+                  <span>{t('continue_btn') || 'Continue to Details'}</span>
+                  <span>→</span>
+                </>
+              )}
             </Button>
           </div>
         </div>
